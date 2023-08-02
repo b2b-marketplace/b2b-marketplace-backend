@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "b2b-marketplace-backend"
+version = "0.1.0"
+description = ""
+authors = ["b2b marketplace team"]
+readme = "README.md"
+packages = [{include = "b2b_marketplace_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+django = "4.1"
+djangorestframework = "^3.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
