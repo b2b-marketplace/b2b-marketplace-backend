@@ -1,0 +1,335 @@
+openapi: 3.0.2
+info:
+  title: 'b2b-marketplace'
+  version: ''
+paths:
+  /api/v1/products:
+    get:
+      tags:
+        - Товары
+      operationId: Список товаров
+      description: Страница доступна всем пользователям
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                    description: 'Общее количество объектов в базе'
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/v1/products/?page=4
+                    description: 'Ссылка на следующую страницу'
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://example.org/api/v1/products/?page=2
+                    description: 'Ссылка на предыдущую страницу'
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductsList'
+                    description: 'Список объектов текущей страницы'
+    post:
+      tags:
+        - Товары
+      security:
+        - Token: []
+      operationId: Создание товара
+      description: 'Доступно только авторизованному пользователю'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductsCreateUpdate'
+      responses:
+        '201':
+          description: 'Товар успешно создан'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/products/{product_id}:
+    parameters:
+    - name: product_id
+      in: path
+      required: true
+      description: "Уникальный id этого пользователя"
+      schema:
+        type: string
+    get:
+      tags:
+        - Товары
+      operationId: Получение товара
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Товары
+      security:
+        - Token: []
+      operationId: Обновление товара
+      description: 'Доступно только владельцу товара'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductsCreateUpdate'
+      responses:
+        '201':
+          description: 'Товар успешно обновлен'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - Товары
+      security:
+        - Token: [ ]
+      operationId: Удаление товара
+      description: 'Удаление доступно только владельцу товара'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteObject'
+      responses:
+        '204':
+          description: 'Товар успешно удален'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    ProductsList:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Уникальный id'
+        sku:
+          type: string
+          description: 'артикул товара'
+        name:
+          type: string
+          description: 'название товара'
+        brand:
+          type: string
+          description: 'производитель товара'
+        price:
+          type: number
+          description: 'цена товара'
+        wholesale_quantity:
+          type: integer
+          description: 'оптовое количество'
+        video:
+          type: string
+          description: 'видео'
+        quantity_in_stock:
+          type: integer
+          description: 'количество в наличии'
+        description:
+          type: string
+          description: 'описание'
+        manufacturer_country:
+          type: string
+          description: 'страна производитель'
+        user:
+          type: object
+          items:
+            example:
+              id: 1
+              username: 'string'
+            type: object
+          properties:
+            id:
+              type: integer
+              description: 'id пользователя'
+            username:
+              type: string
+              description: 'username'
+        category:
+          $ref: '#/components/schemas/Category'
+        images:
+          type: array
+          description: 'список изображений'
+          items:
+            example:
+              image: 'http://example.org/images/image.jpeg'
+            type: object
+            properties:
+              image:
+                description: 'Ссылка на картинку на сайте'
+                example: 'http://example.org/images/image.jpeg'
+                type: string
+                format: url
+
+    ProductsCreateUpdate:
+      type: object
+      properties:
+        sku:
+          type: string
+          description: 'артикул товара'
+        name:
+          type: string
+          description: 'название товара'
+        brand:
+          type: string
+          description: 'производитель товара'
+        price:
+          type: number
+          description: 'цена товара'
+        wholesale_quantity:
+          type: integer
+          description: 'оптовое количество'
+        video:
+          type: string
+          description: 'видео'
+        quantity_in_stock:
+          type: integer
+          description: 'количество в наличии'
+        description:
+          type: string
+          description: 'описание'
+        manufacturer_country:
+          type: string
+          description: 'страна производитель'
+        category:
+          type: object
+          items:
+            example:
+              id: 1
+            type: object
+          properties:
+            id:
+              type: integer
+              description: 'id категории'
+        images:
+          type: array
+          description: 'список изображений'
+          items:
+            example:
+              image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='
+            type: object
+            properties:
+              image:
+                type: string
+                description: 'изображение'
+
+    DeleteObject:
+      example:
+        is_active: false
+      type: object
+      properties:
+        is_active:
+          type: boolean
+          description: ''
+      required:
+        - is_active
+
+    ValidationError:
+      description: Стандартные ошибки валидации DRF
+      type: object
+      properties:
+        field_name:
+          description: 'Название поля, в котором произошли ошибки. Таких полей может быть несколько'
+          example: [ 'Обязательное поле.' ]
+          type: array
+          items:
+            type: string
+
+    AuthenticationError:
+      description: Пользователь не авторизован
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Учетные данные не были предоставлены."
+          type: string
+
+    PermissionDenied:
+      description: Недостаточно прав
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "У вас недостаточно прав для выполнения данного действия."
+          type: string
+
+    NotFound:
+      description: Объект не найден
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Страница не найдена."
+          type: string
+
+  responses:
+    ValidationError:
+      description: 'Ошибки валидации в стандартном формате DRF'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+
+    AuthenticationError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationError'
+
+    PermissionDenied:
+      description: Недостаточно прав
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PermissionDenied'
+
+    NotFound:
+      description: Объект не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFound'
