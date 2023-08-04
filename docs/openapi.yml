@@ -16,36 +16,21 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                    example: 123
-                    description: 'Общее количество объектов в базе'
-                  next:
-                    type: string
-                    nullable: true
-                    format: uri
-                    example: http://example.org/api/v1/products/?page=4
-                    description: 'Ссылка на следующую страницу'
-                  previous:
-                    type: string
-                    nullable: true
-                    format: uri
-                    example: http://example.org/api/v1/products/?page=2
-                    description: 'Ссылка на предыдущую страницу'
-                  results:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ProductsList'
-                    description: 'Список объектов текущей страницы'
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProductsList'
     post:
       tags:
         - Товары
       security:
         - Token: []
       operationId: Создание товара
-      description: 'Доступно только авторизованному пользователю'
+      description: 'Доступно только авторизованному поставщику'
       parameters: []
       requestBody:
         content:
@@ -70,7 +55,7 @@ paths:
     - name: product_id
       in: path
       required: true
-      description: "Уникальный id этого пользователя"
+      description: "Уникальный id товара"
       schema:
         type: string
     get:
@@ -88,7 +73,7 @@ paths:
                 $ref: '#/components/schemas/ProductsList'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags:
         - Товары
       security:
@@ -116,7 +101,7 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-    patch:
+    delete:
       tags:
         - Товары
       security:
@@ -124,11 +109,6 @@ paths:
       operationId: Удаление товара
       description: 'Удаление доступно только владельцу товара'
       parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObject'
       responses:
         '204':
           description: 'Товар успешно удален'
@@ -141,6 +121,29 @@ paths:
 
 components:
   schemas:
+    PaginatedResult:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+          description: 'Общее количество объектов в базе'
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://example.org/api/v1/products/?page=4
+          description: 'Ссылка на следующую страницу'
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://example.org/api/v1/products/?page=2
+          description: 'Ссылка на предыдущую страницу'
+        results:
+          type: array
+          items: {}
+
     ProductsList:
       type: object
       properties:
@@ -161,7 +164,7 @@ components:
           description: 'цена товара'
         wholesale_quantity:
           type: integer
-          description: 'оптовое количество'
+          description: 'минимальный объем заказа'
         video:
           type: string
           description: 'видео'
@@ -221,7 +224,7 @@ components:
           description: 'цена товара'
         wholesale_quantity:
           type: integer
-          description: 'оптовое количество'
+          description: 'минимальный объем заказа'
         video:
           type: string
           description: 'видео'
@@ -255,17 +258,6 @@ components:
               image:
                 type: string
                 description: 'изображение'
-
-    DeleteObject:
-      example:
-        is_active: false
-      type: object
-      properties:
-        is_active:
-          type: boolean
-          description: ''
-      required:
-        - is_active
 
     ValidationError:
       description: Стандартные ошибки валидации DRF
@@ -333,3 +325,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/NotFound'
+
+  securitySchemes:
+    Token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
