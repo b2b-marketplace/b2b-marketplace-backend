@@ -1,0 +1,19 @@
+version: "3.8"
+volumes:
+  pg_data:
+
+services:
+  db:
+    image: postgres:15.3-alpine
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file:
+      - ../.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
