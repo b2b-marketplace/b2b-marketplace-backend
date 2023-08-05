@@ -1,8 +1,225 @@
 openapi: 3.0.2
 info:
   title: 'b2b-marketplace'
-  version: ''
+  version: '0.0.1'
 paths:
+  /api/users/suppliers/:
+    get:
+      operationId: Список поставщиков
+      description: 'Получить список поставщиков'
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Номер страницы.
+          schema:
+            type: integer
+        - name: limit
+          required: false
+          in: query
+          description: Количество объектов на странице.
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Supplier'
+      tags:
+        - Поставщики
+    post:
+      operationId: Регистрация поставщика
+      description: 'Регистрация юридического лица с ролью поставщик'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierInfo'
+          description: 'Поставщик успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+      tags:
+        - Поставщики
+  /api/users/customers/companies/:
+    post:
+      operationId: Регистрация покупателя-юридического лица
+      description: 'Регистрация юридического лица с ролью покупатель'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCompanyCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCompanyInfo'
+          description: 'Покупатель успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+      tags:
+        - Покупатели
+  /api/users/customers/personals/:
+    post:
+      operationId: Регистрация покупателя-физического лица
+      description: 'Регистрация физического лица с ролью покупатель'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPersonalCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPersonalInfo'
+          description: 'Покупатель успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+      tags:
+        - Покупатели
+
+  /api/users/me/:
+    get:
+      operationId: Текущий пользователь
+      description: 'Информация о текущем пользователе'
+      parameters: []
+      security:
+        - Token: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SupplierConfidentionalInfo'
+                  - $ref: '#/components/schemas/CustomerCompanyConfidentionalInfo'
+                  - $ref: '#/components/schemas/CustomerPersonalInfo'
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+    patch:
+      operationId: Изменение текущего пользователя
+      description: 'Изменение информации о текущем пользователе'
+      parameters: []
+      security:
+        - Token: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CompanyUpdate'
+                - $ref: '#/components/schemas/PersonalUpdate'
+      responses:
+        '204':
+          description: 'Пользователь успешно изменен'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+    delete:
+      operationId: Удаление пользователя
+      description: 'Удаление текущего пользователя'
+      parameters: []
+      security:
+        - Token: [ ]
+      responses:
+        '204':
+          description: 'Пользователь успешно удален'
+        '401':
+          description: 'Пользователь не авторизован'
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+  /api/users/set_password/:
+    post:
+      operationId: Изменение пароля
+      description: 'Изменение пароля текущего пользователя'
+      parameters: []
+      security:
+        - Token: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+      responses:
+        '204':
+          description: 'Пароль успешно изменен'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+  /api/auth/token/login/:
+    post:
+      operationId: Получить токен авторизации
+      description: Используется для авторизации по емейлу и паролю, чтобы далее использовать токен при запросах.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenGetResponse'
+          description: ''
+      tags:
+        - Пользователи
+
+  /api/auth/token/logout/:
+    post:
+      operationId: Удаление токена
+      description: Удаляет токен текущего пользователя
+      parameters: []
+      security:
+        - Token: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
   /api/v1/products:
     get:
       tags:
@@ -143,6 +360,455 @@ components:
         results:
           type: array
           items: {}
+
+    Supplier:
+      description: 'Поставщик'
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        company:
+          type: object
+          properties:
+            company_id:
+              type: integer
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    SupplierCreate:
+      description: 'Регистрация поставщика'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона юридического лица'
+            address:
+              type: string
+              description: 'Адрес юридического лица'
+          required:
+            - inn
+            - ogrn
+            - phone_number
+      required:
+        - email
+        - username
+        - password
+
+    CustomerCompanyCreate:
+      description: 'Регистрация покупателя-юридического лица'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: string
+              description: 'Адрес юридического лица'
+          required:
+            - inn
+            - ogrn
+            - phone_number
+      required:
+        - email
+        - username
+        - password
+
+    CustomerPersonalCreate:
+      description: 'Регистрация покупателя-физического лица'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        personal:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: "Имя"
+              example: "Вася"
+            last_name:
+              type: string
+              maxLength: 150
+              description: "Фамилия"
+              example: "Пупкин"
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона'
+            address:
+              type: string
+              description: 'Адрес'
+          required:
+            - first_name
+            - last_name
+            - phone_number
+      required:
+        - email
+        - username
+        - password
+
+    SupplierInfo:
+      description: 'Общедоступная информация о поставщике-юридическом лице'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [Supplier, Customer]
+          example: Supplier
+          description: 'Поставщик'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    SupplierConfidentionalInfo:
+      description: 'Информация о поставщике-юридическом лице (в личном кабинете)'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [Supplier, Customer]
+          example: Supplier
+          description: 'Поставщик'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            company_account:
+              type: integer
+              description: 'Уникальный счет юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    CustomerCompanyInfo:
+      description: 'Общедоступная информация о покупателе-юридическом лице'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [Supplier, Customer]
+          example: Customer
+          description: 'Покупатель'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    CustomerCompanyConfidentionalInfo:
+      description: 'Информация о покупателе-юридическом лице (в личном кабинете)'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [Supplier, Customer]
+          example: Customer
+          description: 'Покупатель'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            company_account:
+              type: integer
+              description: 'Уникальный счет юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    CustomerPersonalInfo:
+      description: 'Информация о покупателе-физическом лице (в личном кабинете)'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [Supplier, Customer]
+          example: Customer
+          description: 'Покупатель'
+        is_company:
+          type: boolean
+          example: false
+          description: 'Не является компанией'
+        personal:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: "Имя"
+              example: "Вася"
+            last_name:
+              type: string
+              maxLength: 150
+              description: "Фамилия"
+              example: "Пупкин"
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона'
+            address:
+              type: string
+              description: 'Адрес'
+
+    CompanyUpdate:
+      description: 'Изменение информации в личном кабинете юридического лица'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            company_account:
+              type: integer
+              description: 'Уникальный счет юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона юридического лица'
+            address:
+              type: string
+              description: 'Адрес юридического лица'
+
+
+    PersonalUpdate:
+      description: 'Изменение информации в личном кабинете физического лица'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        personal:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: "Имя"
+              example: "Вася"
+            last_name:
+              type: string
+              maxLength: 150
+              description: "Фамилия"
+              example: "Пупкин"
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона'
+            address:
+              type: string
+              description: 'Адрес'
 
     ProductsList:
       type: object
@@ -295,6 +961,31 @@ components:
         detail:
           description: 'Описание ошибки'
           example: "Страница не найдена."
+          type: string
+
+    SetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+        current_password:
+          type: string
+      required:
+        - new_password
+        - current_password
+
+    TokenCreate:
+      type: object
+      properties:
+        password:
+          type: string
+        email:
+          type: string
+
+    TokenGetResponse:
+      type: object
+      properties:
+        auth_token:
           type: string
 
   responses:
