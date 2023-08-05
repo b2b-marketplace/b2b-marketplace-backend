@@ -4,7 +4,6 @@ version = "0.1.0"
 description = ""
 authors = ["b2b marketplace team"]
 readme = "README.md"
-packages = [{include = "b2b_marketplace_backend"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
