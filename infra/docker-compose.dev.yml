@@ -5,7 +5,7 @@ volumes:
 services:
   db:
     image: postgres:15.3
-    container_name: db
+    container_name: b2b-marketplace-db-local
     restart: on-failure
     volumes:
       - pg_data:/var/lib/postgresql/data
