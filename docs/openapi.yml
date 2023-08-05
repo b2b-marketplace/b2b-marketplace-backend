@@ -743,11 +743,6 @@ components:
       description: 'Изменение информации в личном кабинете юридического лица'
       type: object
       properties:
-        email:
-          type: string
-          format: email
-          maxLength: 254
-          description: 'Уникальный адрес электронной почты'
         company:
           type: object
           properties:
@@ -770,26 +765,10 @@ components:
               type: string
               description: 'Адрес юридического лица'
 
-
     PersonalUpdate:
       description: 'Изменение информации в личном кабинете физического лица'
       type: object
       properties:
-        email:
-          type: string
-          format: email
-          maxLength: 254
-          description: 'Уникальный адрес электронной почты'
-        username:
-          type: string
-          description: 'Уникальный юзернейм'
-          pattern: ^[\w.@+-]+\z
-          maxLength: 150
-        password:
-          type: string
-          maxLength: 150
-          description: "Пароль"
-          example: "Qwerty123"
         personal:
           type: object
           properties:
