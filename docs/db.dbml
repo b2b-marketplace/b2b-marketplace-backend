@@ -1,0 +1,158 @@
+Table users {
+  id integer [primary key]
+  username char
+  email email
+  password char
+  is_active boolean
+  role enum // поставщик или заказчик
+  is_company boolean
+  is_admin boolean
+  is_staff boolean
+  company_id integer
+  physical_person_id id
+}
+
+Table companies {
+  id integer [primary key]
+  name char
+  company_account integer
+  inn integer
+  ogrn integer
+  phone_number_id integer
+  address_id integer
+}
+
+Table physical_persons {
+  id integer [primary key]
+  first_name char
+  last_name char
+  phone_number_id integer
+  address_id integer
+}
+
+Table addresses {
+  id integer [primary key]
+  address char
+}
+
+Table phone_numbers {
+  id integer [primary key]
+  phone_number char
+}
+
+Table products {
+  id integer [primary key]
+  user_id integer
+  sku char
+  name char
+  category_id integer
+  brand char
+  price decimal
+  wholesale_quantity integer // минимальное объем заказа
+  video varchar
+  quantity_in_stock integer
+  description text
+  manufacturer_country char
+  created_at timestamp
+  updated_at timestamp
+  is_deleted boolean
+}
+
+Table images {
+  id integer
+  product_id integer
+  image varchar
+}
+
+Table categories {
+  id integer [primary key]
+  name char
+  parent_id integer [note: 'self foreign key']
+  slug slug
+}
+
+Table basket_products {
+  id integer [primary key]
+  product_id integer
+  basket_id integer
+  quantity integer
+}
+
+Table baskets {
+  id integer [primary key]
+  user_id integer
+}
+
+Table order_products {
+  id integer [primary key]
+  order_id integer
+  product_id integer
+  quantity integer
+  discount float
+}
+
+Table orders {
+  id integer [primary key]
+  user_id integer
+  status char
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_payments {
+  order_id integer
+  amount float //сумма платежа
+  status char
+  transaction_id integer
+  created_at timestamp
+}
+
+Table delivery {
+  order_id integer
+  address_id integer
+  delivery_date timestamp
+}
+
+Table return_products {
+  id integer [primary key]
+  return_id integer
+  product_id integer
+  quantity integer
+}
+
+Table returns {
+  id integer [primary key]
+  order_id integer
+  return_date timestamp
+}
+
+Table messages {
+  id integer [primary key]
+  customer integer
+  supplier integer
+  message text
+}
+
+Ref: users.id < products.user_id // one-to-many
+Ref: users.company_id - companies.id // one-to-one
+Ref: users.physical_person_id - physical_persons.id // one-to-one
+Ref: companies.address_id < addresses.id // one-to-many
+Ref: physical_persons.address_id < addresses.id // one-to-many
+Ref: companies.phone_number_id < phone_numbers.id // one-to-many
+Ref: physical_persons.phone_number_id < phone_numbers.id // one-to-many
+Ref: products.category_id - categories.id // one-to-one
+Ref: products.id > order_products.product_id // many-to-one
+Ref: orders.id - order_products.order_id // one-to-one
+Ref: users.id < orders.user_id // one-to-many
+Ref: products.id < images.product_id // one-to-many
+Ref: baskets.id - basket_products.basket_id // one-to-one
+Ref: users.id - baskets.user_id // one-to-one
+Ref: products.id > basket_products.product_id // many-to-one
+Ref: orders.id - returns.order_id // one-to-one
+Ref: returns.id - return_products.return_id // one-to-one
+Ref: orders.id - order_payments.order_id // one-to-one
+Ref: products.id > return_products.product_id // many-to-one
+Ref: orders.id - delivery.order_id // one-to-one
+Ref: addresses.id > delivery.address_id // many-to-one
+Ref: orders.user_id - messages.customer // one-to-one
+Ref: products.user_id - messages.supplier // one-to-one
