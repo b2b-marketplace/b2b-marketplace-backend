@@ -220,6 +220,30 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+    delete:
+      summary: 'Удалить корзину по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: basket_id
+          description: "Уникальный идентификатор корзины"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Удаление корзины'
+      description: 'Доступно только авторизированным пользователям'
+      responses:
+        '204':
+          description: 'Корзина успешно удалена'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /api/v1/baskets/mine:
     post:
