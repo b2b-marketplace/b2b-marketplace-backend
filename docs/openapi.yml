@@ -551,8 +551,8 @@ components:
           format: email
         role:
           type: string
-          enum: [Supplier, Customer]
-          example: Supplier
+          enum: [supplier, customer]
+          example: supplier
           description: 'Поставщик'
         is_company:
           type: boolean
@@ -590,8 +590,8 @@ components:
           format: email
         role:
           type: string
-          enum: [Supplier, Customer]
-          example: Supplier
+          enum: [supplier, customer]
+          example: supplier
           description: 'Поставщик'
         is_company:
           type: boolean
@@ -632,8 +632,8 @@ components:
           format: email
         role:
           type: string
-          enum: [Supplier, Customer]
-          example: Customer
+          enum: [supplier, customer]
+          example: customer
           description: 'Покупатель'
         is_company:
           type: boolean
@@ -671,8 +671,8 @@ components:
           format: email
         role:
           type: string
-          enum: [Supplier, Customer]
-          example: Customer
+          enum: [supplier, customer]
+          example: customer
           description: 'Покупатель'
         is_company:
           type: boolean
@@ -713,8 +713,8 @@ components:
           format: email
         role:
           type: string
-          enum: [Supplier, Customer]
-          example: Customer
+          enum: [supplier, customer]
+          example: customer
           description: 'Покупатель'
         is_company:
           type: boolean
