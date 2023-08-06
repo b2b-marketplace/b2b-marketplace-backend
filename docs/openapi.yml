@@ -1,7 +1,9 @@
 openapi: 3.0.2
 info:
   title: 'b2b-marketplace'
+  description: 'API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров'
   version: '0.0.1'
+
 paths:
   /api/v1/users/suppliers/:
     get:
@@ -330,6 +332,197 @@ paths:
       responses:
         '204':
           description: 'Товар успешно удален'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/categories:
+    get:
+      summary: 'Получить список всех категорий'
+      parameters:
+        - in: query
+          name: search
+          description: 'Поиск категории по наименованию'
+          required: false
+          schema:
+            type: string
+      tags:
+        - Категории
+      operationId: 'Cписок всех категорий'
+      description: 'Страница доступна всем пользователям.'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Category'
+
+  /api/v1/categories/{category_id}:
+    get:
+      summary: 'Получить категорию по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: category_id
+          description: "Уникальный идентификатор категории"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Категории
+      operationId: 'Получение информации о категории'
+      description: 'Страница доступна всем пользователям.'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/baskets:
+    post:
+      summary: 'Создать корзину'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Создание корзины'
+      description: 'Доступно только авторизированным пользователям'
+      responses:
+        '201':
+          description: 'Корзина успешно создана'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+
+  /api/v1/baskets/{basket_id}:
+    get:
+      summary: 'Получить корзину по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: basket_id
+          description: "Уникальный идентификатор корзины"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Получение информации о корзине'
+      description: 'Доступно только модераторам'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: 'Удалить корзину по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: basket_id
+          description: "Уникальный идентификатор корзины"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Удаление корзины'
+      description: 'Доступно только авторизированным пользователям'
+      responses:
+        '204':
+          description: 'Корзина успешно удалена'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/baskets/mine:
+    post:
+      summary: 'Добавить товар в корзину'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Добавление товара в корзину'
+      description: 'Доступно только авторизированным пользователям'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasketAddProduct'
+      responses:
+        '201':
+          description: 'Товар успешно добавлен'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Обновить товары в корзине'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Обновление товаров в корзине пользователя'
+      description: 'Доступно только авторизированным пользователям'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasketUpdateProducts'
+      responses:
+        '201':
+          description: 'Товар успешно добавлен'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      summary: 'Просмотреть корзину пользователя'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Получение информации о корзине пользователя'
+      description: 'Доступно только авторизированному пользователю'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
         '401':
           $ref: '#/components/responses/AuthenticationError'
         '403':
@@ -789,6 +982,26 @@ components:
             address:
               type: string
               description: 'Адрес'
+    Category:
+      description: 'Категория товара'
+      type: object
+      properties:
+        id:
+          type: integer          
+          example: 10
+          description: 'Уникальный идентификатор категории'
+        name:
+          type: string
+          example: Куртки
+          description: 'Наименование категории'
+        slug:
+          type: string
+          example: kurtki
+          description: 'Часть url категории (слаг)'
+        parent_id:
+          type: integer
+          example: 123
+          description: 'Уникальный идентификатор родительской категории'
 
     ProductsList:
       type: object
@@ -852,6 +1065,48 @@ components:
                 example: 'http://example.org/images/image.jpeg'
                 type: string
                 format: url
+
+    Basket:
+      description: 'Корзина'
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+          description: 'Уникальный идентификатор корзины'
+        products:
+          type: array
+          description: 'Список товаров в корзине'
+          items:
+            properties:
+              product:
+                $ref: '#/components/schemas/ProductsList'
+              quantity:
+                type: integer
+                example: 1000
+                description: 'Количество товаров'
+
+    BasketAddProduct:
+      description: 'Тело запроса для добавления товара в корзину'
+      type: object
+      properties:
+        product:
+          type: object
+          properties:
+            product_id:
+              type: integer
+              example: 4
+              description: 'Уникальный идентификатор товара'
+            quantity:
+              type: integer
+              example: 234
+              description: 'Количество единиц товара'
+
+    BasketUpdateProducts:
+      description: 'Тело запроса для обновления товаров в корзине'
+      type: array
+      items:
+        $ref: '#/components/schemas/BasketAddProduct'
 
     ProductsCreateUpdate:
       type: object

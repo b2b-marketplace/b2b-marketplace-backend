@@ -9,7 +9,8 @@ readme = "README.md"
 python = "^3.9"
 django = "4.1"
 djangorestframework = "^3.14.0"
-
+psycopg2-binary = "^2.9.6"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
