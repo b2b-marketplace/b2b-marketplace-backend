@@ -530,6 +530,149 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/v1/users/{user_id}/orders/:
+    get:
+      summary: 'Просмотреть заказы пользователя'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          description: 'Номер страницы'
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          description: 'Количество элементов на странице'
+          required: false
+          schema:
+            type: integer
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Просмотреть заказы пользователя'
+      description: 'Доступно только Владельцу заказа'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+    post:
+      summary: 'Добавить заказ'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Добавление заказа пользователя'
+      description: 'Доступно только авторизованному пользователю'
+      responses:
+        '201':
+          description: 'Заказ успешно добавлен'
+      requestBody:
+        content:
+          application/json:
+            schema:
+
+              $ref: '#/components/schemas/CreateOrder'
+
+  /api/v1/users/{user_id}/orders/{order_id}/:
+    get:
+      summary: 'Просмотреть заказ пользователя'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: order_id
+          description: 'Уникальный идентификатор заказа'
+          required: true
+          schema:
+            type: string
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Просмотреть заказ пользователя'
+      description: 'Доступно только Владельцу заказа'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: 'Изменить/удалить заказ'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: order_id
+          description: 'Уникальный идентификатор заказа'
+          required: true
+          schema:
+            type: string
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Изменение заказа пользователя'
+      description: 'Доступно Владельцу заказа и Службам'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrder'
+      responses:
+        '200':
+          description: 'Заказ успешно изменен/удален'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
 components:
   schemas:
     PaginatedResult:
@@ -982,6 +1125,7 @@ components:
             address:
               type: string
               description: 'Адрес'
+
     Category:
       description: 'Категория товара'
       type: object
@@ -1222,6 +1366,88 @@ components:
       properties:
         auth_token:
           type: string
+
+    ProductsInOrder:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          example: 4
+          description: 'Уникальный идентификатор товара'
+        quantity:
+          type: integer
+          example: 234
+          description: 'Количество единиц товара'
+        discount:
+          type: number
+          example: 0.90
+          description: 'Скидка'
+
+    Order:
+      description: 'Заказ'
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+          description: 'Уникальный идентификатор заказа'
+        user_id:
+          type: integer
+          example: 123
+          description: 'Уникальный идентификатор пользователя'
+        status:
+          type: string
+          example: 'new'
+          description: 'Статус заказа'
+        created_at:
+          type: string
+          example: '2022-01-01T00:00:00.000Z'
+          description: 'Дата создания заказа'
+        updated_at:
+          type: string
+          example: '2022-01-01T00:00:00.000Z'
+          description: 'Дата обновления заказа'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductsInOrder'
+
+    CreateOrder:
+      description: 'Тело запроса для создания заказа'
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            properties:
+              product_id:
+                type: integer
+                example: 4
+                description: 'Уникальный идентификатор товара'
+              quantity:
+                type: integer
+                example: 234
+                description: 'Количество единиц товара'
+
+    UpdateOrder:
+      description: 'Тело запроса для обновления/удаления заказа'
+      type: object
+      properties:
+        status:
+          type: string
+          example: 'deleted'
+        products:
+          type: object
+          properties:
+            product_id:
+              type: integer
+              example: 4
+              description: 'Уникальный идентификатор товара'
+            quantity:
+              type: integer
+              example: 234
+              description: 'Количество единиц товара'
+
 
   responses:
     ValidationError:
