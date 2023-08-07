@@ -156,3 +156,4 @@ Ref: orders.id - delivery.order_id // one-to-one
 Ref: addresses.id > delivery.address_id // many-to-one
 Ref: orders.user_id - messages.customer // one-to-one
 Ref: products.user_id - messages.supplier // one-to-one
+Ref: categories.id < categories.parent_id // one-to-many
