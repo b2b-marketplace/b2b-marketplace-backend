@@ -557,7 +557,7 @@ paths:
       security:
         - Token: []
       operationId: 'Просмотреть заказы пользователя'
-      description: 'Доступно только авторизованному пользователю'
+      description: 'Доступно только Владельцу заказа'
       responses:
         '200':
           description: ''
@@ -622,7 +622,7 @@ paths:
       security:
         - Token: []
       operationId: 'Просмотреть заказ пользователя'
-      description: 'Доступно только авторизованному пользователю'
+      description: 'Доступно только Владельцу заказа'
       responses:
         '200':
           description: ''
@@ -656,7 +656,7 @@ paths:
       security:
         - Token: []
       operationId: 'Изменение заказа пользователя'
-      description: 'Доступно только авторизованному пользователю'
+      description: 'Доступно Владельцу заказа и Службам'
       requestBody:
         content:
           application/json:
