@@ -29,7 +29,7 @@ class SoftDeleteMixin(models.Model):
     def delete(self):
         """Предотвращает удаление модели.
 
-        Вместо непосредственного удаления, помечает модель удалённой (is_deleted=True).
+        Вместо непосредственного удаления, помечает запись удалённой (is_deleted=True).
         """
         self.is_deleted = True
         self.save()
