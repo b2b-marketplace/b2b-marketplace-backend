@@ -67,7 +67,7 @@ jobs:
           echo POSTGRES_PORT=$POSTGRES_PORT >> infra/.env
       -
         name: Run migrations
-        run: python manage.py migrate
+        run: poetry run python manage.py migrate
       -
         name: Check Migrations
-        run: python manage.py makemigrations --check
+        run: poetry run python manage.py makemigrations --check
