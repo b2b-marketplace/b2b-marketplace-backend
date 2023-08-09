@@ -55,7 +55,6 @@ jobs:
       -
         name: Create .env file
         run: |
-          mkdir infra
           touch infra/.env
           echo DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY >> infra/.env
           echo DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS >> infra/.env
