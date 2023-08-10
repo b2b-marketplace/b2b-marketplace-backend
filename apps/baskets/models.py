@@ -16,7 +16,7 @@ class Basket(models.Model):
 
 
 class BasketProduct(models.Model):
-    basket = models.ForeignKey(Basket, on_delete=models.CASCADE)
+    basket = models.OneToOneField(Basket, on_delete=models.CASCADE)
     product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="product", verbose_name="Товар")
     quantity = models.PositiveIntegerField(related_name="product quantity", verbose_name="Количество товара")
 
