@@ -12,6 +12,7 @@ class Order(BaseModel):
         UPDATED = "UP", _("Updated")
         PAID = "PA", _("Paid")
         IN_TRANSIT = "TR", _("In_transit")
+        COMPLETED = "CO", _("Completed")
         CANCELED = "CA", _("Canceled")
         RETURNED = "RE", _("Returned")
 
