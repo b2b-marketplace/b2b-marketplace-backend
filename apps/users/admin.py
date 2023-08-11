@@ -11,20 +11,29 @@ class CustomUserAdmin(UserAdmin):
         ("Role Info", {"fields": ("role", "is_company", "company", "personal")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
     )
-    # add_fieldsets = (
-    #     (None, {
-    #         'classes': ('wide',),
-    #         'fields': ('email', 'username', 'password'),
-    #     }),
-    #     ("Role Info", {
-    #         'classes': ('wide',),
-    #         'fields': ('role', 'is_company', 'company', 'personal'),
-    #     }),
-    #     ("Permissions", {
-    #         'classes': ('wide',),
-    #         'fields': ('is_active', 'is_staff', 'is_superuser'),
-    #     }),
-    # )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "username", "password1", "password2"),
+            },
+        ),
+        (
+            "Role Info",
+            {
+                "classes": ("wide",),
+                "fields": ("role", "is_company", "company", "personal"),
+            },
+        ),
+        (
+            "Permissions",
+            {
+                "classes": ("wide",),
+                "fields": ("is_active", "is_staff", "is_superuser"),
+            },
+        ),
+    )
     list_display = (
         "username",
         "email",

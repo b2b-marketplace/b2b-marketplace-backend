@@ -157,19 +157,20 @@ class CustomUser(AbstractUser):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
         if self.role == "customer" and not (self.personal or self.company):
             raise ValidationError(_("Fill out company information or personal details!"))
         if self.role == "supplier" and not self.is_company:
             raise ValidationError(_("Physical person cannot be a supplier!"))
-
-    def save(self, *args, **kwargs):
+        if not (self.is_superuser or self.is_staff):
+            if not self.role:
+                raise ValidationError(_("Role is required for users."))
+            if not self.is_company and not self.personal:
+                raise ValidationError(_("Personal field is required for physical person!"))
         if self.is_superuser or self.is_staff:
             self.role = None
-        # if not (self.is_superuser or self.is_staff) and not self.role:
-        #     raise ValueError(_("Role is required for users."))
         if not self.is_company:
             self.company = None
         if self.is_company:
