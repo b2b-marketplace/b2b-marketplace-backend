@@ -14,7 +14,9 @@ def validate_username(value):
         for char in value:
             if not regex_pattern.match(char):
                 invalid_chars.append(char)
-        raise ValidationError(_("Invalid characters: %(invalid_chars)s") % {"invalid_chars": ", ".join(invalid_chars)})
+        raise ValidationError(
+            _("Invalid characters: %(invalid_chars)s") % {"invalid_chars": ", ".join(invalid_chars)}
+        )
     if value.lower() == "me":
         raise ValidationError(_("Cannot use 'me' as a username!"))
     return value
