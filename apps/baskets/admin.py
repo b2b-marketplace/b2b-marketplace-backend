@@ -10,12 +10,8 @@ class BasketProductInline(admin.TabularInline):
 
 @admin.register(Basket)
 class BasketAdmin(admin.ModelAdmin):
-    list_display = ("basket", "product")
-    list_filter = ("product",)
-    search_fields = ("product",)
-    inlines = [
-        BasketProductInline,
-    ]
-
-
-admin.site.register(BasketProduct, BasketAdmin)
+    list_display = ("user",)
+    list_filter = ("user",)
+    search_fields = ("user",)
+    empty_value_display = "-empty-"
+    inlines = (BasketProductInline,)

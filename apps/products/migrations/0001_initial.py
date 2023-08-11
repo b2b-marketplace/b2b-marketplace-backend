@@ -29,9 +29,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    models.CharField(
-                        max_length=255, unique=True, verbose_name="Category name"
-                    ),
+                    models.CharField(max_length=255, unique=True, verbose_name="Category name"),
                 ),
                 (
                     "slug",
@@ -88,9 +86,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "wholesale_quantity",
-                    models.PositiveIntegerField(
-                        verbose_name="Product wholesale quantity"
-                    ),
+                    models.PositiveIntegerField(verbose_name="Product wholesale quantity"),
                 ),
                 (
                     "video",
@@ -102,16 +98,12 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "quantity_in_stock",
-                    models.PositiveIntegerField(
-                        verbose_name="Products quantity in stock"
-                    ),
+                    models.PositiveIntegerField(verbose_name="Products quantity in stock"),
                 ),
                 ("description", models.TextField(verbose_name="Product description")),
                 (
                     "manufacturer_country",
-                    models.CharField(
-                        max_length=255, verbose_name="Product manufacturer country"
-                    ),
+                    models.CharField(max_length=255, verbose_name="Product manufacturer country"),
                 ),
                 (
                     "category",
@@ -176,8 +168,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="product",
-            index=models.Index(
-                fields=["category"], name="products_pr_categor_9edb3d_idx"
-            ),
+            index=models.Index(fields=["category"], name="products_pr_categor_9edb3d_idx"),
         ),
     ]

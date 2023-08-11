@@ -1,9 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from apps.products.models import Product
+
 
 class Basket(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user", verbose_name="User")
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="user", verbose_name="User"
+    )
 
     class Meta:
         verbose_name = "Basket"
@@ -14,8 +18,12 @@ class Basket(models.Model):
 
 
 class BasketProduct(models.Model):
-    basket = models.OneToOneField(Basket, on_delete=models.CASCADE)
-    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="product", verbose_name="Product")
+    basket = models.OneToOneField(
+        Basket, on_delete=models.CASCADE, related_name="basket", verbose_name="Basket"
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="product", verbose_name="Product"
+    )
     quantity = models.PositiveIntegerField(verbose_name="Product quantity")
 
     class Meta:
