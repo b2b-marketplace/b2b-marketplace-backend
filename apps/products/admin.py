@@ -5,6 +5,7 @@ from .models import Category, Image, Product
 
 class ImageInLine(admin.TabularInline):
     model = Image
+    extra = 1
 
 
 @admin.register(Image)

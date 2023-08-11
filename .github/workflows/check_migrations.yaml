@@ -1,0 +1,73 @@
+name: Check migrations
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+env:
+  DJANGO_SECRET_KEY: somekey
+  DJANGO_ALLOWED_HOSTS: localhost
+  CSRF_TRUSTED_ORIGINS: http://localhost
+  DJANGO_DEBUG: True
+  POSTGRES_DB: b2b-marketplace
+  POSTGRES_USER: b2b-marketplace
+  POSTGRES_PASSWORD: somepassword
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: 5432
+
+jobs:
+  migrations:
+    name: Check migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      -
+        name: Check out the repo
+        uses: actions/checkout@v3
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      -
+        name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+      -
+        name: Install Dependencies
+        run: poetry install
+      -
+        name: Create .env file
+        run: |
+          touch infra/.env
+          echo DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY >> infra/.env
+          echo DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS >> infra/.env
+          echo CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS >> infra/.env
+          echo DJANGO_DEBUG=$DJANGO_DEBUG >> infra/.env
+          echo POSTGRES_DB=$POSTGRES_DB >> infra/.env
+          echo POSTGRES_USER=$POSTGRES_USER >> infra/.env
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> infra/.env
+          echo POSTGRES_HOST=$POSTGRES_HOST >> infra/.env
+          echo POSTGRES_PORT=$POSTGRES_PORT >> infra/.env
+      -
+        name: Run migrations
+        run: poetry run python manage.py migrate
+      -
+        name: Check Migrations
+        run: poetry run python manage.py makemigrations --check

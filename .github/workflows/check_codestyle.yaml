@@ -1,0 +1,35 @@
+name: Check codestyle
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  codestyle:
+    name: Check codestyle
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Check out the repo
+      uses: actions/checkout@v3
+    -
+      name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    -
+      name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.5.1
+    -
+      name: Install Dependencies
+      run: poetry install
+    -
+      name: Lint with flake8
+      run: poetry run flake8 .
+    -
+      name: Check black codestyle
+      run: poetry run black --check --line-length=100 .
