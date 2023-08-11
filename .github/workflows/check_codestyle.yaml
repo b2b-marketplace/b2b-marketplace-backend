@@ -32,4 +32,4 @@ jobs:
       run: poetry run flake8 .
     -
       name: Check black codestyle
-      run: poetry run black --check .
+      run: poetry run black --check --line-length=100 .
