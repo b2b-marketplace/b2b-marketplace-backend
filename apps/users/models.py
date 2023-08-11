@@ -14,10 +14,7 @@ def validate_username(value):
         for char in value:
             if not regex_pattern.match(char):
                 invalid_chars.append(char)
-        raise ValidationError(
-            _("Invalid characters: %(invalid_chars)s")
-            % {"invalid_chars": ", ".join(invalid_chars)}
-        )
+        raise ValidationError(_("Invalid characters: %(invalid_chars)s") % {"invalid_chars": ", ".join(invalid_chars)})
     if value.lower() == "me":
         raise ValidationError(_("Cannot use 'me' as a username!"))
     return value
@@ -29,17 +26,15 @@ def validate_length(value, expected_length, error_message):
 
 
 def validate_account(value):
-    validate_length(
-        value, 20, _("The account number must contain exactly 20 characters.")
-    )
+    validate_length(value, 20, _("The account number must contain exactly 20 characters."))
 
 
 def validate_inn(value):
-    validate_length(value, 10, _("The INN must contain exactly 10 characters."))
+    validate_length(value, 10, _("The TIN must contain exactly 10 characters."))
 
 
 def validate_ogrn(value):
-    validate_length(value, 13, _("The OGRN must contain exactly 13 characters."))
+    validate_length(value, 13, _("The PSRN must contain exactly 13 characters."))
 
 
 def validate_digits_only(value):
@@ -73,6 +68,12 @@ class Address(models.Model):
 
 
 class Company(models.Model):
+    ROLE_CHOICES = (
+        ("supplier", "supplier"),
+        ("customer", "customer"),
+    )
+
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, blank=False, null=True)
     name = models.CharField(max_length=100)
     company_account = models.CharField(
         max_length=20,
@@ -92,12 +93,8 @@ class Company(models.Model):
         validators=[validate_ogrn, validate_digits_only],
         verbose_name=_("PSRN"),
     )
-    phone_number = models.ForeignKey(
-        PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    address = models.ForeignKey(
-        Address, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ("name",)
@@ -117,12 +114,8 @@ class PhysicalPerson(models.Model):
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
     )
-    phone_number = models.ForeignKey(
-        PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    address = models.ForeignKey(
-        Address, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ("last_name",)
@@ -134,14 +127,7 @@ class PhysicalPerson(models.Model):
 
 
 class CustomUser(AbstractUser):
-    ROLE_CHOICES = (
-        ("supplier", "supplier"),
-        ("customer", "customer"),
-    )
-
-    email = models.EmailField(
-        unique=True, blank=False, max_length=254, verbose_name="Email"
-    )
+    email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name="Email")
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -149,7 +135,7 @@ class CustomUser(AbstractUser):
         validators=[validate_username],
         verbose_name=_("Username"),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, blank=True, null=True)
+
     is_company = models.BooleanField(default=False)
     company = models.OneToOneField(
         Company,
@@ -172,24 +158,16 @@ class CustomUser(AbstractUser):
         verbose_name = _("User")
         verbose_name_plural = _("Users")
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
-        if self.role == "customer" and not (self.personal or self.company):
-            raise ValidationError(
-                _("Fill out company information or personal details!")
-            )
-        if self.role == "supplier" and not self.is_company:
-            raise ValidationError(_("Physical person cannot be a supplier!"))
-        if not (self.is_superuser or self.is_staff):
-            if not self.role:
-                raise ValidationError(_("Role is required for users."))
-            if not self.is_company and not self.personal:
-                raise ValidationError(
-                    _("Personal field is required for physical person!")
-                )
+        if not (self.is_superuser or self.is_staff) and not (self.is_company or self.personal):
+            raise ValidationError(_("Personal field is required for physical person!"))
+
+    def save(self, *args, **kwargs):
         if self.is_superuser or self.is_staff:
             self.role = None
+            self.is_company = False
         if not self.is_company:
             self.company = None
         if self.is_company:

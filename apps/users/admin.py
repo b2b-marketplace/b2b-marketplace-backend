@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 
 from .models import Address, Company, CustomUser, PhoneNumber, PhysicalPerson
 
@@ -8,7 +9,7 @@ from .models import Address, Company, CustomUser, PhoneNumber, PhysicalPerson
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("email",)}),
-        ("Role Info", {"fields": ("role", "is_company", "company", "personal")}),
+        ("Role Info", {"fields": ("is_company", "company", "personal")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
     )
     add_fieldsets = (
@@ -23,7 +24,7 @@ class CustomUserAdmin(UserAdmin):
             "Role Info",
             {
                 "classes": ("wide",),
-                "fields": ("role", "is_company", "company", "personal"),
+                "fields": ("is_company", "company", "personal"),
             },
         ),
         (
@@ -37,19 +38,18 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         "username",
         "email",
-        "role",
         "is_company",
     )
-    list_filter = (
-        "role",
-        "is_company",
-    )
+    list_filter = ("is_company",)
     empty_value_display = "-empty-"
 
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = (
+        "name",
+        "role",
+    )
     empty_value_display = "-empty-"
 
 
@@ -72,3 +72,6 @@ class PhoneNumberAdmin(admin.ModelAdmin):
 class AddressAdmin(admin.ModelAdmin):
     list_display = ("address",)
     empty_value_display = "-empty-"
+
+
+admin.site.unregister(Group)
