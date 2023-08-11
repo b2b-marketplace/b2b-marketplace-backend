@@ -36,12 +36,22 @@ class Order(BaseModel):
 
 
 class OrderProduct(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.DO_NOTHING, related_name="orders", verbose_name=_("Order"))
+    order = models.OneToOneField(
+        Order,
+        on_delete=models.DO_NOTHING,
+        related_name="orders",
+        verbose_name=_("Order"),
+    )
     product = models.ForeignKey(
-        Product, on_delete=models.DO_NOTHING, related_name="orders", verbose_name=_("Product in order")
+        Product,
+        on_delete=models.DO_NOTHING,
+        related_name="orders",
+        verbose_name=_("Product in order"),
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
-    discount = models.DecimalField(max_digits=4, decimal_places=2, verbose_name=_("Product discount"))
+    discount = models.DecimalField(
+        max_digits=4, decimal_places=2, verbose_name=_("Product discount")
+    )
 
     class Meta:
         verbose_name = _("OrderProduct")
