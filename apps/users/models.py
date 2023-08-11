@@ -14,7 +14,10 @@ def validate_username(value):
         for char in value:
             if not regex_pattern.match(char):
                 invalid_chars.append(char)
-        raise ValidationError(_("Invalid characters: %(invalid_chars)s") % {"invalid_chars": ", ".join(invalid_chars)})
+        raise ValidationError(
+            _("Invalid characters: %(invalid_chars)s")
+            % {"invalid_chars": ", ".join(invalid_chars)}
+        )
     if value.lower() == "me":
         raise ValidationError(_("Cannot use 'me' as a username!"))
     return value
@@ -26,7 +29,9 @@ def validate_length(value, expected_length, error_message):
 
 
 def validate_account(value):
-    validate_length(value, 20, _("The account number must contain exactly 20 characters."))
+    validate_length(
+        value, 20, _("The account number must contain exactly 20 characters.")
+    )
 
 
 def validate_inn(value):
@@ -87,8 +92,12 @@ class Company(models.Model):
         validators=[validate_ogrn, validate_digits_only],
         verbose_name=_("PSRN"),
     )
-    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    phone_number = models.ForeignKey(
+        PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    address = models.ForeignKey(
+        Address, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     class Meta:
         ordering = ("name",)
@@ -108,8 +117,12 @@ class PhysicalPerson(models.Model):
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
     )
-    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    phone_number = models.ForeignKey(
+        PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    address = models.ForeignKey(
+        Address, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     class Meta:
         ordering = ("last_name",)
@@ -126,7 +139,9 @@ class CustomUser(AbstractUser):
         ("customer", "customer"),
     )
 
-    email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name="Email")
+    email = models.EmailField(
+        unique=True, blank=False, max_length=254, verbose_name="Email"
+    )
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -161,14 +176,18 @@ class CustomUser(AbstractUser):
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
         if self.role == "customer" and not (self.personal or self.company):
-            raise ValidationError(_("Fill out company information or personal details!"))
+            raise ValidationError(
+                _("Fill out company information or personal details!")
+            )
         if self.role == "supplier" and not self.is_company:
             raise ValidationError(_("Physical person cannot be a supplier!"))
         if not (self.is_superuser or self.is_staff):
             if not self.role:
                 raise ValidationError(_("Role is required for users."))
             if not self.is_company and not self.personal:
-                raise ValidationError(_("Personal field is required for physical person!"))
+                raise ValidationError(
+                    _("Personal field is required for physical person!")
+                )
         if self.is_superuser or self.is_staff:
             self.role = None
         if not self.is_company:
