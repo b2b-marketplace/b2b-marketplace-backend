@@ -5,10 +5,11 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import BaseModel, SoftDeleteMixin
 
 
-def product_directory_path(instance, filename):
+def get_product_directory_path(instance, filename):
     if isinstance(instance, Image):
-        return "products/product_{0}".format(instance.product.id)
-    return "products/product_{0}".format(instance.id)
+        return f"products/{instance.product.category.slug}/{instance.product.sku}/{filename}"
+    if isinstance(instance, Product):
+        return f"products/{instance.category.slug}/{instance.sku}/{filename}"
 
 
 class Category(models.Model):
@@ -17,6 +18,7 @@ class Category(models.Model):
         "self",
         on_delete=models.CASCADE,
         null=True,
+        blank=True,
         verbose_name=_("Category parent"),
     )
     slug = models.SlugField(
@@ -43,7 +45,7 @@ class Image(models.Model):
         verbose_name=_("Product"),
     )
     image = models.ImageField(
-        upload_to=product_directory_path,
+        upload_to=get_product_directory_path,
         null=True,
         verbose_name=_("Product image"),
     )
@@ -58,13 +60,7 @@ class Image(models.Model):
 
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(is_deleted=False)
-            .select_related("user", "category")
-            .prefetch_related("images")
-        )
+        return super().get_queryset().select_related("user", "category").prefetch_related("images")
 
 
 class Product(SoftDeleteMixin, BaseModel):
@@ -75,27 +71,22 @@ class Product(SoftDeleteMixin, BaseModel):
         related_name="suppliers",
         verbose_name=_("Product supplier"),
     )
-    category = models.OneToOneField(
-        Category, on_delete=models.SET_NULL, null=True, related_name="categories", verbose_name=_("Product category")
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="categories",
+        verbose_name=_("Product category"),
     )
     sku = models.CharField(max_length=255, verbose_name=_("Product sku"))
     name = models.CharField(max_length=255, verbose_name=_("Product name"))
     brand = models.CharField(max_length=255, verbose_name=_("Product brand"))
     price = models.DecimalField(max_digits=11, decimal_places=2, verbose_name=_("Product price"))
-    wholesale_quantity = models.PositiveIntegerField(
-        verbose_name=_("Product wholesale quantity"),
-    )
-    video = models.FileField(upload_to=product_directory_path, null=True, verbose_name=_("Product video"))
-    quantity_in_stock = models.PositiveIntegerField(
-        verbose_name=_("Products quantity in stock"),
-    )
-    description = models.TextField(
-        verbose_name=_("Product description"),
-    )
-    manufacturer_country = models.CharField(
-        max_length=255,
-        verbose_name=_("Product manufacturer country"),
-    )
+    wholesale_quantity = models.PositiveIntegerField(verbose_name=_("Product wholesale quantity"))
+    video = models.FileField(upload_to=get_product_directory_path, null=True, verbose_name=_("Product video"))
+    quantity_in_stock = models.PositiveIntegerField(verbose_name=_("Products quantity in stock"))
+    description = models.TextField(verbose_name=_("Product description"))
+    manufacturer_country = models.CharField(max_length=255, verbose_name=_("Product manufacturer country"))
 
     objects = ProductManager()
 
