@@ -161,5 +161,5 @@ cython_debug/
 media/
 .DS_Store
 
-# Vscode project settigns
+# Vscode project settings
 .vscode
