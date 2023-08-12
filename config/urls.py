@@ -6,6 +6,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from config.settings import DEBUG
+
 api_schema_url_patterns = [
     path(
         route="",
@@ -28,3 +30,8 @@ urlpatterns = [
     path(route="api/v1/schema/", view=include(api_schema_url_patterns)),
     path("admin/", admin.site.urls),
 ]
+
+if DEBUG:
+    import debug_toolbar
+
+    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
