@@ -15,6 +15,8 @@ DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 ALLOWED_HOSTS = os.environ["DJANGO_ALLOWED_HOSTS"].split(",")
 CSRF_TRUSTED_ORIGINS = os.environ["CSRF_TRUSTED_ORIGINS"].split(",")
 
+AUTH_USER_MODEL = "users.CustomUser"
+
 # Application definition
 
 DJANGO_APPS = [
@@ -27,10 +29,18 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "debug_toolbar",
+    "drf_spectacular",
     "rest_framework",
 ]
 
-LOCAL_APPS = ["apps.core", "apps.products", "apps.baskets"]
+LOCAL_APPS = [
+    "apps.core",
+    "apps.products",
+    "apps.users",
+    "apps.orders",
+    "apps.baskets",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -42,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -119,3 +130,18 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+if DEBUG:
+    INTERNAL_IPS = ["127.0.0.1"]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "b2b-marketplace",
+    "DESCRIPTION": (
+        "API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров"
+    ),
+    "VERSION": "0.0.1",
+}
