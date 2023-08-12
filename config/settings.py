@@ -15,6 +15,8 @@ DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 ALLOWED_HOSTS = os.environ["DJANGO_ALLOWED_HOSTS"].split(",")
 CSRF_TRUSTED_ORIGINS = os.environ["CSRF_TRUSTED_ORIGINS"].split(",")
 
+AUTH_USER_MODEL = "users.CustomUser"
+
 # Application definition
 
 DJANGO_APPS = [
@@ -30,7 +32,12 @@ THIRD_PARTY_APPS = [
     "rest_framework",
 ]
 
-LOCAL_APPS = ["apps.core", "apps.products", "apps.orders"]
+LOCAL_APPS = [
+    "apps.core",
+    "apps.products",
+    "apps.users",
+    "apps.orders",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
