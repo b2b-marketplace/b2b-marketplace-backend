@@ -8,6 +8,10 @@ from drf_spectacular.views import (
 
 from config.settings import DEBUG
 
+apps_url_patterns = [
+    path("", include("apps.products.urls")),
+]
+
 api_schema_url_patterns = [
     path(
         route="",
@@ -28,8 +32,8 @@ api_schema_url_patterns = [
 
 urlpatterns = [
     path(route="api/v1/schema/", view=include(api_schema_url_patterns)),
+    path(route="api/v1/", view=include(apps_url_patterns)),
     path("admin/", admin.site.urls),
-    path("api/v1/", include("apps.products.urls")),
 ]
 
 if DEBUG:
