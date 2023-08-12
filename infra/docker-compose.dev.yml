@@ -21,8 +21,8 @@ services:
   backend:
     build:
       context: ../
-      dockerfile: Dockerfile.dev
-    container_name: b2b-marketplace-web
+      dockerfile: infra/Dockerfile.dev
+    container_name: b2b-marketplace-backend
     command: >
       sh -c "poetry run python manage.py migrate &&
              poetry run python manage.py createsuperuser --no-input --username admin --email admin@example.com &&
