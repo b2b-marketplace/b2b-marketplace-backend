@@ -5,6 +5,11 @@ from apps.products.serializers import CategorySerializer, ImageSerializer
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения и отображения данных о товаре.
+
+    Используется в безопасных http-методах.
+    """
+
     images = ImageSerializer(many=True)
     category = CategorySerializer()
     # TODO: заменить на кастомный сериализатор пользователя
@@ -31,6 +36,8 @@ class ProductReadSerializer(serializers.ModelSerializer):
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания нового товара или изменения существующего товара."""
+
     images = serializers.ListField(child=serializers.ImageField(), required=True)
 
     class Meta:
@@ -50,6 +57,12 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         )
 
     def create_or_update_product(self, validated_data, instance=None):
+        """Создаёт или обновляет товар.
+
+        Аргументы:
+            instance (Product | None): экземпляр модели товара. При передачи аргумента
+        осуществляется обновление экземпляра. В противном случае - создание.
+        """
         product = instance if instance else Product()
         image_list = validated_data.pop("images", None)
         for key, val in validated_data.items():
