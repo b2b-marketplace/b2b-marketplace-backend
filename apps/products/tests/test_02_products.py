@@ -71,11 +71,11 @@ def test_partial_update_product_smoke(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.patch(endpoint, {"some": "data"})
     assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_200_OK
 
 
 def test_delete_product_smoke(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.delete(endpoint)
     assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_204_NO_CONTENT
