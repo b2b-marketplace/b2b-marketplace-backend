@@ -12,11 +12,11 @@ PRODUCT_RESPONSE = {
     "brand": "789",
     "price": "789.00",
     "wholesale_quantity": 789,
-    "video": "/path/to/video.mp4",
+    "video": "http://host.ru/media/products/kategoriya-1/789/video.mp4",
     "quantity_in_stock": 789,
     "description": "789",
     "manufacturer_country": "789",
-    "images": [{"image": "http://127.0.0.1:8000/media/products/kategoriya-1/789/2.bmp"}],
+    "images": [{"image": "http://host.ru/media/products/kategoriya-1/789/image.bmp"}],
 }
 
 
@@ -52,4 +52,30 @@ def test_get_product_by_id(guest_client, product):
     assert data["name"] == product[0].name
 
 
-# TODO: переписать тесты, после реализации аутентификации
+# TODO: создание/обновление/удаление не разрешено гостю.
+# Переписать и дополнить тесты после того, как будет реализована аутентификаиции.
+def test_create_product_smoke(guest_client):
+    response = guest_client.post(PRODUCTS_ENDPOINT)
+    assert response.status_code != status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_update_product_smoke(guest_client, product):
+    endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
+    response = guest_client.put(endpoint, {"some": "data"})
+    assert response.status_code != status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_partial_update_product_smoke(guest_client, product):
+    endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
+    response = guest_client.patch(endpoint, {"some": "data"})
+    assert response.status_code != status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_delete_product_smoke(guest_client, product):
+    endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
+    response = guest_client.delete(endpoint)
+    assert response.status_code != status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_200_OK
