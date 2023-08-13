@@ -6,7 +6,7 @@ from apps.users.models import CustomUser
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by("-id")
     serializer_class = serializers.ProductReadSerializer
 
     def get_serializer_class(self):

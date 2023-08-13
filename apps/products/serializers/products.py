@@ -1,20 +1,7 @@
 from rest_framework import serializers
 
-from apps.products.models import Category, Image, Product
-
-
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ("image",)
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    parent_id = serializers.PrimaryKeyRelatedField(read_only=True, source="parent")
-
-    class Meta:
-        model = Category
-        fields = ("id", "name", "slug", "parent_id")
+from apps.products.models import Image, Product
+from apps.products.serializers import CategorySerializer, ImageSerializer
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
