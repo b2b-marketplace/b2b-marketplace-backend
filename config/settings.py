@@ -145,4 +145,5 @@ SPECTACULAR_SETTINGS = {
         "API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров"
     ),
     "VERSION": "0.0.1",
+    "COMPONENT_SPLIT_REQUEST": True,
 }
