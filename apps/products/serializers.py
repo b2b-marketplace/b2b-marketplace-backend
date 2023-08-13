@@ -44,7 +44,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):
-    images = serializers.ListField(child=serializers.ImageField())
+    images = serializers.ListField(child=serializers.ImageField(), required=True)
 
     class Meta:
         model = Product
@@ -58,19 +58,27 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             "quantity_in_stock",
             "description",
             "manufacturer_country",
+            "video",
             "images",
         )
 
-    # TODO: валидация
+    def create_or_update_product(self, validated_data, instance=None):
+        product = instance if instance else Product()
+        image_list = validated_data.pop("images", None)
+        for key, val in validated_data.items():
+            setattr(product, key, val)
+        product.save()
+        if image_list:
+            product.images.all().delete()
+            for image in image_list:
+                Image.objects.create(product=product, image=image)
+        return product
 
     def create(self, validated_data):
-        image_list = validated_data.pop("images", None)
-        if not image_list:
-            raise serializers.ValidationError("Добавьте как минимум одно изображение товара")
-        product = Product.objects.create(**validated_data)
-        for image in image_list:
-            Image.objects.create(product=product, image=image)
-        return product
+        return self.create_or_update_product(validated_data)
+
+    def update(self, instance, validated_data):
+        return self.create_or_update_product(validated_data, instance=instance)
 
     def to_representation(self, instance):
         serializer = ProductReadSerializer(instance)
