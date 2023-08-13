@@ -28,3 +28,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 exclude = '.+/migrations/.+\.py$'
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
