@@ -24,7 +24,7 @@ def test_get_all_categories(guest_client, categories):
     assert "results" in data
 
     # fields
-    assert type(data["results"]) == list
+    assert isinstance(data["results"], list)
     assert set(data["results"][0]) == set(CATEGORY_RESPONSE_FIELDS)
 
     # data

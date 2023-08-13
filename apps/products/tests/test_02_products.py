@@ -35,7 +35,7 @@ def test_get_all_products(guest_client, product):
     assert "previous" in data
     assert "results" in data
 
-    assert type(data["results"]) == list
+    assert isinstance(data["results"], list)
     assert set(data["results"][0]) == set(PRODUCT_RESPONSE)
 
     assert data["results"][0]["name"] == product[0].name
