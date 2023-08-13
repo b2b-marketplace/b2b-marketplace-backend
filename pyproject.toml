@@ -19,6 +19,7 @@ django-debug-toolbar = "^4.2.0"
 flake8 = "^6.1.0"
 pre-commit = "^3.3.3"
 black = "^23.7.0"
+factory-boy = "^3.3.0"
 
 [build-system]
 requires = ["poetry-core"]
