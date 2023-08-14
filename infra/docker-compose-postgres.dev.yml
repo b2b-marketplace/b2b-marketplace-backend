@@ -1,0 +1,20 @@
+version: "3.8"
+volumes:
+  pg_data:
+
+services:
+  db:
+    image: postgres:15.3
+    container_name: b2b-marketplace-db-local
+    restart: on-failure
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
