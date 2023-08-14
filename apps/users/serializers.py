@@ -10,6 +10,8 @@ User = get_user_model()
 
 
 class PhoneNumberSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения данных о номере телефона."""
+
     class Meta:
         model = PhoneNumber
         fields = ("id", "phone_number")
