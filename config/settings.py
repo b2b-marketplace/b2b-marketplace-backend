@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path=BASE_DIR / "infra" / ".env")
 
-
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 
@@ -157,8 +156,11 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 SITE_NAME = "b2b"
 
 DJOSER = {
+    "LOGIN_FIELD": "email",
     "SEND_ACTIVATION_EMAIL": True,
+    "SEND_CONFIRMATION_EMAIL": True,
     "ACTIVATION_URL": "activate/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_URL": "/password-reset/{uid}/{token}",
-    "SERIALIZERS": {},
+    "SET_PASSWORD_RETYPE": True,
+    "HIDE_USERS": True,
 }
