@@ -22,7 +22,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
     category = factory.SubFactory(CategoryFactory)
     sku = factory.Sequence(lambda n: f"sku{n}")
     name = factory.Sequence(lambda n: f"product{n}")
-    brand = factory.Sequence(lambda n: f"brand{n}")
+    brand = factory.Faker("word")
     price = factory.Faker("pydecimal", min_value=0, left_digits=3, right_digits=1)
     wholesale_quantity = factory.Faker("pyint", min_value=2, max_value=10)
     video = factory.django.FileField(filename="example.mp4")
