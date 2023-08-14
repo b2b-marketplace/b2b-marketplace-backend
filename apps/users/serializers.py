@@ -12,13 +12,13 @@ User = get_user_model()
 class PhoneNumberSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhoneNumber
-        fields = "__all__"
+        fields = ("id", "phone_number")
 
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = "__all__"
+        fields = ("id", "address")
 
 
 class AddressPhoneSerializer(serializers.ModelSerializer):
