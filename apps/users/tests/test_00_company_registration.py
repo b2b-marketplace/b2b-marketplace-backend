@@ -97,7 +97,7 @@ class Test00CompanyRegistration:
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         login_data = {
-            "username": "valid-username",
+            "email": "validemail@mail.fake",
             "password": "12345678",
         }
 

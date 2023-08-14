@@ -24,7 +24,7 @@ class Test01CompanyAPI:
 
         assert data["count"] == 1
 
-    def test_01_users_delete(self, apiclient, company_client, company):
+    def test_01_user_delete(self, apiclient, company_client, company):
         response = apiclient.delete(self.user_me_url, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -32,9 +32,9 @@ class Test01CompanyAPI:
             "current_password": "12345678",
         }
 
-        assert company.is_deleted is False
+        assert company.is_active is True
 
         response = company_client.delete(self.user_me_url, data=login_data, format="json")
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert company.is_deleted is True
+        assert company.is_active is False
