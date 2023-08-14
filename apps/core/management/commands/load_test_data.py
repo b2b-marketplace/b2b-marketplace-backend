@@ -15,6 +15,7 @@ from apps.users.factories import (
     PhysicalPersonFactory,
 )
 from apps.users.models import CustomUser
+from config.settings import LANGUAGE_CODE
 
 
 class Command(BaseCommand):
@@ -51,8 +52,12 @@ class Command(BaseCommand):
         number_min = 1
         number_max = 5
 
-        self.create_users(number_max)
-        self.create_products(number_max)
-        self.create_baskets_and_orders(number_min)
+        try:
+            with factory.Faker.override_default_locale(LANGUAGE_CODE):
+                self.create_users(number_max)
+                self.create_products(number_max)
+                self.create_baskets_and_orders(number_min)
 
-        self.stdout.write(self.style.SUCCESS(_("Test data created successfully!")))
+            self.stdout.write(self.style.SUCCESS(_("Test data created successfully!")))
+        except Exception as exp:
+            self.stdout.write(self.style.ERROR(_("Error: %s" % exp)))
