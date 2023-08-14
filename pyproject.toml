@@ -12,11 +12,14 @@ djangorestframework = "^3.14.0"
 psycopg2-binary = "^2.9.6"
 python-dotenv = "^1.0.0"
 pillow = "^10.0.0"
+djoser = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
 pre-commit = "^3.3.3"
 black = "^23.7.0"
+pytest = "^7.4.0"
+pytest-django = "^4.5.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -25,3 +28,10 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 exclude = '.+/migrations/.+\.py$'
+
+[tool.pytest.ini_options]
+pythonpath = ["b2b-marketplace-backend"]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+addopts = "-vv -p no:cacheprovider --disable-warnings"
+norecursedirs = [".*"]
