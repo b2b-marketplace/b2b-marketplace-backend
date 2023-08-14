@@ -136,6 +136,8 @@ if DEBUG:
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -144,4 +146,5 @@ SPECTACULAR_SETTINGS = {
         "API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров"
     ),
     "VERSION": "0.0.1",
+    "COMPONENT_SPLIT_REQUEST": True,
 }
