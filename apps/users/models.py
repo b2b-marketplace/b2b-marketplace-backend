@@ -1,9 +1,11 @@
 import re
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from apps.core.models import SoftDeleteMixin
 
 
 def validate_username(value):
@@ -128,7 +130,12 @@ class PhysicalPerson(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-class CustomUser(AbstractUser):
+class CustomUserManager(UserManager):
+    def get_companies(self):
+        return self.exclude(company=None)
+
+
+class CustomUser(SoftDeleteMixin, AbstractUser):
     email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name="Email")
     username = models.CharField(
         max_length=150,
@@ -154,6 +161,8 @@ class CustomUser(AbstractUser):
         on_delete=models.SET_NULL,
     )
 
+    objects = CustomUserManager()
+
     class Meta:
         swappable = "AUTH_USER_MODEL"
         ordering = ("username",)
@@ -161,6 +170,7 @@ class CustomUser(AbstractUser):
         verbose_name_plural = _("Users")
 
     def clean(self):
+        super().clean()
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
         if not (self.is_superuser or self.is_staff) and not (self.is_company or self.personal):
