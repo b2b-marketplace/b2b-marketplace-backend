@@ -38,7 +38,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
 class ProductWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания нового товара или изменения существующего товара."""
 
-    images = serializers.ListField(child=serializers.ImageField(), required=True)
+    images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=True)
 
     class Meta:
         model = Product
