@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path=BASE_DIR / "infra" / ".env")
 
+
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 
@@ -28,6 +29,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "debug_toolbar",
+    "drf_spectacular",
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
@@ -38,6 +41,7 @@ LOCAL_APPS = [
     "apps.products",
     "apps.users",
     "apps.orders",
+    "apps.baskets",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -50,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -128,16 +133,28 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-SITE_NAME = "b2b"
+if DEBUG:
+    INTERNAL_IPS = ["127.0.0.1"]
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "b2b-marketplace",
+    "DESCRIPTION": (
+        "API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров"
+    ),
+    "VERSION": "0.0.1",
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SITE_NAME = "b2b"
 
 DJOSER = {
     "SEND_ACTIVATION_EMAIL": True,
