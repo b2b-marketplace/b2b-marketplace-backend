@@ -19,6 +19,7 @@ django-debug-toolbar = "^4.2.0"
 flake8 = "^6.1.0"
 pre-commit = "^3.3.3"
 black = "^23.7.0"
+pytest-django = "^4.5.2"
 factory-boy = "^3.3.0"
 
 [build-system]
@@ -28,3 +29,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 exclude = '.+/migrations/.+\.py$'
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]

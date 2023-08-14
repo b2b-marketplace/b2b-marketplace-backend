@@ -84,7 +84,7 @@ class Product(SoftDeleteMixin, BaseModel):
     price = models.DecimalField(max_digits=11, decimal_places=2, verbose_name=_("Product price"))
     wholesale_quantity = models.PositiveIntegerField(verbose_name=_("Product wholesale quantity"))
     video = models.FileField(
-        upload_to=get_product_directory_path, null=True, verbose_name=_("Product video")
+        upload_to=get_product_directory_path, blank=True, null=True, verbose_name=_("Product video")
     )
     quantity_in_stock = models.PositiveIntegerField(verbose_name=_("Products quantity in stock"))
     description = models.TextField(verbose_name=_("Product description"))
