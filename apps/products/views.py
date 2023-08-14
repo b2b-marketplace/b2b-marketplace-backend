@@ -1,4 +1,4 @@
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, parsers, permissions, viewsets
 
 from apps.products import serializers
 from apps.products.models import Category, Product
@@ -13,6 +13,7 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by("-id")
     serializer_class = serializers.ProductReadSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
 
     def get_serializer_class(self):
         if self.request.method in permissions.SAFE_METHODS:
