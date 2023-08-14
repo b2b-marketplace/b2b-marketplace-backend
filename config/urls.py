@@ -9,6 +9,7 @@ from drf_spectacular.views import (
 from config.settings import DEBUG
 
 apps_url_patterns = [
+    path("", include("apps.products.urls")),
     path("", include("apps.users.urls")),
     path("auth/", include("djoser.urls.authtoken")),
 ]

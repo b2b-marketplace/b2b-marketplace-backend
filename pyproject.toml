@@ -34,6 +34,6 @@ exclude = '.+/migrations/.+\.py$'
 [tool.pytest.ini_options]
 pythonpath = ["b2b-marketplace-backend"]
 DJANGO_SETTINGS_MODULE = "config.settings"
-python_files = ["test_*.py"]
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
 addopts = "-vv -p no:cacheprovider --disable-warnings"
 norecursedirs = [".*"]

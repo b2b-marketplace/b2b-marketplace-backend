@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path=BASE_DIR / "infra" / ".env")
 
+
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 
@@ -150,6 +151,7 @@ SPECTACULAR_SETTINGS = {
         "API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров"
     ),
     "VERSION": "0.0.1",
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
