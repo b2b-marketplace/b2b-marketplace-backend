@@ -3,9 +3,8 @@ import re
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-
-from apps.core.models import SoftDeleteMixin
 
 
 def validate_username(value):
@@ -132,10 +131,10 @@ class PhysicalPerson(models.Model):
 
 class CustomUserManager(UserManager):
     def get_companies(self):
-        return self.exclude(company=None)
+        return self.filter(Q(is_company=True) & Q(is_active=True))
 
 
-class CustomUser(SoftDeleteMixin, AbstractUser):
+class CustomUser(AbstractUser):
     email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name="Email")
     username = models.CharField(
         max_length=150,
@@ -188,3 +187,11 @@ class CustomUser(SoftDeleteMixin, AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def delete(self):
+        """Предотвращает удаление модели.
+
+        Вместо непосредственного удаления, помечает запись удалённой (is_active=True).
+        """
+        self.is_active = False
+        self.save()
