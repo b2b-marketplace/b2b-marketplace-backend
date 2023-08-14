@@ -5,7 +5,7 @@ from apps.users.factories import CustomUserFactory
 from .models import Category, Image, Product
 
 
-class CategoryFactory(factory.Factory):
+class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Category
 
@@ -14,7 +14,7 @@ class CategoryFactory(factory.Factory):
     slug = factory.Sequence(lambda n: f"slug{n}")
 
 
-class ProductFactory(factory.Factory):
+class ProductFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Product
 
@@ -29,6 +29,14 @@ class ProductFactory(factory.Factory):
     quantity_in_stock = factory.Faker("pyint", min_value=1, max_value=100)
     description = factory.Faker("paragraph")
     manufacturer_country = factory.Faker("country")
+
+    @factory.post_generation
+    def create_image(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            ImageFactory(product=self)
 
 
 class ImageFactory(factory.django.DjangoModelFactory):

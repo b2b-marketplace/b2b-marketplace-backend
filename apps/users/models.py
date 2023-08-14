@@ -63,7 +63,11 @@ class PhoneNumber(models.Model):
 
 
 class Address(models.Model):
-    address = models.CharField(max_length=255, verbose_name=_("Address"))
+    address = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = _("Address")
+        verbose_name_plural = _("Addresses")
 
     def __str__(self):
         return self.address

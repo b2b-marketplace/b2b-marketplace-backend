@@ -1,41 +1,58 @@
+import random
+
 import factory
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.utils.translation import gettext as _
 
-from apps.products.factories import CategoryFactory, ImageFactory, ProductFactory
-
-# from orders.factories import OrderFactory, OrderProductFactory
+from apps.baskets.factories import BasketFactory, BasketProductFactory
+from apps.orders.factories import OrderFactory, OrderProductFactory
+from apps.products.factories import CategoryFactory, ProductFactory
+from apps.products.models import Product
 from apps.users.factories import (
-    AddressFactory,
     CompanyFactory,
     CustomUserFactory,
-    PhoneNumberFactory,
     PhysicalPersonFactory,
 )
+from apps.users.models import CustomUser
 
 
 class Command(BaseCommand):
     help = _("Creating test data.")
 
+    def create_users(self, number_max):
+        physical_persons = PhysicalPersonFactory.create_batch(number_max)
+        companies = CompanyFactory.create_batch(number_max)
+
+        CustomUserFactory.create_batch(number_max, personal=factory.Iterator(physical_persons))
+        CustomUserFactory.create_batch(
+            number_max, is_company=True, company=factory.Iterator(companies)
+        )
+
+    def create_products(self, number_max):
+        categories = CategoryFactory.create_batch(number_max)
+        users = CustomUser.objects.filter(is_company=True, company__role="supplier")
+        for user in users:
+            category = random.choice(categories)
+            ProductFactory.create_batch(number_max, user=user, category=category, create_image=True)
+
+    def create_baskets_and_orders(self, number_min):
+        products = list(Product.objects.all())
+        users = CustomUser.objects.filter(Q(is_company=False) | Q(company__role="customer"))
+        for user in users:
+            basket = BasketFactory(user=user)
+            order = OrderFactory(user=user)
+            user_products = random.sample(products, k=random.randint(number_min, len(products)))
+            for product in user_products:
+                BasketProductFactory(basket=basket, product=product)
+                OrderProductFactory(order=order, product=product)
+
     def handle(self, *args, **options):
-        PhoneNumberFactory.create_batch(4)
-        AddressFactory.create_batch(4)
+        number_min = 1
+        number_max = 5
 
-        physical_persons = PhysicalPersonFactory.create_batch(2)
-        companies = CompanyFactory.create_batch(4)
-
-        CustomUserFactory.create_batch(2, personal=factory.Iterator(physical_persons))
-        CustomUserFactory.create_batch(4, is_company=True, company=factory.Iterator(companies))
-
-        def create_related_objects():
-            category = CategoryFactory()
-            category.save()
-            product = ProductFactory(category=category)
-            product.save()
-
-            ImageFactory(product=product)
-            return product
-
-        [create_related_objects() for _ in range(10)]
+        self.create_users(number_max)
+        self.create_products(number_max)
+        self.create_baskets_and_orders(number_min)
 
         self.stdout.write(self.style.SUCCESS(_("Test data created successfully!")))
