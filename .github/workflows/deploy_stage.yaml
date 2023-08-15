@@ -98,7 +98,7 @@ jobs:
 
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> infra/.env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> infra/.env
-            echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> infra/.env
+            echo POSTGRES_PASSWORD=$'${{ secrets.POSTGRES_PASSWORD }}' >> infra/.env
             echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> infra/.env
             echo POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} >> infra/.env
 
