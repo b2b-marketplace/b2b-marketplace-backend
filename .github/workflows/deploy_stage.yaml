@@ -73,7 +73,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          # passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.SSH_PORT }}
           source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf"
           target: ${{ env.DEPLOY_PATH }}
@@ -84,12 +83,14 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          # passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ env.DEPLOY_PATH }}
             rm -f infra/.env
             touch infra/.env
+
+            echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> infra/.env
+
             echo DJANGO_SECRET_KEY=$'${{ secrets.DJANGO_SECRET_KEY }}' >> infra/.env
             echo DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }} >> infra/.env
             echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> infra/.env
@@ -102,7 +103,8 @@ jobs:
             echo POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} >> infra/.env
 
             sudo docker image prune -f
-            sudo docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+            # sudo docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+            sudo docker pull profcheg/b2bmarketplace
             sudo docker compose --file infra/docker-compose.stage.yaml stop
             sudo docker compose --file infra/docker-compose.stage.yaml rm backend
             sudo docker compose --file infra/docker-compose.stage.yaml up -d
