@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: b2b_marketplace_backend
-  DEPLOY_PATH: /b2b_marketplace
+  DEPLOY_PATH: b2b_marketplace/
 
 defaults:
   run:
