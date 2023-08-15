@@ -39,8 +39,8 @@ jobs:
         name: Build and push image
         uses: docker/build-push-action@v4
         with:
-          context: infra/
-          file: Dockerfile.stage
+          context: .
+          file: infra/Dockerfile.stage
           labels: runnumber=${GITHUB_RUN_ID}
           push: true
           tags: |
