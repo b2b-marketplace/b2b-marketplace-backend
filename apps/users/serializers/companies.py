@@ -23,7 +23,6 @@ class CompanyReadSerializer(serializers.ModelSerializer):
             "id",
             "role",
             "name",
-            "company_account",
             "inn",
             "ogrn",
             "phone_number",
