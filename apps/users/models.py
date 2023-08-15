@@ -131,7 +131,9 @@ class PhysicalPerson(models.Model):
 
 class CustomUserManager(UserManager):
     def get_companies(self):
-        return self.filter(Q(is_company=True) & Q(is_active=True))
+        return self.filter(Q(is_company=True) & Q(is_active=True)).select_related(
+            "company", "company__address", "company__phone_number"
+        )
 
 
 class CustomUser(AbstractUser):
