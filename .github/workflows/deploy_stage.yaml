@@ -8,7 +8,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # REP_OWNER: b2b-marketplace
   IMAGE_NAME: b2b_marketplace_backend
   DEPLOY_PATH: /b2b_marketplace
 
