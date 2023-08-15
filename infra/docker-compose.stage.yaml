@@ -1,0 +1,51 @@
+version: "3.8"
+
+volumes:
+  postgres_data:
+  static_value:
+  media_value:
+
+services:
+  db:
+    image: postgres:15.3
+    container_name: b2b-marketplace-db-stage
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/b2b-marketplace/b2b_marketplace_backend:latest
+    container_name: b2b_marketplace_backend
+    command: >
+      sh -c "python manage.py migrate &&
+      python manage.py collectstatic --no-input --clear &&
+      gunicorn config.wsgi:application --bind 0:8000"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - static_value:/b2b_marketplace/static/
+      - media_value:/b2b_marketplace/media/
+    env_file:
+      - .env
+
+  nginx:
+    image: nginx:1.25.1-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./infra/nginx/:/etc/nginx/conf.d/
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+    depends_on:
+      - backend
