@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -22,6 +23,7 @@ class CustomUserViewSet(UserViewSet):
         else:
             return super().get_serializer_class()
 
+    @extend_schema(responses={200: UserCompanyReadSerializer(many=True)})
     @action(("get",), detail=False, permission_classes=(AllowAny,))
     def companies(self, request):
         user = User.objects.get_companies()
@@ -32,6 +34,7 @@ class CustomUserViewSet(UserViewSet):
         serializer = self.get_serializer(user, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(responses={201: UserCompanyWriteSerializer})
     @companies.mapping.post
     def create_company(self, request):
         serializer = self.get_serializer(data=request.data)
