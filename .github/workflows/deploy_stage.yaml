@@ -58,7 +58,7 @@ jobs:
   deploy:
     name: Deploy
     # if: github.event.pull_request.merged == true
-    runs-on: ubunut-latest
+    runs-on: ubuntu-latest
     needs: buld_and_push_image_to_github_packages
     environment:
       name: Stage
