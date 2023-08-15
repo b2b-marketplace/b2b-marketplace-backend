@@ -5,7 +5,10 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from apps.users.serializers.companies import CompanySerializer, UserReadSerializer
+from apps.users.serializers.companies import (
+    CompanySerializer,
+    UserCompanyReadSerializer,
+)
 
 User = get_user_model()
 
@@ -13,7 +16,7 @@ User = get_user_model()
 class CustomUserViewSet(UserViewSet):
     def get_serializer_class(self):
         if self.action == "companies":
-            return UserReadSerializer
+            return UserCompanyReadSerializer
         elif self.action == "create_company":
             return CompanySerializer
         else:

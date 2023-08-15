@@ -52,8 +52,8 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class UserReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения и отображения данных о пользователях.
+class UserCompanyReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения и отображения данных о пользователях-компаниях.
 
     Используется в безопасных http-методах.
     """
@@ -91,5 +91,5 @@ class CompanySerializer(BaseSerializer):
         return self.perform_create(validated_data, **relations, is_company=True)
 
     def to_representation(self, instance):
-        serializer = UserReadSerializer(instance)
+        serializer = UserCompanyReadSerializer(instance)
         return serializer.data
