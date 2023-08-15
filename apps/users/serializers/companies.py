@@ -71,7 +71,7 @@ class UserCompanyReadSerializer(serializers.ModelSerializer):
         )
 
 
-class CompanySerializer(BaseSerializer):
+class UserCompanyWriteSerializer(BaseSerializer):
     """Сериализатор для создания пользователя-компании."""
 
     company = CompanyWriteSerializer()

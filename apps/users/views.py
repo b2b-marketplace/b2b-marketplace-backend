@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.users.serializers.companies import (
-    CompanySerializer,
     UserCompanyReadSerializer,
+    UserCompanyWriteSerializer,
 )
 
 User = get_user_model()
@@ -18,7 +18,7 @@ class CustomUserViewSet(UserViewSet):
         if self.action == "companies":
             return UserCompanyReadSerializer
         elif self.action == "create_company":
-            return CompanySerializer
+            return UserCompanyWriteSerializer
         else:
             return super().get_serializer_class()
 
