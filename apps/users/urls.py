@@ -1,9 +1,9 @@
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
 
+from apps.core.routers import DynamicRouter
 from apps.users.views import CustomUserViewSet
 
-router = DefaultRouter()
+router = DynamicRouter()
 router.register("users", CustomUserViewSet, basename="users")
 
 urlpatterns = [
