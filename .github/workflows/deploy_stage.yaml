@@ -1,11 +1,10 @@
 name: Build and deploy to stage server
 
 on:
-  workflow_dispatch
-  # pull_request:
-  #   branches:
-  #     - develop
-  #   types: [ closed ]
+  pull_request:
+    branches:
+      - develop
+    # types: [ closed ]
 
 env:
   REGISTRY: ghcr.io
