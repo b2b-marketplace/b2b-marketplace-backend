@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import IntegerField, Q, Value
 
-from apps.products.models import Product
+from apps.products.models import Category, Product
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -50,3 +50,21 @@ class ProductFilter(django_filters.FilterSet):
             .annotate(order=Value(1, IntegerField()))
         )
         return qs1.union(qs2).order_by("order")
+
+
+class CategoryFilter(django_filters.FilterSet):
+    """Фильтр по категориям.
+
+    Возможные параметры:
+        - name: название категории (частичное совпадение)
+        - slug: название товара (точное совпадение)
+    """
+
+    name = django_filters.CharFilter(
+        lookup_expr="icontains", help_text="Название категории (частичное совпадение)"
+    )
+    slug = django_filters.CharFilter(lookup_expr="iexact", help_text="Slug категории")
+
+    class Meta:
+        model = Category
+        fields = ("name", "slug")
