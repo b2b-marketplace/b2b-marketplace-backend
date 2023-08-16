@@ -1,6 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, parsers, permissions, viewsets
 
 from apps.products import serializers
+from apps.products.filters import ProductFilter
 from apps.products.models import Category, Product
 from apps.users.models import CustomUser
 
@@ -11,9 +13,11 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all().order_by("-id")
+    queryset = Product.objects.all().order_by()
     serializer_class = serializers.ProductReadSerializer
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = ProductFilter
 
     def get_serializer_class(self):
         if self.request.method in permissions.SAFE_METHODS:
