@@ -102,7 +102,7 @@ jobs:
             echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> infra/.env
             echo POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} >> infra/.env
 
-            echo ${{ secrets.REGISTRY_PAT }} | docker login ghcr.io -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+            echo ${{ secrets.REGISTRY_PAT }} | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
             docker image prune -f
             docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
