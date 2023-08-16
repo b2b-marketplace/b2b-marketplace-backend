@@ -88,6 +88,7 @@ class Company(models.Model):
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
         null=True,
+        blank=True,
     )
     inn = models.CharField(
         max_length=10,
