@@ -14,6 +14,7 @@ python-dotenv = "^1.0.0"
 pillow = "^10.0.0"
 djoser = "^2.2.0"
 drf-spectacular = "^0.26.4"
+gunicorn = "^21.2.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.2.0"

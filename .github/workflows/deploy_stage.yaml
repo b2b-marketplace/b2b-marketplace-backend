@@ -1,0 +1,111 @@
+name: Build and deploy to stage server
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [ closed ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: b2b_marketplace_backend
+  DEPLOY_PATH: b2b_marketplace/
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  buld_and_push_image_to_github_packages:
+    name: Build and push image to GitHub Packages
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    environment:
+      name: Stage
+
+    steps:
+      -
+        name: Check out the repo
+        uses: actions/checkout@v3
+      -
+        name: Login to GutHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Set REP_OWNER variable
+        run: |
+          echo REP_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
+      -
+        name: Build and push image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: infra/Dockerfile.stage
+          labels: runnumber=${GITHUB_RUN_ID}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:stage,
+            ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest,
+            ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  deploy:
+    name: Deploy and start the App
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    needs: buld_and_push_image_to_github_packages
+    environment:
+      name: Stage
+
+    steps:
+      -
+        name: Check out the repo
+        uses: actions/checkout@v3
+      -
+        name: Copy docker-compose and nginx files to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf"
+          target: ${{ env.DEPLOY_PATH }}
+      -
+        name: Execute remote commands to deploy and start app
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}
+            rm -f infra/.env
+            touch infra/.env
+
+            echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> infra/.env
+
+            echo DJANGO_SECRET_KEY=$'${{ secrets.DJANGO_SECRET_KEY }}' >> infra/.env
+            echo DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }} >> infra/.env
+            echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> infra/.env
+            echo DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }} >> infra/.env
+
+            echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> infra/.env
+            echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> infra/.env
+            echo POSTGRES_PASSWORD=$'${{ secrets.POSTGRES_PASSWORD }}' >> infra/.env
+            echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> infra/.env
+            echo POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} >> infra/.env
+
+            echo ${{ secrets.REGISTRY_PAT }} | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+            docker image prune -f
+            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+            docker compose --file infra/docker-compose.stage.yaml stop
+            docker compose --file infra/docker-compose.stage.yaml rm backend
+            docker compose --file infra/docker-compose.stage.yaml up -d
