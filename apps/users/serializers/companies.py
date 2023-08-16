@@ -86,8 +86,8 @@ class UserCompanyWriteSerializer(BaseSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        relations = self.update_or_create(validated_data)
-        return self.perform_create(validated_data, **relations, is_company=True)
+        flatten_data = self._flatten_dict(validated_data)
+        return User.objects.create_user(**flatten_data)
 
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)
