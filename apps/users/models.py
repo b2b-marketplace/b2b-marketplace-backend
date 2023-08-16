@@ -64,7 +64,11 @@ class PhoneNumber(models.Model):
 
 
 class Address(models.Model):
-    address = models.CharField(max_length=255, verbose_name=_("Address"))
+    address = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = _("Address")
+        verbose_name_plural = _("Addresses")
 
     def __str__(self):
         return self.address
@@ -98,7 +102,7 @@ class Company(models.Model):
         verbose_name=_("PSRN"),
         null=True,
     )
-    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
+    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=False)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
@@ -119,7 +123,7 @@ class PhysicalPerson(models.Model):
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
     )
-    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
+    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=False)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
@@ -139,7 +143,7 @@ class CustomUserManager(UserManager):
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name="Email")
+    email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name=_("Email"))
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -177,7 +181,7 @@ class CustomUser(AbstractUser):
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
         if not (self.is_superuser or self.is_staff) and not (self.is_company or self.personal):
-            raise ValidationError(_("Personal field is required for physical person!"))
+            raise ValidationError(_("Personal field is required for physical persons!"))
 
     def save(self, *args, **kwargs):
         if self.is_superuser or self.is_staff:

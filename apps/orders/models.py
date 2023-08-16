@@ -22,6 +22,13 @@ class Order(BaseModel):
         related_name="customer",
         verbose_name=_("Order owner"),
     )
+    order_products = models.ManyToManyField(
+        Product,
+        blank=False,
+        through="OrderProduct",
+        related_name="order_products",
+        verbose_name=_("Products"),
+    )
     status = models.CharField(
         max_length=2, choices=Status.choices, default=Status.CREATED, verbose_name=_("Order status")
     )
@@ -36,7 +43,7 @@ class Order(BaseModel):
 
 
 class OrderProduct(models.Model):
-    order = models.OneToOneField(
+    order = models.ForeignKey(
         Order,
         on_delete=models.DO_NOTHING,
         related_name="orders",
