@@ -105,7 +105,8 @@ jobs:
             sudo echo ${{ secrets.REGISTRY_PAT }} | docker login ghcr.io -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
             sudo docker image prune -f
-            sudo docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+            # sudo docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:latest
+            sudo docker pull ghcr.io/b2b-marketplace/b2b_marketplace_backend
             sudo docker compose --file infra/docker-compose.stage.yaml stop
             sudo docker compose --file infra/docker-compose.stage.yaml rm backend
             sudo docker compose --file infra/docker-compose.stage.yaml up -d
