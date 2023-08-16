@@ -39,6 +39,7 @@ class CustomUserAdmin(UserAdmin):
         "username",
         "email",
         "is_company",
+        "is_active",
     )
     list_filter = ("is_company",)
     empty_value_display = "-empty-"
