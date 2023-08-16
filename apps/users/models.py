@@ -83,6 +83,7 @@ class Company(models.Model):
         unique=True,
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
+        null=True,
     )
     inn = models.CharField(
         max_length=10,
@@ -95,6 +96,7 @@ class Company(models.Model):
         unique=True,
         validators=[validate_ogrn, validate_digits_only],
         verbose_name=_("PSRN"),
+        null=True,
     )
     phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
