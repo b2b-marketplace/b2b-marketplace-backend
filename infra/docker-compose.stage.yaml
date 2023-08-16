@@ -23,9 +23,7 @@ services:
       retries: 5
 
   backend:
-    # TODO: забирать с гитхаба, когда пакет сделают публичным
-    # image: ghcr.io/b2b-marketplace/b2b_marketplace_backend:latest
-    image: profcheg/b2bmarketplace
+    image: ghcr.io/b2b-marketplace/b2b_marketplace_backend:latest
     container_name: b2b_marketplace_backend
     command: >
       sh -c "python manage.py migrate &&
