@@ -1,8 +1,9 @@
 import re
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -86,6 +87,8 @@ class Company(models.Model):
         unique=True,
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
+        null=True,
+        blank=True,
     )
     inn = models.CharField(
         max_length=10,
@@ -98,6 +101,8 @@ class Company(models.Model):
         unique=True,
         validators=[validate_ogrn, validate_digits_only],
         verbose_name=_("PSRN"),
+        null=True,
+        blank=True,
     )
     phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=False)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
@@ -132,6 +137,13 @@ class PhysicalPerson(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+class CustomUserManager(UserManager):
+    def get_companies(self):
+        return self.filter(Q(is_company=True) & Q(is_active=True)).select_related(
+            "company", "company__address", "company__phone_number"
+        )
+
+
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name=_("Email"))
     username = models.CharField(
@@ -158,6 +170,8 @@ class CustomUser(AbstractUser):
         on_delete=models.SET_NULL,
     )
 
+    objects = CustomUserManager()
+
     class Meta:
         swappable = "AUTH_USER_MODEL"
         ordering = ("username",)
@@ -165,6 +179,7 @@ class CustomUser(AbstractUser):
         verbose_name_plural = _("Users")
 
     def clean(self):
+        super().clean()
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
         if not (self.is_superuser or self.is_staff) and not (self.is_company or self.personal):
@@ -182,3 +197,11 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def delete(self):
+        """Предотвращает удаление модели.
+
+        Вместо непосредственного удаления, помечает запись удалённой (is_active=True).
+        """
+        self.is_active = False
+        self.save()
