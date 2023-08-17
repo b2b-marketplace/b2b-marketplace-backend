@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from apps.users.models import Company
 from apps.users.serializers.addresses import AddressSerializer
-from apps.users.serializers.base import BaseSerializer
 from apps.users.serializers.phonenumbers import PhoneNumberSerializer
 
 User = get_user_model()
@@ -70,9 +69,10 @@ class UserCompanyReadSerializer(serializers.ModelSerializer):
         )
 
 
-class UserCompanyWriteSerializer(BaseSerializer):
+class UserCompanyWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания пользователя-компании."""
 
+    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
     company = CompanyWriteSerializer()
 
     class Meta:
@@ -86,8 +86,7 @@ class UserCompanyWriteSerializer(BaseSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        relations = self.update_or_create(validated_data)
-        return self.perform_create(validated_data, **relations, is_company=True)
+        return User.objects.create_user(**validated_data)
 
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)

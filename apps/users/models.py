@@ -138,6 +138,44 @@ class PhysicalPerson(models.Model):
 
 
 class CustomUserManager(UserManager):
+    def _save_object(self, model, extra_fields):
+        obj = model()
+        for key, value in extra_fields.items():
+            setattr(obj, key, value)
+        obj.save()
+        return obj
+
+    def _profile(self, field_name, model, extra_fields, instance=None):
+        """Создает и обновляет пользователей."""
+        address = extra_fields[field_name].pop("address", None)
+        phone_number = extra_fields[field_name].pop("phone_number", None)
+
+        obj_model = getattr(instance, field_name) if instance else model
+        obj = self._save_object(obj_model, extra_fields.pop(field_name, None))
+
+        if address:
+            address_model = getattr(obj_model, "address") if instance else Address
+            address = self._save_object(address_model, address)
+            obj.address = address
+
+        if phone_number:
+            phone_number_model = getattr(obj_model, "phone_number") if instance else PhoneNumber
+            phone_number = self._save_object(phone_number_model, phone_number)
+            obj.phone_number = phone_number
+
+        obj.save()
+        return obj
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_active", False)
+
+        if "company" in extra_fields:
+            extra_fields.setdefault("is_company", True)
+            company = self._profile("company", Company, extra_fields)
+            extra_fields.setdefault("company", company)
+
+        return super().create_user(username, email, password, **extra_fields)
+
     def get_companies(self):
         return self.filter(Q(is_company=True) & Q(is_active=True)).select_related(
             "company", "company__address", "company__phone_number"
