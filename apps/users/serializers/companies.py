@@ -103,6 +103,7 @@ class MeUserCompanyReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        depth = 2
         fields = (
             "id",
             "email",
