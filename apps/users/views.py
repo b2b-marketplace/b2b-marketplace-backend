@@ -1,12 +1,14 @@
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from drf_spectacular.utils import extend_schema
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.users.serializers.companies import (
+    MeUserCompanyReadSerializer,
+    MeUserCompanyWriteSerializer,
     UserCompanyReadSerializer,
     UserCompanyWriteSerializer,
 )
@@ -20,8 +22,22 @@ class CustomUserViewSet(UserViewSet):
             return UserCompanyReadSerializer
         elif self.action == "create_company":
             return UserCompanyWriteSerializer
-        else:
-            return super().get_serializer_class()
+
+        elif (
+            self.action == "me"
+            and self.request.method in permissions.SAFE_METHODS
+            and self.get_instance().is_company
+        ):
+            return MeUserCompanyReadSerializer
+
+        elif (
+            self.action == "me"
+            and self.request.method in ("PUT", "PATCH")
+            and self.get_instance().is_company
+        ):
+            return MeUserCompanyWriteSerializer
+
+        return super().get_serializer_class()
 
     @extend_schema(responses={200: UserCompanyReadSerializer(many=True)})
     @action(("get",), detail=False, permission_classes=(AllowAny,))
@@ -42,3 +58,14 @@ class CustomUserViewSet(UserViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @extend_schema(
+        request=MeUserCompanyWriteSerializer,
+        responses={
+            200: MeUserCompanyReadSerializer,
+        },
+        methods=["get", "put", "patch"],
+    )
+    @action(["get", "put", "patch", "delete"], detail=False)
+    def me(self, request, *args, **kwargs):
+        return super().me(request, *args, **kwargs)
