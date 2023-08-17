@@ -101,9 +101,10 @@ class MeUserCompanyReadSerializer(serializers.ModelSerializer):
     Используется в безопасных http-методах.
     """
 
+    company = CompanyReadSerializer()
+
     class Meta:
         model = User
-        depth = 2
         fields = (
             "id",
             "email",
