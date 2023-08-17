@@ -24,6 +24,42 @@ class Test01CompanyAPI:
 
         assert data["count"] == 1
 
+    def test_01_company_update_profile(self, apiclient, company_client):
+        request_data = {
+            "company": {
+                "role": "supplier",
+                "name": "best_company",
+                "ogrn": "3333333333333",
+                "company_account": "22222222222222222222",
+                "address": {"address": "earth"},
+            },
+        }
+
+        responses_data_after_update_profile = {
+            "id": 4,
+            "email": "company@company.fake",
+            "username": "companyuser",
+            "is_company": True,
+            "company": {
+                "id": 4,
+                "role": "supplier",
+                "name": "best_company",
+                "inn": "1234567890",
+                "ogrn": "3333333333333",
+                "company_account": "22222222222222222222",
+                "address": {"id": 4, "address": "earth"},
+                "phone_number": {"id": 4, "phone_number": "1234567"},
+            },
+        }
+
+        response = apiclient.patch(self.user_me_url, data=request_data, format="json")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+        response = company_client.patch(self.user_me_url, data=request_data, format="json")
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.json() == responses_data_after_update_profile
+
     def test_01_user_delete(self, apiclient, company_client, company):
         response = apiclient.delete(self.user_me_url, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
