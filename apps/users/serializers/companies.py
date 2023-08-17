@@ -122,7 +122,7 @@ class MeUserCompanyReadSerializer(serializers.ModelSerializer):
     Используется в безопасных http-методах.
     """
 
-    company = CompanyReadSerializer()
+    company = MeCompanyReadSerializer()
 
     class Meta:
         model = User
