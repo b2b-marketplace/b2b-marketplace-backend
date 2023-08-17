@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Image, Product
+from .models import Category, Image, Product, Video
 
 
 class ImageInLine(admin.TabularInline):
@@ -8,9 +8,22 @@ class ImageInLine(admin.TabularInline):
     extra = 1
 
 
+class VideoInLine(admin.TabularInline):
+    model = Video
+    extra = 1
+
+
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     list_display = ("product", "image")
+    search_fields = ("product",)
+    list_filter = ("product",)
+    empty_value_display = "-empty-"
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ("product", "video")
     search_fields = ("product",)
     list_filter = ("product",)
     empty_value_display = "-empty-"
@@ -36,7 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
         "brand",
         "price",
         "wholesale_quantity",
-        "video",
+        # "video",
         "quantity_in_stock",
         "description",
         "manufacturer_country",
@@ -47,4 +60,4 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ("sku", "name", "user", "category")
     list_filter = ("sku", "name", "user", "category", "is_deleted")
     empty_value_display = "-empty-"
-    inlines = (ImageInLine,)
+    inlines = (ImageInLine, VideoInLine)
