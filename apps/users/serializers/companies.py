@@ -112,3 +112,21 @@ class MeUserCompanyReadSerializer(serializers.ModelSerializer):
             "is_company",
             "company",
         )
+
+
+class MeUserCompanyWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для обновления данных в личном кабинете."""
+
+    company = CompanyWriteSerializer()
+
+    class Meta:
+        model = User
+        fields = ("company",)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        return User.objects.update_user(instance, validated_data)
+
+    def to_representation(self, instance):
+        serializer = MeUserCompanyReadSerializer(instance)
+        return serializer.data
