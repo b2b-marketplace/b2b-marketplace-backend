@@ -138,10 +138,11 @@ class PhysicalPerson(models.Model):
 
 
 class CustomUserManager(UserManager):
-    def _save_object(self, model, extra_fields):
-        obj = model()
-        for key, value in extra_fields.items():
-            setattr(obj, key, value)
+    def _save_object(self, instance, extra_fields):
+        obj = instance
+        if isinstance(extra_fields, dict):
+            for key, value in extra_fields.items():
+                setattr(obj, key, value)
         obj.save()
         return obj
 
@@ -150,20 +151,24 @@ class CustomUserManager(UserManager):
         address = extra_fields[field_name].pop("address", None)
         phone_number = extra_fields[field_name].pop("phone_number", None)
 
-        obj_model = getattr(instance, field_name) if instance else model
-        obj = self._save_object(obj_model, extra_fields.pop(field_name, None))
+        obj_model = getattr(instance, field_name) if instance else model()
 
         if address:
-            address_model = getattr(obj_model, "address") if instance else Address
+            address_model = getattr(obj_model, "address") if instance else Address()
             address = self._save_object(address_model, address)
-            obj.address = address
+            extra_fields[field_name].setdefault("address", address)
 
         if phone_number:
-            phone_number_model = getattr(obj_model, "phone_number") if instance else PhoneNumber
+            phone_number_model = getattr(obj_model, "phone_number") if instance else PhoneNumber()
             phone_number = self._save_object(phone_number_model, phone_number)
-            obj.phone_number = phone_number
+            extra_fields[field_name].setdefault("phone_number", phone_number)
+
+        obj = self._save_object(obj_model, extra_fields.pop(field_name, None))
 
         obj.save()
+        if instance:
+            instance.save()
+            return instance
         return obj
 
     def create_user(self, username, email=None, password=None, **extra_fields):
@@ -175,6 +180,11 @@ class CustomUserManager(UserManager):
             extra_fields.setdefault("company", company)
 
         return super().create_user(username, email, password, **extra_fields)
+
+    def update_user(self, instance, validated_data):
+        if "company" in validated_data:
+            company = self._profile("company", Company, validated_data, instance=instance)
+            return company
 
     def get_companies(self):
         return self.filter(Q(is_company=True) & Q(is_active=True)).select_related(
