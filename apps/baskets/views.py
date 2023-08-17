@@ -29,9 +29,41 @@ class BasketViewSet(viewsets.ModelViewSet):
         user = CustomUser.objects.get(id=1)
         serializer.save(user=user)
 
-    @action(detail=False, methods=["post"], url_path="mine", serializer_class=BasketWriteSerializer)
-    def add_products_to_basket(self, request):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
+    # @action(detail=False, methods=["post", "put"], url_path="mine",
+    #                                serializer_class=BasketWriteSerializer)
+    # def add_products_to_basket(self, request):
+    #     serializer = self.get_serializer(data=request.data, context={"request": request})
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response({"message": "Products added to the basket successfully"})
+
+    @action(
+        detail=False,
+        methods=["post", "put"],
+        url_path="mine",
+        serializer_class=BasketWriteSerializer,
+    )
+    def manage_basket(self, request):
+        user = CustomUser.objects.get(id=1)
+        if request.method == "POST":
+            serializer = self.get_serializer(data=request.data, context={"request": request})
+        else:
+            basket = Basket.objects.get(user=user)
+            serializer = self.get_serializer(instance=basket, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"message": "Products added to the basket successfully"})
+
+        if request.method == "POST":
+            message = "Products added to the basket successfully"
+        else:
+            message = "Basket updated successfully"
+
+        return Response({"message": message})
+
+    # def update_basket(self, request):
+    #     user = CustomUser.objects.get(id=1)
+    #     basket = Basket.objects.get(user=user)
+    #     serializer = self.get_serializer(instance=basket, data=request.data, partial=True)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response({"message": "Basket updated successfully"})
