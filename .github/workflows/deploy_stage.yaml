@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: b2b_marketplace_backend
+  REP_OWNER: b2b-marketplace
   DEPLOY_PATH: b2b_marketplace/
 
 defaults:
@@ -37,10 +38,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Set REP_OWNER variable
-        run: |
-          echo REP_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
       -
         name: Build and push image
         uses: docker/build-push-action@v4
