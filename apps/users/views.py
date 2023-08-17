@@ -18,7 +18,7 @@ User = get_user_model()
 
 class CustomUserViewSet(UserViewSet):
     def get_serializer_class(self):
-        if self.action == "companies":
+        if self.action == "companies" and self.request.method in permissions.SAFE_METHODS:
             return UserCompanyReadSerializer
         elif self.action == "create_company":
             return UserCompanyWriteSerializer
