@@ -6,7 +6,7 @@ from apps.users.factories import CustomUserFactory
 
 
 class BasketFactory(factory.django.DjangoModelFactory):
-    """ Фабрика для создания объектов корзины."""
+    """Фабрика для создания объектов корзины."""
 
     class Meta:
         model = Basket
@@ -15,7 +15,7 @@ class BasketFactory(factory.django.DjangoModelFactory):
 
 
 class BasketProductFactory(factory.django.DjangoModelFactory):
-    """ Фабрика для создания объектов товаров в корзине. """
+    """Фабрика для создания объектов товаров в корзине."""
 
     class Meta:
         model = BasketProduct

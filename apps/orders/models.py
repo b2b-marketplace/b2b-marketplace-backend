@@ -7,10 +7,10 @@ from apps.products.models import Product
 
 
 class Order(BaseModel):
-    """ Модель заказа. """
+    """Модель заказа."""
 
     class Status(models.TextChoices):
-        """ Статусы заказа. """
+        """Статусы заказа."""
 
         CREATED = "CR", _("Created")
         UPDATED = "UP", _("Updated")
@@ -47,7 +47,7 @@ class Order(BaseModel):
 
 
 class OrderProduct(models.Model):
-    """ Модель товара в заказе. """
+    """Модель товара в заказе."""
 
     order = models.ForeignKey(
         Order,

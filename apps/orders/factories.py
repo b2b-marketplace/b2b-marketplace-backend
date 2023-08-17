@@ -6,7 +6,7 @@ from apps.users.factories import CustomUserFactory
 
 
 class OrderFactory(factory.django.DjangoModelFactory):
-    """ Фабрика для создания объектов заказа. """
+    """Фабрика для создания объектов заказа."""
 
     class Meta:
         model = Order
@@ -18,7 +18,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
 
 
 class OrderProductFactory(factory.django.DjangoModelFactory):
-    """ Фабрика для создания объектов товаров в заказе. """
+    """Фабрика для создания объектов товаров в заказе."""
 
     class Meta:
         model = OrderProduct

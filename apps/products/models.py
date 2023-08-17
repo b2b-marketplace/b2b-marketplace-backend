@@ -26,7 +26,7 @@ def get_product_directory_path(instance, filename):
 
 
 class Category(models.Model):
-    """ Модель категории. """
+    """Модель категории."""
 
     name = models.CharField(max_length=255, unique=True, verbose_name=_("Category name"))
     parent = models.ForeignKey(
@@ -53,7 +53,7 @@ class Category(models.Model):
 
 
 class Image(models.Model):
-    """ Модель изображения. """
+    """Модель изображения."""
 
     product = models.ForeignKey(
         "Product",
@@ -76,14 +76,14 @@ class Image(models.Model):
 
 
 class ProductManager(models.Manager):
-    """ Менеджер для модели Product. """
+    """Менеджер для модели Product."""
 
     def get_queryset(self):
         return super().get_queryset().select_related("user", "category").prefetch_related("images")
 
 
 class Product(SoftDeleteMixin, BaseModel):
-    """ Модель товара. """
+    """Модель товара."""
 
     user = models.ForeignKey(
         get_user_model(),
