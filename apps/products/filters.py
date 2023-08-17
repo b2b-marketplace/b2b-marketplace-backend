@@ -8,7 +8,9 @@ class ProductFilter(django_filters.FilterSet):
     """Фильтр по товарам.
 
     Возможные параметры:
-        - category: slug категории (точное совпадение)
+        - category: slug категории товара (точное совпадение)
+        - parent_category: slug родительской категории, к которой принадлежит
+        категория товара (точное совпаданию).
         - name: название товара (частичное совпадение)
         - min_quantity: минимальный заказ
         - ordering: сортировка по цене
@@ -16,6 +18,10 @@ class ProductFilter(django_filters.FilterSet):
 
     category = django_filters.CharFilter(
         field_name="category__slug", help_text="Категория товара (slug)"
+    )
+    parent_category = django_filters.CharFilter(
+        field_name="category__parent__slug",
+        help_text="Родительская категория, к которой относится категория товара (slug)",
     )
     name = django_filters.CharFilter(
         method="filter_by_name", help_text="Название товара (частичное совпадение)"
@@ -31,7 +37,7 @@ class ProductFilter(django_filters.FilterSet):
         model = Product
         #  ! поле name обязательно должно быть последним элементом в fields, т.к. возвращает union
         #  https://docs.djangoproject.com/en/4.2/ref/models/querysets/#union
-        fields = ("category", "min_quantity", "ordering", "name")
+        fields = ("category", "parent_category", "min_quantity", "ordering", "name")
 
     def filter_by_name(self, queryset, name, value):
         """Фильтрация по названию товара.
@@ -58,13 +64,20 @@ class CategoryFilter(django_filters.FilterSet):
     Возможные параметры:
         - name: название категории (частичное совпадение)
         - slug: название товара (точное совпадение)
+        - parent_category: slug родительской категории, к которой относится
+        категория (точное совпадение)
     """
 
     name = django_filters.CharFilter(
         lookup_expr="icontains", help_text="Название категории (частичное совпадение)"
     )
     slug = django_filters.CharFilter(lookup_expr="iexact", help_text="Slug категории")
+    parent_category = django_filters.CharFilter(
+        field_name="parent__slug",
+        lookup_expr="iexact",
+        help_text="Slug родительской категории, к которой относится категория",
+    )
 
     class Meta:
         model = Category
-        fields = ("name", "slug")
+        fields = ("name", "slug", "parent_category")
