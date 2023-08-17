@@ -96,44 +96,32 @@ class BasketWriteSerializer(serializers.ModelSerializer):
         self.create_products_quantity(basket_products, basket)
         return basket
 
-    # работающий код для обновления товара:
-    # def update(self, instance, validated_data):
-    #     basket_products = validated_data.pop("basket_products")
-    #     self.create_products_quantity(basket_products, instance)
-    #     return instance
-
-    # работающий код для удаления товара:
-    # def update(self, instance, validated_data):
-    #     basket_products = validated_data.pop("basket_products")
-    #     self.remove_products_from_basket(basket_products, instance)
-    #     return instance
-
-    # def remove_products_from_basket(self, basket_products, basket):
-    #     product_ids_to_remove = [product_data["id"] for product_data in basket_products]
-    #     BasketProduct.objects.filter(basket=basket, product_id__in=product_ids_to_remove).delete()
-
     def update(self, instance, validated_data):
         basket_products = validated_data.pop("basket_products")
+        existing_product_ids = set(instance.basket_products.values_list("id", flat=True))
 
-        # удаление существующих продуктов
-        product_ids = set(instance.basket_products.values_list("id", flat=True))
+        # обновление существующих товаров или добавление новых товаров
+        for product_data in basket_products:
+            product_id = product_data["id"]
+            quantity = product_data["quantity"]
+            if product_id in existing_product_ids:
+                # обновление количества товара
+                BasketProduct.objects.filter(basket=instance, product_id=product_id).update(
+                    quantity=quantity
+                )
+            else:
+                # добавление нового товара
+                BasketProduct.objects.create(
+                    basket=instance, product_id=product_id, quantity=quantity
+                )
+
+        # удаление товаров, которых больше нет в запросе
         product_ids_to_remove = [
-            product_data["id"]
-            for product_data in basket_products
-            if product_data["id"] in product_ids
+            product_id
+            for product_id in existing_product_ids
+            if product_id not in [product_data["id"] for product_data in basket_products]
         ]
         BasketProduct.objects.filter(basket=instance, product_id__in=product_ids_to_remove).delete()
-
-        # добавление новых продуктов
-        new_products = [
-            BasketProduct(
-                basket=instance, product_id=product_data["id"], quantity=product_data["quantity"]
-            )
-            for product_data in basket_products
-            if product_data["id"] not in product_ids
-        ]
-        BasketProduct.objects.bulk_create(new_products)
-
         return instance
 
     def to_representation(self, basket):
