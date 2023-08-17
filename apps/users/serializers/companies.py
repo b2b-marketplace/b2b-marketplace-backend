@@ -41,6 +41,8 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
             "role",
             "name",
             "inn",
+            "ogrn",
+            "company_account",
             "phone_number",
             "address",
         )
