@@ -166,9 +166,6 @@ class CustomUserManager(UserManager):
         obj = self._save_object(obj_model, extra_fields.pop(field_name, None))
 
         obj.save()
-        if instance:
-            instance.save()
-            return instance
         return obj
 
     def create_user(self, username, email=None, password=None, **extra_fields):
@@ -183,8 +180,10 @@ class CustomUserManager(UserManager):
 
     def update_user(self, instance, validated_data):
         if "company" in validated_data:
-            company = self._profile("company", Company, validated_data, instance=instance)
-            return company
+            self._profile("company", Company, validated_data, instance=instance)
+
+        instance.save()
+        return instance
 
     def get_companies(self):
         return self.filter(Q(is_company=True) & Q(is_active=True)).select_related(
