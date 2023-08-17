@@ -27,6 +27,27 @@ class BasketReadSerializer(serializers.ModelSerializer):
         fields = ("id", "user", "basket_products")
 
 
+class BasketCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Basket.
+
+    Используется для создания корзины.
+    """
+
+    # TODO: заменить на кастомный сериализатор пользователя
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Basket
+        fields = "__all__"
+
+    def create(self, user, instance=None):
+        user = CustomUser.objects.get(id=1)
+        if instance:
+            return instance
+        basket, created = Basket.objects.get_or_create(user=user)
+        return basket
+
+
 class BasketWriteSerializer(serializers.ModelSerializer):
     """Сериализатор модели Basket.
 
