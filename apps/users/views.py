@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -60,11 +60,34 @@ class CustomUserViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @extend_schema(
+        examples=[
+            OpenApiExample(
+                name="response",
+                value={
+                    "id": 0,
+                    "email": "user@example.com",
+                    "username": "string",
+                    "is_company": True,
+                    "company": {
+                        "id": 0,
+                        "role": "supplier",
+                        "name": "string",
+                        "inn": "string",
+                        "ogrn": "string",
+                        "company_account": "string",
+                        "phone_number": {"id": 0, "phone_number": "string"},
+                        "address": {"id": 0, "phone_number": "string"},
+                    },
+                },
+                response_only=True,
+            )
+        ],
         request=MeUserCompanyWriteSerializer,
-        responses={
-            200: MeUserCompanyReadSerializer,
-        },
+        responses={200: MeUserCompanyReadSerializer},
         methods=["get", "put", "patch"],
+    )
+    @extend_schema(
+        description="```request body: {'current_password': 'password'}```", methods=["delete"]
     )
     @action(["get", "put", "patch", "delete"], detail=False)
     def me(self, request, *args, **kwargs):
