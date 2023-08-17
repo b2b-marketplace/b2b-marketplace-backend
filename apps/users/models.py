@@ -145,9 +145,10 @@ class CustomUserManager(UserManager):
         obj.save()
         return obj
 
-    def _profile(self, field_name, model, instance, extra_fields):
-        address = extra_fields.pop("address", None)
-        phone_number = extra_fields.pop("phone_number", None)
+    def _profile(self, field_name, model, extra_fields, instance=None):
+        """Создает и обновляет пользователей."""
+        address = extra_fields[field_name].pop("address", None)
+        phone_number = extra_fields[field_name].pop("phone_number", None)
 
         obj_model = getattr(instance, field_name) if instance else model
         obj = self._save_object(obj_model, extra_fields.pop(field_name, None))
@@ -163,14 +164,15 @@ class CustomUserManager(UserManager):
             obj.phone_number = phone_number
 
         obj.save()
-        extra_fields.setdefault(field_name, obj)
+        return obj
 
-    def create_user(self, username, email=None, password=None, instance=None, **extra_fields):
+    def create_user(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault("is_active", False)
 
         if "company" in extra_fields:
             extra_fields.setdefault("is_company", True)
-            self._profile("company", Company, instance, extra_fields)
+            company = self._profile("company", Company, extra_fields)
+            extra_fields.setdefault("company", company)
 
         return super().create_user(username, email, password, **extra_fields)
 

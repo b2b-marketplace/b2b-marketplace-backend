@@ -19,9 +19,9 @@ def company(django_user_model):
             "inn": "1234567890",
             "ogrn": "1234567890123",
             "company_account": "12345678901234567890",
+            "address": {"address": "address"},
+            "phone_number": {"phone_number": "1234567"},
         },
-        "address": {"address": "address"},
-        "phone_number": {"phone_number": "1234567"},
     }
     user = django_user_model.objects.create_user(**data)
     user.is_active = True

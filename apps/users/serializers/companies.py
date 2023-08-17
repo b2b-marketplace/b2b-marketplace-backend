@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
 
-from apps.core.utils import _flatten_dict
 from apps.users.models import Company
 from apps.users.serializers.addresses import AddressSerializer
 from apps.users.serializers.phonenumbers import PhoneNumberSerializer
@@ -87,8 +86,7 @@ class UserCompanyWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        flatten_data = _flatten_dict(validated_data)
-        return User.objects.create_user(**flatten_data)
+        return User.objects.create_user(**validated_data)
 
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)
