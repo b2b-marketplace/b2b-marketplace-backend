@@ -91,3 +91,21 @@ class UserCompanyWriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)
         return serializer.data
+
+
+class MeUserCompanyReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения и отображения данных в личном кабинете о пользователях-компаниях.
+
+    Используется в безопасных http-методах.
+    """
+
+    class Meta:
+        model = User
+        depth = 2
+        fields = (
+            "id",
+            "email",
+            "username",
+            "is_company",
+            "company",
+        )
