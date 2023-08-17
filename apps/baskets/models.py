@@ -6,6 +6,8 @@ from apps.products.models import Product
 
 
 class Basket(models.Model):
+    """ Модель корзины. """
+
     user = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="user", verbose_name=_("User")
     )
@@ -20,6 +22,8 @@ class Basket(models.Model):
 
 
 class BasketProduct(models.Model):
+    """ Модель товара в корзине. """
+
     basket = models.ForeignKey(
         Basket, on_delete=models.CASCADE, related_name="basket", verbose_name=_("Basket")
     )

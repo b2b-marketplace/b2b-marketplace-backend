@@ -4,6 +4,8 @@ from .models import Address, Company, CustomUser, PhoneNumber, PhysicalPerson
 
 
 class PhoneNumberFactory(factory.django.DjangoModelFactory):
+    """ Фабрика для создания телефонных номеров. """
+
     class Meta:
         model = PhoneNumber
 
@@ -11,6 +13,8 @@ class PhoneNumberFactory(factory.django.DjangoModelFactory):
 
 
 class AddressFactory(factory.django.DjangoModelFactory):
+    """ Фабрика для создания адресов. """
+
     class Meta:
         model = Address
 
@@ -18,6 +22,8 @@ class AddressFactory(factory.django.DjangoModelFactory):
 
 
 class CompanyFactory(factory.django.DjangoModelFactory):
+    """ Фабрика для создания компаний. """
+
     class Meta:
         model = Company
 
@@ -31,6 +37,8 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
 
 class PhysicalPersonFactory(factory.django.DjangoModelFactory):
+    """ Фабрика для создания физических лиц. """
+
     class Meta:
         model = PhysicalPerson
 
@@ -42,6 +50,8 @@ class PhysicalPersonFactory(factory.django.DjangoModelFactory):
 
 
 class CustomUserFactory(factory.django.DjangoModelFactory):
+    """ Фабрика для создания пользователей. """
+
     class Meta:
         model = CustomUser
 
@@ -53,6 +63,8 @@ class CustomUserFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def set_associated_objects(self, create, extracted, **kwargs):
+        """ Установка связей. """
+
         if not create:
             return
         if self.is_company:

@@ -15,6 +15,8 @@ User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
+    """ Кастомный ViewSet для пользователей. """
+
     def get_serializer_class(self):
         if self.action == "companies":
             return UserCompanyReadSerializer
@@ -26,6 +28,8 @@ class CustomUserViewSet(UserViewSet):
     @extend_schema(responses={200: UserCompanyReadSerializer(many=True)})
     @action(("get",), detail=False, permission_classes=(AllowAny,))
     def companies(self, request):
+        """ Получение списка компаний. """
+
         user = User.objects.get_companies()
         page = self.paginate_queryset(user)
         if page is not None:
@@ -37,6 +41,8 @@ class CustomUserViewSet(UserViewSet):
     @extend_schema(responses={201: UserCompanyWriteSerializer})
     @companies.mapping.post
     def create_company(self, request):
+        """ Создание компании. """
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
