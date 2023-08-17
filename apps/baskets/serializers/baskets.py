@@ -1,4 +1,3 @@
-# from django.core.exceptions import ValidationError
 # from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -44,7 +43,7 @@ class BasketCreateSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.get(id=1)
         if instance:
             return instance
-        basket, created = Basket.objects.get_or_create(user=user)
+        basket, _created = Basket.objects.get_or_create(user=user)
         return basket
 
 
@@ -62,33 +61,25 @@ class BasketWriteSerializer(serializers.ModelSerializer):
         model = Basket
         fields = "__all__"
 
-    # def validate(self, data):
-    #     basket_products = data.get("basket_products", [])
-    #     if basket_products:
-    #         product_id = basket_products[0]["id"]
-    #         self.validate_products(product_id)
-    #     return data
-
-    # def validate_products(self, product_id):
-    #     user = CustomUser.objects.get(id=1)
-    #     basket_products = BasketProduct.objects.filter(basket__user=user)
-    #     product_ids = set(basket_products.values_list("product_id", flat=True))
-
-    #     if product_id in product_ids:
-    #         raise serializers.ValidationError("Product already exists in the basket.")
-
     def create_or_update_basket(self, user, instance=None):
         user = CustomUser.objects.get(id=1)
         if instance:
             return instance
-        basket, created = Basket.objects.get_or_create(user=user)
+        basket, _created = Basket.objects.get_or_create(user=user)
         return basket
 
     def create_products_quantity(self, basket_products, basket):
+        products = set(basket.basket_products.values_list("id", flat=True))
+        created_products = set()
         for product in basket_products:
-            BasketProduct.objects.create(
-                basket=basket, product_id=product["id"], quantity=product["quantity"]
-            )
+            product_id = product["id"]
+            if product_id in created_products or product_id in products:
+                continue
+            else:
+                BasketProduct.objects.create(
+                    basket=basket, product_id=product_id, quantity=product["quantity"]
+                )
+            created_products.add(product_id)
 
     def create(self, validated_data):
         basket_products = validated_data.pop("basket_products")
@@ -98,30 +89,28 @@ class BasketWriteSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         basket_products = validated_data.pop("basket_products")
-        existing_product_ids = set(instance.basket_products.values_list("id", flat=True))
+        products = set(instance.basket_products.values_list("id", flat=True))
 
         # обновление существующих товаров или добавление новых товаров
         for product_data in basket_products:
             product_id = product_data["id"]
             quantity = product_data["quantity"]
-            if product_id in existing_product_ids:
+            if product_id in products:
                 # обновление количества товара
                 BasketProduct.objects.filter(basket=instance, product_id=product_id).update(
                     quantity=quantity
                 )
             else:
                 # добавление нового товара
-                BasketProduct.objects.create(
-                    basket=instance, product_id=product_id, quantity=quantity
-                )
+                self.create_products_quantity(basket_products, instance)
 
         # удаление товаров, которых больше нет в запросе
-        product_ids_to_remove = [
+        products_to_remove = [
             product_id
-            for product_id in existing_product_ids
+            for product_id in products
             if product_id not in [product_data["id"] for product_data in basket_products]
         ]
-        BasketProduct.objects.filter(basket=instance, product_id__in=product_ids_to_remove).delete()
+        BasketProduct.objects.filter(basket=instance, product_id__in=products_to_remove).delete()
         return instance
 
     def to_representation(self, basket):

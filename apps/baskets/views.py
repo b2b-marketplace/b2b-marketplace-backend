@@ -12,8 +12,6 @@ from apps.users.models import CustomUser
 
 
 class BasketViewSet(viewsets.ModelViewSet):
-    # http_method_names = ["get", "post", "delete"]
-
     def get_queryset(self):
         user = CustomUser.objects.get(id=1)
         return Basket.objects.filter(user=user)
