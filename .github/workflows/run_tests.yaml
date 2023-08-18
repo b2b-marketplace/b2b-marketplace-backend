@@ -1,0 +1,65 @@
+name: Run tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+
+env:
+  DJANGO_SECRET_KEY: somekey
+  DJANGO_ALLOWED_HOSTS: localhost
+  CSRF_TRUSTED_ORIGINS: http://localhost
+  DJANGO_DEBUG: True
+  POSTGRES_DB_TEST: b2b-marketplace-test
+  POSTGRES_USER_TEST: b2b-marketplace-test
+  POSTGRES_PASSWORD_TEST: somepassword-test
+  POSTGRES_HOST_TEST: localhost
+  POSTGRES_PORT_TEST: 5432
+
+jobs:
+  migrations:
+    name: Run tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: ${{env.POSTGRES_DB_TEST}}
+          POSTGRES_USER: ${{env.POSTGRES_USER_TEST}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD_TEST}}
+        ports:
+          - 5432:5432
+    steps:
+      -
+        name: Check out the repo
+        uses: actions/checkout@v3
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      -
+        name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+      -
+        name: Install Dependencies
+        run: poetry install
+      -
+        name: Create .env file
+        run: |
+          touch infra/.env
+          echo DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY >> infra/.env
+          echo DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS >> infra/.env
+          echo CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS >> infra/.env
+          echo DJANGO_DEBUG=$DJANGO_DEBUG >> infra/.env
+          echo POSTGRES_DB_TEST=$POSTGRES_DB_TEST >> infra/.env
+          echo POSTGRES_USER_TEST=$POSTGRES_USER_TEST >> infra/.env
+          echo POSTGRES_PASSWORD_TEST=$POSTGRES_PASSWORD_TEST >> infra/.env
+          echo POSTGRES_HOST_TEST=$POSTGRES_HOST_TEST >> infra/.env
+          echo POSTGRES_PORT_TEST=$POSTGRES_PORT_TEST >> infra/.env
+      -
+        name: Run test
+        run: poetry run pytest
