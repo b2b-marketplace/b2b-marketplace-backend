@@ -41,8 +41,6 @@ class BasketCreateSerializer(serializers.ModelSerializer):
 
     def create(self, user, instance=None):
         user = CustomUser.objects.get(id=14)
-        if instance:
-            return instance
         basket, _created = Basket.objects.get_or_create(user=user)
         return basket
 
@@ -63,8 +61,6 @@ class BasketWriteSerializer(serializers.ModelSerializer):
 
     def create_or_update_basket(self, user, instance=None):
         user = CustomUser.objects.get(id=14)
-        if instance:
-            return instance
         basket, _created = Basket.objects.get_or_create(user=user)
         return basket
 
