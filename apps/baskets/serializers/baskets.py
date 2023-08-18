@@ -17,7 +17,6 @@ class BasketReadSerializer(serializers.ModelSerializer):
 
     """
 
-    # TODO: заменить на кастомный сериализатор пользователя
     basket_products = BasketProductReadSerializer(read_only=True, many=True, source="basket")
 
     class Meta:
@@ -31,7 +30,6 @@ class BasketCreateSerializer(serializers.ModelSerializer):
     Используется для создания корзины.
     """
 
-    # TODO: заменить на кастомный сериализатор пользователя
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
@@ -50,7 +48,6 @@ class BasketWriteSerializer(serializers.ModelSerializer):
     Используется для добавления/обновления товаров в корзине.
     """
 
-    # TODO: заменить на кастомный сериализатор пользователя
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     basket_products = BasketProductWriteSerializer(many=True)
 
