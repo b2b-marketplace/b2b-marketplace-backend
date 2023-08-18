@@ -1,4 +1,4 @@
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -11,8 +11,6 @@ from apps.baskets.serializers.baskets import (
 
 
 class BasketViewSet(viewsets.ModelViewSet):
-    http_methods = ["get", "post", "delete"]
-
     def get_queryset(self):
         return Basket.objects.filter(user=self.request.user)
 
@@ -25,6 +23,9 @@ class BasketViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
         detail=False,
