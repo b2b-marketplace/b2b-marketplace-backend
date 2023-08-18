@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +13,16 @@ def get_product_directory_path(instance, filename):
         return f"products/{instance.product.category.slug}/{instance.product.sku}/videos/{filename}"
     if isinstance(instance, Product):
         return f"products/{instance.category.slug}/{instance.sku}/{filename}"
+
+
+def validate_video_size(value):
+    """Валидация размера файла."""
+    limit = 100 * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError(
+            f"Загружаемый файл слишком большой."
+            f" Максимальный размер файла: {limit / 1024 / 1024} Мб"
+        )
 
 
 class Category(models.Model):
@@ -74,6 +85,7 @@ class Video(models.Model):
         blank=True,
         null=True,
         verbose_name=_("Product video"),
+        validators=[validate_video_size],
     )
 
 
