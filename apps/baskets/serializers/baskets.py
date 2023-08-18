@@ -18,12 +18,11 @@ class BasketReadSerializer(serializers.ModelSerializer):
     """
 
     # TODO: заменить на кастомный сериализатор пользователя
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
     basket_products = BasketProductReadSerializer(read_only=True, many=True, source="basket")
 
     class Meta:
         model = Basket
-        fields = ("id", "user", "basket_products")
+        fields = ("id", "basket_products")
 
 
 class BasketCreateSerializer(serializers.ModelSerializer):
