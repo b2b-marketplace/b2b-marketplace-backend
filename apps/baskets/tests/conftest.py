@@ -1,4 +1,5 @@
 import pytest
+from rest_framework.test import APIClient
 
 from apps.baskets.models import Basket, BasketProduct
 from apps.products.models import Category, Image, Product
@@ -7,8 +8,6 @@ from apps.users.models import CustomUser
 
 @pytest.fixture
 def guest_client():
-    from rest_framework.test import APIClient
-
     return APIClient()
 
 
@@ -46,7 +45,7 @@ def product(user, categories):
 
 
 @pytest.fixture
-def product2(user, categories):
+def product1(user, categories):
     product = Product.objects.create(
         user=user,
         category=categories[0],

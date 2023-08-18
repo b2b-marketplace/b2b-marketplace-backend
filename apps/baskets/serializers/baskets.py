@@ -90,7 +90,6 @@ class BasketWriteSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         basket_products = validated_data.pop("basket_products")
         products = set(instance.basket_products.values_list("id", flat=True))
-
         # обновление существующих товаров или добавление новых товаров
         for product_data in basket_products:
             product_id = product_data["id"]
