@@ -1,12 +1,10 @@
-# from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from apps.baskets.models import Basket, BasketProduct
-from apps.users.models import CustomUser
-
-from .basketproducts import BasketProductReadSerializer, BasketProductWriteSerializer
-
-# User = get_user_model()
+from apps.baskets.serializers.basketproducts import (
+    BasketProductReadSerializer,
+    BasketProductWriteSerializer,
+)
 
 
 class BasketReadSerializer(serializers.ModelSerializer):
@@ -37,8 +35,7 @@ class BasketCreateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, user, instance=None):
-        user = CustomUser.objects.get(id=14)
-        basket, _created = Basket.objects.get_or_create(user=user)
+        basket, _created = Basket.objects.get_or_create(user=user["user"])
         return basket
 
 
@@ -55,8 +52,8 @@ class BasketWriteSerializer(serializers.ModelSerializer):
         model = Basket
         fields = "__all__"
 
-    def create_or_update_basket(self, user, instance=None):
-        user = CustomUser.objects.get(id=14)
+    def create_or_update_basket(self, instance=None):
+        user = self.context["request"].user
         basket, _created = Basket.objects.get_or_create(user=user)
         return basket
 
@@ -94,7 +91,6 @@ class BasketWriteSerializer(serializers.ModelSerializer):
             else:
                 # добавление нового товара
                 self.create_products_quantity(basket_products, instance)
-
         # удаление товаров, которых больше нет в запросе
         products_to_remove = [
             product_id

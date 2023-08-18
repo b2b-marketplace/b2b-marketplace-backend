@@ -8,13 +8,11 @@ from apps.baskets.serializers.baskets import (
     BasketReadSerializer,
     BasketWriteSerializer,
 )
-from apps.users.models import CustomUser
 
 
 class BasketViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
-        user = CustomUser.objects.get(id=14)
-        return Basket.objects.filter(user=user)
+        return Basket.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -24,8 +22,7 @@ class BasketViewSet(viewsets.ModelViewSet):
         return BasketWriteSerializer
 
     def perform_create(self, serializer):
-        user = CustomUser.objects.get(id=14)
-        serializer.save(user=user)
+        serializer.save(user=self.request.user)
 
     @action(
         detail=False,
@@ -33,12 +30,11 @@ class BasketViewSet(viewsets.ModelViewSet):
         url_path="mine",
         serializer_class=BasketWriteSerializer,
     )
-    def manage_basket(self, request):
-        user = CustomUser.objects.get(id=14)
+    def mine_basket(self, request):
         if request.method == "POST":
             serializer = self.get_serializer(data=request.data, context={"request": request})
         else:
-            basket = Basket.objects.get(user=user)
+            basket = Basket.objects.get(user=self.request.user)
             serializer = self.get_serializer(instance=basket, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()

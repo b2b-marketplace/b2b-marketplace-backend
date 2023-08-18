@@ -12,9 +12,15 @@ def guest_client():
 
 
 @pytest.fixture
+def auth_client(user):
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
+
+
+@pytest.fixture
 def user():
-    # TODO убрать id, когда аутентификация будет
-    return CustomUser.objects.create(username="username", id=14)
+    return CustomUser.objects.create(username="username")
 
 
 @pytest.fixture
