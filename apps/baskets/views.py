@@ -11,6 +11,8 @@ from apps.baskets.serializers.baskets import (
 
 
 class BasketViewSet(viewsets.ModelViewSet):
+    http_methods = ["get", "post", "delete"]
+
     def get_queryset(self):
         return Basket.objects.filter(user=self.request.user)
 
