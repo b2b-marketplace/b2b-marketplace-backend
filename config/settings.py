@@ -32,6 +32,9 @@ THIRD_PARTY_APPS = [
     "debug_toolbar",
     "drf_spectacular",
     "rest_framework",
+    "rest_framework.authtoken",
+    "djoser",
+    "django_filters",
 ]
 
 LOCAL_APPS = [
@@ -110,9 +113,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru-RU"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
@@ -122,6 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -136,8 +140,11 @@ if DEBUG:
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 20,
+    "PAGE_SIZE": 10,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -147,4 +154,17 @@ SPECTACULAR_SETTINGS = {
     ),
     "VERSION": "0.0.1",
     "COMPONENT_SPLIT_REQUEST": True,
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SITE_NAME = "b2b"
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "SEND_ACTIVATION_EMAIL": True,
+    "SEND_CONFIRMATION_EMAIL": True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "/password-reset/{uid}/{token}",
+    "SET_PASSWORD_RETYPE": True,
+    "HIDE_USERS": True,
 }
