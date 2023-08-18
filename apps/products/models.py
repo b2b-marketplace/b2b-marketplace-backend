@@ -6,8 +6,10 @@ from apps.core.models import BaseModel, SoftDeleteMixin
 
 
 def get_product_directory_path(instance, filename):
-    if isinstance(instance, Image | Video):
-        return f"products/{instance.product.category.slug}/{instance.product.sku}/{filename}"
+    if isinstance(instance, Image):
+        return f"products/{instance.product.category.slug}/{instance.product.sku}/images/{filename}"
+    if isinstance(instance, Video):
+        return f"products/{instance.product.category.slug}/{instance.product.sku}/videos/{filename}"
     if isinstance(instance, Product):
         return f"products/{instance.category.slug}/{instance.sku}/{filename}"
 
