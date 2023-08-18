@@ -55,6 +55,13 @@ jobs:
           echo DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS >> infra/.env
           echo CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS >> infra/.env
           echo DJANGO_DEBUG=$DJANGO_DEBUG >> infra/.env
+
+          echo POSTGRES_DB=$POSTGRES_DB >> infra/.env
+          echo POSTGRES_USER=$POSTGRES_USER >> infra/.env
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> infra/.env
+          echo POSTGRES_HOST=$POSTGRES_HOST >> infra/.env
+          echo POSTGRES_PORT=$POSTGRES_PORT >> infra/.env
+
           echo POSTGRES_DB_TEST=$POSTGRES_DB_TEST >> infra/.env
           echo POSTGRES_USER_TEST=$POSTGRES_USER_TEST >> infra/.env
           echo POSTGRES_PASSWORD_TEST=$POSTGRES_PASSWORD_TEST >> infra/.env
