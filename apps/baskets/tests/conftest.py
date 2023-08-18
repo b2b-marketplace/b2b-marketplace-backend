@@ -5,17 +5,6 @@ from apps.products.models import Category, Image, Product
 from apps.users.models import CustomUser
 
 
-@pytest.fixture(scope="session")
-def django_db_setup():
-    from django.conf import settings
-
-    settings.DATABASES["default"] = {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": settings.BASE_DIR / "db.sqlite3",
-        "ATOMIC_REQUESTS": False,
-    }
-
-
 @pytest.fixture
 def guest_client():
     from rest_framework.test import APIClient
@@ -25,7 +14,8 @@ def guest_client():
 
 @pytest.fixture
 def user():
-    return CustomUser.objects.create(username="username")
+    # TODO убрать id, когда аутентификация будет
+    return CustomUser.objects.create(username="username", id=14)
 
 
 @pytest.fixture
@@ -56,6 +46,25 @@ def product(user, categories):
 
 
 @pytest.fixture
+def product2(user, categories):
+    product = Product.objects.create(
+        user=user,
+        category=categories[0],
+        sku="123",
+        name="Майка2",
+        brand="Ультра майки инкорпорейтед",
+        price="500",
+        wholesale_quantity="1000",
+        video="path/to/video.mp4",
+        quantity_in_stock="12000",
+        description="Майка как майка",
+        manufacturer_country="Китай",
+    )
+    Image.objects.create(product=product, image="path/to/image.jpg")
+    return Product.objects.all()
+
+
+@pytest.fixture
 def basket(user):
     Basket.objects.create(user=user)
     return Basket.objects.filter(user=user)
@@ -63,4 +72,4 @@ def basket(user):
 
 @pytest.fixture
 def basket_products(basket, product):
-    return BasketProduct.objects.create(basket=basket, product=product, quantity=1)
+    return BasketProduct.objects.create(basket=basket[0], product=product[0], quantity=1)

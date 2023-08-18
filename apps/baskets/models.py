@@ -17,9 +17,6 @@ class Basket(models.Model):
         verbose_name = _("Basket")
         verbose_name_plural = _("Baskets")
 
-    def __str__(self):
-        return f"{self.user}"
-
 
 class BasketProduct(models.Model):
     basket = models.ForeignKey(
