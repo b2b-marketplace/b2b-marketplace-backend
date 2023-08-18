@@ -4,17 +4,6 @@ from apps.products.models import Category, Image, Product
 from apps.users.models import CustomUser
 
 
-@pytest.fixture(scope="session")
-def django_db_setup():
-    from django.conf import settings
-
-    settings.DATABASES["default"] = {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": settings.BASE_DIR / "db.sqlite3",
-        "ATOMIC_REQUESTS": False,
-    }
-
-
 @pytest.fixture
 def guest_client():
     from rest_framework.test import APIClient
