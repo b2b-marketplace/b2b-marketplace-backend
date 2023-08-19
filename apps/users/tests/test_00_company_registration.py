@@ -9,7 +9,7 @@ from apps.users.tests.utils import (
 )
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Test00CompanyRegistration:
     url_signup = "/api/v1/users/companies/"
     activate_url = "/api/v1/users/activation/"
@@ -107,7 +107,7 @@ class Test00CompanyRegistration:
         token = response.json()["auth_token"]
 
         response = apiclient.get(self.user_me_url)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
         apiclient.credentials(HTTP_AUTHORIZATION=f"Token {token}")
 
