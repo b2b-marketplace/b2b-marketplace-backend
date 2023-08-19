@@ -2,7 +2,7 @@ import pytest
 from rest_framework import status
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Test01CompanyAPI:
     companies_url = "/api/v1/users/companies/"
     user_me_url = "/api/v1/users/me/"
@@ -36,19 +36,19 @@ class Test01CompanyAPI:
         }
 
         responses_data_after_update_profile = {
-            "id": 4,
+            "id": 1,
             "email": "company@company.fake",
             "username": "companyuser",
             "is_company": True,
             "company": {
-                "id": 4,
+                "id": 1,
                 "role": "supplier",
                 "name": "best_company",
                 "inn": "1234567890",
                 "ogrn": "3333333333333",
                 "company_account": "22222222222222222222",
-                "address": {"id": 4, "address": "earth"},
-                "phone_number": {"id": 4, "phone_number": "1234567"},
+                "address": {"id": 1, "address": "earth"},
+                "phone_number": {"id": 1, "phone_number": "1234567"},
             },
         }
 
