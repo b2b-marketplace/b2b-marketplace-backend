@@ -96,6 +96,29 @@ class UserCompanyWriteSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
+class MeCompanyReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения и отображения данных в личном кабинете компании.
+
+    Используется в безопасных http-методах.
+    """
+
+    address = AddressSerializer(read_only=True)
+    phone_number = PhoneNumberSerializer(read_only=True)
+
+    class Meta:
+        model = Company
+        fields = (
+            "id",
+            "role",
+            "company_account",
+            "name",
+            "inn",
+            "ogrn",
+            "phone_number",
+            "address",
+        )
+
+
 class MeUserCompanyReadSerializer(serializers.ModelSerializer):
     """Сериализатор для получения и отображения данных в личном кабинете о пользователях-компаниях.
 
