@@ -63,4 +63,3 @@ def customer_company_client(customer_company):
     client = APIClient()
     client.force_authenticate(user=customer_company)
     return client
-
