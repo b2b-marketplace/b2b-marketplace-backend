@@ -10,14 +10,16 @@ User = get_user_model()
 
 
 class CompanyReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения и отображения данных о компании.
+    """Сериализатор для получения и отображения публичных данных о компании.
 
     Используется в безопасных http-методах.
     """
 
+    address = AddressSerializer(read_only=True)
+    phone_number = PhoneNumberSerializer(read_only=True)
+
     class Meta:
         model = Company
-        depth = 1
         fields = (
             "id",
             "role",
@@ -41,9 +43,12 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
             "role",
             "name",
             "inn",
+            "ogrn",
+            "company_account",
             "phone_number",
             "address",
         )
+        extra_kwargs = {"company_account": {"write_only": True}}
 
     def to_representation(self, instance):
         serializer = CompanyReadSerializer(instance)
@@ -51,19 +56,18 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
 
 
 class UserCompanyReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения и отображения данных о пользователях-компаниях.
+    """Сериализатор для получения и отображения публичных данных о пользователях-компаниях.
 
     Используется в безопасных http-методах.
     """
 
-    company = CompanyReadSerializer()
+    company = CompanyReadSerializer(read_only=True)
 
     class Meta:
         model = User
         fields = (
             "id",
             "email",
-            "username",
             "is_company",
             "company",
         )
@@ -90,4 +94,64 @@ class UserCompanyWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)
+        return serializer.data
+
+
+class MeCompanyReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения и отображения данных в личном кабинете компании.
+
+    Используется в безопасных http-методах.
+    """
+
+    address = AddressSerializer(read_only=True)
+    phone_number = PhoneNumberSerializer(read_only=True)
+
+    class Meta:
+        model = Company
+        fields = (
+            "id",
+            "role",
+            "company_account",
+            "name",
+            "inn",
+            "ogrn",
+            "phone_number",
+            "address",
+        )
+
+
+class MeUserCompanyReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для получения и отображения данных в личном кабинете пользователя-компании.
+
+    Используется в безопасных http-методах.
+    """
+
+    company = MeCompanyReadSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "username",
+            "is_company",
+            "company",
+        )
+
+
+class MeUserCompanyWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для обновления данных в личном кабинете."""
+
+    company = CompanyWriteSerializer()
+
+    class Meta:
+        model = User
+        fields = ("company",)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        return User.objects.update_user(instance, validated_data)
+
+    def to_representation(self, instance):
+        serializer = MeUserCompanyReadSerializer(instance)
         return serializer.data
