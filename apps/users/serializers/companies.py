@@ -120,14 +120,15 @@ class MeCompanyReadSerializer(serializers.ModelSerializer):
 
 
 class MeUserCompanyReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения и отображения данных в личном кабинете о пользователях-компаниях.
+    """Сериализатор для получения и отображения данных в личном кабинете пользователя-компании.
 
     Используется в безопасных http-методах.
     """
 
+    company = MeCompanyReadSerializer(read_only=True)
+
     class Meta:
         model = User
-        depth = 2
         fields = (
             "id",
             "email",
