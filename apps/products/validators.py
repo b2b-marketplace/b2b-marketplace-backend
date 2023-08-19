@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.template.defaultfilters import filesizeformat
 
-MAX_VIDEO_SIZE = 100 * 1024 * 1024  # 100 Мб
+MAX_VIDEO_SIZE = 3 * 1024 * 1024  # 3 Мб
 CONTENT_TYPES = (
     "video/mp4",
     "video/webm",
