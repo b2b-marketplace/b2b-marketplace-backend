@@ -22,6 +22,7 @@ class CompanyReadSerializer(serializers.ModelSerializer):
         model = Company
         fields = (
             "id",
+            "role",
             "name",
             "inn",
             "ogrn",
