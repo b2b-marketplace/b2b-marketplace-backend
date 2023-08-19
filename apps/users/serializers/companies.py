@@ -15,12 +15,13 @@ class CompanyReadSerializer(serializers.ModelSerializer):
     Используется в безопасных http-методах.
     """
 
+    address = AddressSerializer(read_only=True)
+    phone_number = PhoneNumberSerializer(read_only=True)
+
     class Meta:
         model = Company
-        depth = 1
         fields = (
             "id",
-            "role",
             "name",
             "inn",
             "ogrn",
