@@ -53,7 +53,7 @@ class Test01CompanyAPI:
         }
 
         response = apiclient.patch(self.user_me_url, data=request_data, format="json")
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
         response = company_client.patch(self.user_me_url, data=request_data, format="json")
         assert response.status_code == status.HTTP_200_OK
@@ -62,7 +62,7 @@ class Test01CompanyAPI:
 
     def test_01_user_delete(self, apiclient, company_client, company):
         response = apiclient.delete(self.user_me_url, format="json")
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
         login_data = {
             "current_password": "12345678",
