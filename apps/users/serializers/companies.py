@@ -54,19 +54,18 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
 
 
 class UserCompanyReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для получения и отображения данных о пользователях-компаниях.
+    """Сериализатор для получения и отображения публичных данных о пользователях-компаниях.
 
     Используется в безопасных http-методах.
     """
 
-    company = CompanyReadSerializer()
+    company = CompanyReadSerializer(read_only=True)
 
     class Meta:
         model = User
         fields = (
             "id",
             "email",
-            "username",
             "is_company",
             "company",
         )
