@@ -47,6 +47,7 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
             "phone_number",
             "address",
         )
+        extra_kwargs = {"company_account": {"write_only": True}}
 
     def to_representation(self, instance):
         serializer = CompanyReadSerializer(instance)
