@@ -18,14 +18,8 @@ def test_create_basket(auth_client, user):
     assert len(data["basket_products"]) == 0
 
 
-def test_get_basket_by_id(auth_client, basket, user):
-    endpoint = f"{BASKETS_ENDPOINT}{basket[0].pk}/"
-    response = auth_client.get(endpoint)
-    assert response.status_code == status.HTTP_200_OK
-
-
-def test_delete_basket_by_id(auth_client, basket, user):
-    endpoint = f"{BASKETS_ENDPOINT}{basket[0].pk}/"
+def test_delete_mine_basket(auth_client, basket, user):
+    endpoint = f"{BASKETS_ENDPOINT}mine/"
     response = auth_client.delete(endpoint)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 

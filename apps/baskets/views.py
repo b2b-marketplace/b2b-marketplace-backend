@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -25,6 +26,14 @@ class BasketViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @extend_schema(methods=["GET"], exclude=True)
+    def list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @extend_schema(exclude=True)
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     @extend_schema(exclude=True)
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -33,17 +42,25 @@ class BasketViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    @extend_schema(exclude=True)
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
     @action(
         detail=False,
-        methods=["get", "post", "put"],
+        methods=["get", "post", "put", "delete"],
         url_path="mine",
         serializer_class=BasketWriteSerializer,
     )
     def mine_basket(self, request):
         if request.method == "POST":
             serializer = self.get_serializer(data=request.data, context={"request": request})
+        elif request.method == "DELETE":
+            basket = get_object_or_404(Basket, user=self.request.user)
+            basket.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            basket = Basket.objects.get(user=self.request.user)
+            basket = get_object_or_404(Basket, user=self.request.user)
             serializer = self.get_serializer(instance=basket, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()

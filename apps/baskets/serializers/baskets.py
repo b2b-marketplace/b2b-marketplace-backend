@@ -100,6 +100,9 @@ class BasketWriteSerializer(serializers.ModelSerializer):
         BasketProduct.objects.filter(basket=instance, product_id__in=products_to_remove).delete()
         return instance
 
+    def delete(self, instance):
+        instance.delete()
+
     def to_representation(self, basket):
         representation = BasketReadSerializer(
             basket, context={"request": self.context.get("request")}
