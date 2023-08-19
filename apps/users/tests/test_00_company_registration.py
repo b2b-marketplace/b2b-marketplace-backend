@@ -107,7 +107,7 @@ class Test00CompanyRegistration:
         token = response.json()["auth_token"]
 
         response = apiclient.get(self.user_me_url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
         apiclient.credentials(HTTP_AUTHORIZATION=f"Token {token}")
 

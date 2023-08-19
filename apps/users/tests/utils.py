@@ -59,11 +59,9 @@ request_valid_data = {
 response_valid_data_company_registration = {
     "id": 1,
     "email": "validemail@mail.fake",
-    "username": "valid-username",
     "is_company": True,
     "company": {
         "id": 1,
-        "role": "customer",
         "name": "valid-name",
         "inn": "1010101010",
         "ogrn": None,
