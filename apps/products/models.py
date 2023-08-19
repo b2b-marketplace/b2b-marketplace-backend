@@ -7,6 +7,19 @@ from apps.products.validators import validate_video
 
 
 def get_product_directory_path(instance, filename):
+    """Функция для генерации пути сохранения файлов товаров и изображений.
+
+    Args:
+        instance: Экземпляр модели (Image или Product).
+        filename (str): Имя файла.
+
+    Returns:
+        str: Путь для сохранения файла в зависимости от типа экземпляра.
+
+    Пример использования:
+        path = get_product_directory_path(image_instance, 'example.jpg')
+    """
+
     if isinstance(instance, Image):
         return f"products/{instance.product.category.slug}/{instance.product.sku}/images/{filename}"
     if isinstance(instance, Video):
@@ -16,6 +29,8 @@ def get_product_directory_path(instance, filename):
 
 
 class Category(models.Model):
+    """Модель категории."""
+
     name = models.CharField(max_length=255, unique=True, verbose_name=_("Category name"))
     parent = models.ForeignKey(
         "self",
@@ -41,6 +56,8 @@ class Category(models.Model):
 
 
 class Image(models.Model):
+    """Модель изображения."""
+
     product = models.ForeignKey(
         "Product",
         on_delete=models.CASCADE,
@@ -87,6 +104,8 @@ class Video(models.Model):
 
 
 class ProductManager(models.Manager):
+    """Менеджер для модели Product."""
+
     def get_queryset(self):
         return (
             super()
@@ -97,6 +116,8 @@ class ProductManager(models.Manager):
 
 
 class Product(SoftDeleteMixin, BaseModel):
+    """Модель товара."""
+
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.SET_NULL,

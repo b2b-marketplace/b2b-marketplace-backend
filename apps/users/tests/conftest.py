@@ -64,31 +64,3 @@ def customer_company_client(customer_company):
     client.force_authenticate(user=customer_company)
     return client
 
-
-@pytest.fixture
-def customer_company(django_user_model):
-    data = {
-        "email": "customer@company.fake",
-        "username": "customer-company",
-        "password": "12345678",
-        "company": {
-            "role": "customer",
-            "name": "customer_company",
-            "inn": "1111111111",
-            "ogrn": "3333333333333",
-            "company_account": "22222222222222222222",
-            "address": {"address": "address"},
-            "phone_number": {"phone_number": "123456789"},
-        },
-    }
-    user = django_user_model.objects.create_user(**data)
-    user.is_active = True
-    user.save()
-    return user
-
-
-@pytest.fixture
-def customer_company_client(customer_company):
-    client = APIClient()
-    client.force_authenticate(user=customer_company)
-    return client
