@@ -78,6 +78,13 @@ class Video(models.Model):
         validators=[validate_video],
     )
 
+    class Meta:
+        verbose_name = _("Video")
+        verbose_name_plural = _("Videos")
+
+    def __str__(self):
+        return f"{self.product}"
+
 
 class ProductManager(models.Manager):
     def get_queryset(self):

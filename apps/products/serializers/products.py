@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from apps.products.models import Image, Product
+from apps.products.models import Image, Product, Video
 from apps.products.serializers import CategorySerializer, ImageSerializer
+from apps.products.serializers.videos import VideoSerializer
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
@@ -11,6 +12,8 @@ class ProductReadSerializer(serializers.ModelSerializer):
     """
 
     images = ImageSerializer(many=True)
+    videos = VideoSerializer(many=True)
+
     category = CategorySerializer()
     # TODO: заменить на кастомный сериализатор пользователя
     user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -27,7 +30,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
             "brand",
             "price",
             "wholesale_quantity",
-            "video",
+            "videos",
             "quantity_in_stock",
             "description",
             "manufacturer_country",
@@ -39,6 +42,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания нового товара или изменения существующего товара."""
 
     images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=True)
+    videos = serializers.ListField(child=serializers.FileField(), max_length=2, required=True)
 
     class Meta:
         model = Product
@@ -52,7 +56,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             "quantity_in_stock",
             "description",
             "manufacturer_country",
-            "video",
+            "videos",
             "images",
         )
 
@@ -65,6 +69,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         """
         product = instance if instance else Product()
         image_list = validated_data.pop("images", None)
+        video_list = validated_data.pop("videos", None)
         for key, val in validated_data.items():
             setattr(product, key, val)
         product.save()
@@ -72,6 +77,10 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             product.images.all().delete()
             for image in image_list:
                 Image.objects.create(product=product, image=image)
+        if video_list:
+            product.videos.all().delete()
+            for video in video_list:
+                Video.objects.create(product=product, video=video)
         return product
 
     def create(self, validated_data):
