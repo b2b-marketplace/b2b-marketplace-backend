@@ -8,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 def validate_username(value):
+    """Валидация имени пользователя."""
+
     pattern = r"^[\w.@+-]+$"
     regex_pattern = re.compile(pattern)
     if not regex_pattern.match(value):
@@ -24,34 +26,48 @@ def validate_username(value):
 
 
 def validate_length(value, expected_length, error_message):
+    """Валидация длины строки."""
+
     if len(value) != expected_length:
         raise ValidationError(error_message)
 
 
 def validate_account(value):
+    """Валидация номера счета."""
+
     validate_length(value, 20, _("The account number must contain exactly 20 characters."))
 
 
 def validate_inn(value):
+    """Валидация ИНН."""
+
     validate_length(value, 10, _("The TIN must contain exactly 10 characters."))
 
 
 def validate_ogrn(value):
+    """Валидация ОГРН."""
+
     validate_length(value, 13, _("The PSRN must contain exactly 13 characters."))
 
 
 def validate_digits_only(value):
+    """Валидация цифр."""
+
     if not value.isdigit():
         raise ValidationError(_("Only digits are allowed."))
 
 
 def validate_phone_number(value):
+    """Валидация номера телефона."""
+
     pattern = r"^\+?[0-9]*$"
     if not re.match(pattern, value):
         raise ValidationError(_("Invalid phone number format"))
 
 
 class PhoneNumber(models.Model):
+    """Модель для хранения телефонных номеров."""
+
     phone_number = models.CharField(
         max_length=20,
         unique=True,
@@ -64,6 +80,8 @@ class PhoneNumber(models.Model):
 
 
 class Address(models.Model):
+    """Модель для хранения адресов."""
+
     address = models.CharField(max_length=255)
 
     class Meta:
@@ -75,6 +93,8 @@ class Address(models.Model):
 
 
 class Company(models.Model):
+    """Модель для хранения компаний."""
+
     ROLE_CHOICES = (
         ("supplier", "supplier"),
         ("customer", "customer"),
@@ -117,6 +137,8 @@ class Company(models.Model):
 
 
 class PhysicalPerson(models.Model):
+    """Модель для хранения физических лиц."""
+
     first_name = models.CharField(max_length=150, blank=False, verbose_name=_("Name"))
     last_name = models.CharField(max_length=150, blank=False, verbose_name=_("Surname"))
     personal_account = models.CharField(
@@ -138,7 +160,15 @@ class PhysicalPerson(models.Model):
 
 
 class CustomUserManager(UserManager):
+    """Менеджер пользователей с расширенными функциями для работы с профилями и компаниями.
+
+     Этот менеджер расширяет функциональность стандартного менеджера пользователей (UserManager),
+     предоставляя дополнительные методы для создания и обновления пользователей,
+     а также работы с компаниями.
+     """
     def _save_object(self, instance, extra_fields):
+        """Создает и сохраняет объект указанной модели с дополнительными полями."""
+
         obj = instance
         if isinstance(extra_fields, dict):
             for key, value in extra_fields.items():
@@ -147,7 +177,8 @@ class CustomUserManager(UserManager):
         return obj
 
     def _profile(self, field_name, model, extra_fields, instance=None):
-        """Создает и обновляет пользователей."""
+        """Создает и обновляет профиль пользователя с дополнительными полями."""
+
         address = extra_fields[field_name].pop("address", None)
         phone_number = extra_fields[field_name].pop("phone_number", None)
 
@@ -169,6 +200,8 @@ class CustomUserManager(UserManager):
         return obj
 
     def create_user(self, username, email=None, password=None, **extra_fields):
+        """Создает пользователя с расширенными полями."""
+
         extra_fields.setdefault("is_active", False)
 
         if "company" in extra_fields:
@@ -186,12 +219,19 @@ class CustomUserManager(UserManager):
         return instance
 
     def get_companies(self):
+        """Возвращает компании пользователя."""
+
         return self.filter(
             Q(is_company=True) & Q(is_active=True) & Q(company__role="supplier")
         ).select_related("company", "company__address", "company__phone_number")
 
 
 class CustomUser(AbstractUser):
+    """Пользовательский класс пользователя.
+
+    Пользовательский класс, основанный на AbstractUser с дополнительными полями.
+    """
+
     email = models.EmailField(unique=True, blank=False, max_length=254, verbose_name=_("Email"))
     username = models.CharField(
         max_length=150,
@@ -226,6 +266,8 @@ class CustomUser(AbstractUser):
         verbose_name_plural = _("Users")
 
     def clean(self):
+        """Проверка полей при сохранении модели."""
+
         super().clean()
         if self.is_company and not self.company:
             raise ValidationError(_("Company field is required for companies!"))
@@ -233,6 +275,16 @@ class CustomUser(AbstractUser):
             raise ValidationError(_("Personal field is required for physical persons!"))
 
     def save(self, *args, **kwargs):
+        """
+        Переопределение метода сохранения объекта.
+
+        Если пользователь является суперпользователем или персоналом,
+        сбрасываем поле 'role' и устанавливаем 'is_company' в False.
+
+        Если пользователь не является компанией, сбрасываем поле 'company'.
+
+        Если пользователь является компанией, сбрасываем поле 'personal'.
+        """
         if self.is_superuser or self.is_staff:
             self.role = None
             self.is_company = False

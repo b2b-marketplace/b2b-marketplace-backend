@@ -6,6 +6,8 @@ from .models import Category, Image, Product
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
+    """Фабрика для создания категорий."""
+
     class Meta:
         model = Category
 
@@ -15,6 +17,8 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
+    """Фабрика для создания товаров."""
+
     class Meta:
         model = Product
 
@@ -40,6 +44,8 @@ class ProductFactory(factory.django.DjangoModelFactory):
 
 
 class ImageFactory(factory.django.DjangoModelFactory):
+    """Фабрика для создания изображений."""
+
     class Meta:
         model = Image
 

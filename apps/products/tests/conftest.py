@@ -6,6 +6,8 @@ from apps.users.models import CustomUser
 
 @pytest.fixture(scope="session")
 def django_db_setup():
+    """Устанавливает базу данных."""
+
     from django.conf import settings
 
     settings.DATABASES["default"] = {
@@ -17,6 +19,8 @@ def django_db_setup():
 
 @pytest.fixture
 def guest_client():
+    """Создает клиент без авторизации."""
+
     from rest_framework.test import APIClient
 
     return APIClient()
@@ -24,11 +28,15 @@ def guest_client():
 
 @pytest.fixture
 def user():
+    """Создает пользователя."""
+
     return CustomUser.objects.create(username="username")
 
 
 @pytest.fixture
 def categories():
+    """Создает категории."""
+
     cat1 = Category.objects.create(name="Товары для дома", slug="tovary-dlya-doma")
     Category.objects.create(name="Посуда", slug="posuda", parent=cat1)
     Category.objects.create(name="Бытовая химия", slug="bytovaya-khimiya", parent=cat1)
@@ -37,6 +45,8 @@ def categories():
 
 @pytest.fixture
 def product(user, categories):
+    """Создает продукт."""
+
     product = Product.objects.create(
         user=user,
         category=categories[0],

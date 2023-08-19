@@ -6,6 +6,19 @@ from apps.core.models import BaseModel, SoftDeleteMixin
 
 
 def get_product_directory_path(instance, filename):
+    """Функция для генерации пути сохранения файлов товаров и изображений.
+
+    Args:
+        instance: Экземпляр модели (Image или Product).
+        filename (str): Имя файла.
+
+    Returns:
+        str: Путь для сохранения файла в зависимости от типа экземпляра.
+
+    Пример использования:
+        path = get_product_directory_path(image_instance, 'example.jpg')
+    """
+
     if isinstance(instance, Image):
         return f"products/{instance.product.category.slug}/{instance.product.sku}/{filename}"
     if isinstance(instance, Product):
@@ -13,6 +26,8 @@ def get_product_directory_path(instance, filename):
 
 
 class Category(models.Model):
+    """Модель категории."""
+
     name = models.CharField(max_length=255, unique=True, verbose_name=_("Category name"))
     parent = models.ForeignKey(
         "self",
@@ -38,6 +53,8 @@ class Category(models.Model):
 
 
 class Image(models.Model):
+    """Модель изображения."""
+
     product = models.ForeignKey(
         "Product",
         on_delete=models.CASCADE,
@@ -59,11 +76,15 @@ class Image(models.Model):
 
 
 class ProductManager(models.Manager):
+    """Менеджер для модели Product."""
+
     def get_queryset(self):
         return super().get_queryset().select_related("user", "category").prefetch_related("images")
 
 
 class Product(SoftDeleteMixin, BaseModel):
+    """Модель товара."""
+
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.SET_NULL,
