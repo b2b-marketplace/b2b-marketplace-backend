@@ -186,9 +186,9 @@ class CustomUserManager(UserManager):
         return instance
 
     def get_companies(self):
-        return self.filter(Q(is_company=True) & Q(is_active=True)).select_related(
-            "company", "company__address", "company__phone_number"
-        )
+        return self.filter(
+            Q(is_company=True) & Q(is_active=True) & Q(company__role="supplier")
+        ).select_related("company", "company__address", "company__phone_number")
 
 
 class CustomUser(AbstractUser):
