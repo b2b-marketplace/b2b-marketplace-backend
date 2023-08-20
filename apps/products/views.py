@@ -11,6 +11,8 @@ from apps.products.permissions import (
 
 
 class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """Вьюсет для работы с категориями."""
+
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
     filter_backends = (DjangoFilterBackend,)
@@ -18,6 +20,8 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
 
 
 class ProductViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с продуктами."""
+
     queryset = Product.objects.all().order_by("-id")
     serializer_class = serializers.ProductReadSerializer
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
@@ -26,6 +30,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     filterset_class = ProductFilter
 
     def get_serializer_class(self):
+        """Возвращает класс сериализатора."""
+
         if self.request.method in permissions.SAFE_METHODS:
             return serializers.ProductReadSerializer
         return serializers.ProductWriteSerializer

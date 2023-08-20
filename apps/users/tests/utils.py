@@ -52,14 +52,13 @@ request_valid_data = {
         "name": "valid-name",
         "inn": "1010101010",
         "address": {"address": "earth"},
-        "phone_number": {"phone_number": "1234567"},
+        "phone_number": {"phone_number": "123"},
     },
 }
 
 response_valid_data_company_registration = {
     "id": 1,
     "email": "validemail@mail.fake",
-    "username": "valid-username",
     "is_company": True,
     "company": {
         "id": 1,
@@ -68,6 +67,6 @@ response_valid_data_company_registration = {
         "inn": "1010101010",
         "ogrn": None,
         "address": {"id": 1, "address": "earth"},
-        "phone_number": {"id": 1, "phone_number": "1234567"},
+        "phone_number": {"id": 1, "phone_number": "123"},
     },
 }

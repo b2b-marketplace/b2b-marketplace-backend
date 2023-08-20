@@ -9,7 +9,7 @@ from apps.users.tests.utils import (
 )
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Test00CompanyRegistration:
     url_signup = "/api/v1/users/companies/"
     activate_url = "/api/v1/users/activation/"
@@ -63,7 +63,6 @@ class Test00CompanyRegistration:
 
         assert users_count == django_user_model.objects.count()
 
-    @pytest.mark.django_db(transaction=True, reset_sequences=True)
     def test_00_valid_data_company_signup(self, apiclient, django_user_model):
         outbox_before_count = len(mail.outbox)
 
