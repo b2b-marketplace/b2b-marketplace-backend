@@ -9,6 +9,12 @@ from apps.users.serializers.phonenumbers import PhoneNumberSerializer
 User = get_user_model()
 
 
+class CompanyNameAndIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ("id", "name")
+
+
 class CompanyReadSerializer(serializers.ModelSerializer):
     """Сериализатор для получения и отображения публичных данных о компании.
 
