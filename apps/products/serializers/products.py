@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.products.models import Image, Product
 from apps.products.serializers import CategorySerializer, ImageSerializer
-from apps.users.serializers.companies import CompanyNameAndIdSerializer
+from apps.users.serializers.companies import CompanyReadSerializer
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
 
     images = ImageSerializer(many=True)
     category = CategorySerializer()
-    seller = CompanyNameAndIdSerializer(read_only=True, source="user.company")
+    seller = CompanyReadSerializer(read_only=True, source="user.company")
 
     class Meta:
         model = Product
