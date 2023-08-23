@@ -5,7 +5,7 @@ PRODUCTS_ENDPOINT = "/api/v1/products/"
 
 PRODUCT_RESPONSE = {
     "id": 11,
-    "user": 2,
+    "seller": {"id": 2, "name": "OOO Название"},
     "category": {"id": 1, "name": "Категория-1", "slug": "kategoriya-1", "parent_id": 3},
     "sku": "789",
     "name": "789",
