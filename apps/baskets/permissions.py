@@ -7,4 +7,4 @@ class IsBuyer(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
-        return not request.user.is_company or request.user.company.role == "customer"
+        return request.user.personal or request.user.company.role == "customer"

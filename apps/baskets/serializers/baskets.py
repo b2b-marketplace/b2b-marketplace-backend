@@ -52,6 +52,14 @@ class BasketWriteSerializer(serializers.ModelSerializer):
         model = Basket
         fields = "__all__"
 
+    # def validate(self, attrs):
+    #     if self.context['request'].method == 'PUT':
+    #         basket_products = attrs.get("basket_products")
+    #         if not basket_products:
+    #             raise serializers.ValidationError({"basket_products":
+    #                                               ["This field is required."]})
+    #     return attrs
+
     def create_or_update_basket(self, instance=None):
         user = self.context["request"].user
         basket, _created = Basket.objects.get_or_create(user=user)
