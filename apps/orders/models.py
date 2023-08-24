@@ -11,7 +11,9 @@ class OrderManager(models.Manager):
         return (
             self.filter(user=user)
             .select_related("user__company", "user__personal")
-            .prefetch_related("orders__product", "orders__product__images", "orders__product__user")
+            .prefetch_related(
+                "orders__product", "orders__product__images", "orders__product__user__company"
+            )
         )
 
 
