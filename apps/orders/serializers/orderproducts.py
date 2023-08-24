@@ -10,6 +10,10 @@ class OrderProductReadSerializer(serializers.ModelSerializer):
 
     product = ProductReadMiniFieldSerializer()
 
+    class Meta:
+        model = OrderProduct
+        fields = ("product", "quantity", "discount", "cost", "cost_with_discount")
+
 
 class OrderProductWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для записи промежуточной модели."""
