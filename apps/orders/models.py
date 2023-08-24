@@ -97,4 +97,4 @@ class OrderProduct(models.Model):
 
     @property
     def cost_with_discount(self):
-        return round(self.cost * (self.discount / 100), 2)
+        return round(self.cost - self.cost * (self.discount / 100), 2)
