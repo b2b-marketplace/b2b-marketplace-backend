@@ -6,6 +6,15 @@ from apps.core.models import BaseModel
 from apps.products.models import Product
 
 
+class OrderManager(models.Manager):
+    def get_related_queryset(self, user):
+        return (
+            self.filter(user=user)
+            .select_related("user__company", "user__personal")
+            .prefetch_related("orders__product", "orders__product__images", "orders__product__user")
+        )
+
+
 class Order(BaseModel):
     """Модель заказа."""
 
@@ -36,6 +45,8 @@ class Order(BaseModel):
     status = models.CharField(
         max_length=2, choices=Status.choices, default=Status.CREATED, verbose_name=_("Order status")
     )
+
+    objects = OrderManager()
 
     class Meta:
         verbose_name = _("Order")
