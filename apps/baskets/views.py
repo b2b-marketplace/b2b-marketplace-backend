@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.baskets.models import Basket
+from apps.baskets.permissions import IsBuyer
 from apps.baskets.serializers.baskets import (
     BasketCreateSerializer,
     BasketReadSerializer,
@@ -13,6 +14,8 @@ from apps.baskets.serializers.baskets import (
 
 
 class BasketViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsBuyer]
+
     def get_queryset(self):
         return Basket.objects.filter(user=self.request.user)
 
@@ -50,7 +53,6 @@ class BasketViewSet(viewsets.ModelViewSet):
         detail=False,
         methods=["get", "post", "put", "delete"],
         url_path="mine",
-        serializer_class=BasketWriteSerializer,
     )
     def mine_basket(self, request):
         if request.method == "POST":

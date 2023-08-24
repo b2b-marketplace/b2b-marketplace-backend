@@ -77,8 +77,12 @@ class BasketWriteSerializer(serializers.ModelSerializer):
         return basket
 
     def update(self, instance, validated_data):
-        basket_products = validated_data.pop("basket_products")
+        basket_products = validated_data.pop("basket_products", None)
         products = set(instance.basket_products.values_list("id", flat=True))
+
+        if basket_products is None:
+            raise serializers.ValidationError({"basket_products": ["This field is required."]})
+
         # обновление существующих товаров или добавление новых товаров
         for product_data in basket_products:
             product_id = product_data["id"]
