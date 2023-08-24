@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core import validators
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -76,7 +77,10 @@ class OrderProduct(models.Model):
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
     discount = models.DecimalField(
-        max_digits=4, decimal_places=2, verbose_name=_("Product discount")
+        max_digits=4,
+        decimal_places=2,
+        verbose_name=_("Product discount"),
+        validators=[validators.MinValueValidator(0), validators.MaxValueValidator(100)],
     )
 
     class Meta:
