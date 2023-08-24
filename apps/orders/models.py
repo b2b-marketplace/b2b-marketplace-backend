@@ -59,6 +59,14 @@ class Order(BaseModel):
     def __str__(self):
         return f"{self.user}"
 
+    def delete(self):
+        """Предотвращает удаление модели.
+
+        Вместо непосредственного удаления, помечает запись отмененной (status = canceled).
+        """
+        self.status = self.Status.CANCELED
+        self.save()
+
 
 class OrderProduct(models.Model):
     """Модель товара в заказе."""
