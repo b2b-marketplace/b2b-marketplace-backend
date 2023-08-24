@@ -1,6 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
 
+from apps.orders.models import Order, OrderProduct
 from apps.products.models import Category, Image, Product
 from apps.users.models import CustomUser
 
@@ -71,4 +72,13 @@ def product(company, categories):
         manufacturer_country="Китай",
     )
     Image.objects.create(product=product, image="path/to/image.jpg")
-    return Product.objects.all()
+    return product
+
+
+@pytest.fixture
+def order(user, product):
+    order = Order.objects.create(
+        user=user,
+    )
+    OrderProduct.objects.create(order=order, product=product, quantity=3, discount=10.00)
+    return order

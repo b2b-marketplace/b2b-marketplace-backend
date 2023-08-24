@@ -9,6 +9,7 @@ from apps.orders.tests.conftest import mock_time_now
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Test00OrderAPI:
     orders_url = f"/api/v1/users/{1}/orders/"
+
     order = {
         "id": 1,
         "user": 1,
@@ -52,3 +53,11 @@ class Test00OrderAPI:
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == self.order
+
+    def test_00_delete_order(self, guest_client, auth_client, order):
+        response = guest_client.delete(f"{self.orders_url}{1}/")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+        response = auth_client.delete(f"{self.orders_url}{1}/")
+        assert response.status_code != status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_204_NO_CONTENT
