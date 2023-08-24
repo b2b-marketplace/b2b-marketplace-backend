@@ -3,12 +3,7 @@ from rest_framework.test import APIClient
 
 from apps.baskets.models import Basket
 from apps.products.models import Category, Image, Product
-from apps.users.models import CustomUser
-
-
-@pytest.fixture
-def guest_client():
-    return APIClient()
+from apps.users.models import Company, CustomUser
 
 
 @pytest.fixture
@@ -20,7 +15,16 @@ def auth_client(user):
 
 @pytest.fixture
 def user():
-    return CustomUser.objects.create(username="username")
+    company = Company.objects.create(
+        role="customer",
+        name="Test Company",
+    )
+    user = CustomUser.objects.create(
+        username="username",
+        company=company,
+        is_company=True,
+    )
+    return user
 
 
 @pytest.fixture

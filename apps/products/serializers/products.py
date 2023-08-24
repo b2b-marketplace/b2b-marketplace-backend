@@ -3,7 +3,10 @@ from rest_framework import serializers
 from apps.products.models import Image, Product
 from apps.products.serializers import CategorySerializer, ImageSerializer
 from apps.products.serializers.images import ImagePreviewSerializer
-from apps.users.serializers.companies import CompanyMiniFieldSerializer
+from apps.users.serializers.companies import (
+    CompanyMiniFieldSerializer,
+    CompanyReadSerializer,
+)
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
@@ -14,15 +17,14 @@ class ProductReadSerializer(serializers.ModelSerializer):
 
     images = ImageSerializer(many=True)
     category = CategorySerializer()
-    # TODO: заменить на кастомный сериализатор пользователя
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    seller = CompanyReadSerializer(read_only=True, source="user.company")
 
     class Meta:
         model = Product
         depth = 1
         fields = (
             "id",
-            "user",
+            "seller",
             "category",
             "sku",
             "name",

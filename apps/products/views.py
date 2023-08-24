@@ -22,7 +22,11 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
 class ProductViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с продуктами."""
 
-    queryset = Product.objects.all().order_by("-id")
+    queryset = (
+        Product.objects.all()
+        .select_related("user__company", "user__company__address", "user__company__phone_number")
+        .order_by("-id")
+    )
     serializer_class = serializers.ProductReadSerializer
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     permission_classes = (IsSellerCompanyOrReadOnly, IsOwnerOfProductOrReadOnly)
@@ -31,7 +35,6 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         """Возвращает класс сериализатора."""
-
         if self.request.method in permissions.SAFE_METHODS:
             return serializers.ProductReadSerializer
         return serializers.ProductWriteSerializer
