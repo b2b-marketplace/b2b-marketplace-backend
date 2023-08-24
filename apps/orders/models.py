@@ -79,3 +79,11 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f"{self.order} - {self.product}"
+
+    @property
+    def cost(self):
+        return self.product.price * self.quantity
+
+    @property
+    def cost_with_discount(self):
+        return round(self.cost * (self.discount / 100), 2)
