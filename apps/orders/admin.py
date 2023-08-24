@@ -9,7 +9,7 @@ class OrderProductInLine(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("user", "status")
+    list_display = ("id", "user", "status", "created_at", "updated_at")
     search_fields = ("user",)
     list_filter = (
         "user",
