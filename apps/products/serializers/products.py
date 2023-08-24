@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from apps.products.models import Image, Product
 from apps.products.serializers import CategorySerializer, ImageSerializer
+from apps.products.serializers.images import ImagePreviewSerializer
+from apps.users.serializers.companies import CompanyMiniFieldSerializer
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
@@ -83,3 +85,14 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         serializer = ProductReadSerializer(instance)
         return serializer.data
+
+
+class ProductReadMiniFieldSerializer(serializers.ModelSerializer):
+    """Сериализатор для отображения ограниченного количества данных о товаре."""
+
+    supplier = CompanyMiniFieldSerializer(source="user.company")
+    images = ImagePreviewSerializer(many=True)
+
+    class Meta:
+        model = Product
+        fields = ("id", "supplier", "sku", "name", "price", "images")
