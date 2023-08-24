@@ -1,7 +1,12 @@
+from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.orders.models import Order
-from apps.orders.serializers.orderproducts import OrderProductReadSerializer
+from apps.orders.serializers.orderproducts import (
+    OrderProductReadSerializer,
+    OrderProductWriteSerializer,
+)
 
 
 class OrderReadSerializer(serializers.ModelSerializer):
@@ -12,3 +17,55 @@ class OrderReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ("id", "user", "status", "created_at", "order_products")
+
+
+class OrderWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания заказов покупателем."""
+
+    order_products = OrderProductWriteSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ("status", "order_products")
+
+    def validate(self, attrs):
+        for order_product in attrs["order_products"]:
+            product = order_product["product"]
+            if order_product["quantity"] < 0:
+                raise serializers.ValidationError(_("Item quantity must be greater than zero"))
+
+            if 0 > order_product["discount"] > 100:
+                raise serializers.ValidationError(_("Item discount must be between 0 and 100"))
+
+            if product.quantity_in_stock < order_product["quantity"]:
+                raise serializers.ValidationError(_("Quantity to order cannot be more than stock"))
+
+        return attrs
+
+    def create_or_update_order(self, validated_data, instance=None):
+        order_products = validated_data.pop("order_products", None)
+        order = instance if instance else Order()
+
+        for key, value in validated_data.items():
+            setattr(order, key, value)
+        order.save()
+
+        for order_product in order_products:
+            product = order_product.pop("product")
+            order.order_products.add(product, through_defaults=order_product)
+            product.quantity_in_stock -= order_product.get("quantity", 0)
+            product.save()
+
+        return order
+
+    @transaction.atomic
+    def create(self, validated_data):
+        return self.create_or_update_order(validated_data)
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        return self.create_or_update_order(validated_data, instance=instance)
+
+    def to_representation(self, instance):
+        serializer = OrderReadSerializer(instance)
+        return serializer.data
