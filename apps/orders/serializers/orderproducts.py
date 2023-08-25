@@ -22,4 +22,4 @@ class OrderProductWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderProduct
-        fields = ("product", "quantity", "discount")
+        fields = ("product", "quantity")
