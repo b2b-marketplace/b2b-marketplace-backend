@@ -27,16 +27,13 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("status", "order_products")
+        fields = ("order_products",)
 
     def validate(self, attrs):
         for order_product in attrs["order_products"]:
             product = order_product["product"]
             if order_product["quantity"] < 0:
                 raise serializers.ValidationError(_("Item quantity must be greater than zero"))
-
-            if 0 > order_product["discount"] > 100:
-                raise serializers.ValidationError(_("Item discount must be between 0 and 100"))
 
             if product.quantity_in_stock < order_product["quantity"]:
                 raise serializers.ValidationError(_("Quantity to order cannot be more than stock"))
@@ -55,7 +52,8 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         for order_product in order_products:
             product = order_product.pop("product")
             order.order_products.add(product, through_defaults=order_product)
-            basket.basket_products.remove(product)
+            if basket:
+                basket.basket_products.remove(product)
 
             # TODO: заменить на правильно считающую формулу обновления количества товара
             product.quantity_in_stock -= order_product.get("quantity", 0)
@@ -66,10 +64,6 @@ class OrderWriteSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         return self.create_or_update_order(validated_data)
-
-    @transaction.atomic
-    def update(self, instance, validated_data):
-        return self.create_or_update_order(validated_data, instance=instance)
 
     def to_representation(self, instance):
         serializer = OrderReadSerializer(instance)
