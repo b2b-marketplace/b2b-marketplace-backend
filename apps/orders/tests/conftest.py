@@ -1,6 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
 
+from apps.baskets.models import Basket, BasketProduct
 from apps.orders.models import Order, OrderProduct
 from apps.products.models import Category, Image, Product
 from apps.users.models import CustomUser
@@ -57,28 +58,53 @@ def categories():
 
 
 @pytest.fixture
-def product(company, categories):
+def product_1(company, categories):
     product = Product.objects.create(
         user=company,
         category=categories[0],
         sku="123",
-        name="Майка",
-        brand="Ультра майки инкорпорейтед",
+        name="product_1",
+        brand="product_1",
         price=500,
         wholesale_quantity=1000,
         video="path/to/video.mp4",
         quantity_in_stock=12000,
-        description="Майка как майка",
-        manufacturer_country="Китай",
+        description="product_1",
+        manufacturer_country="product_1",
     )
     Image.objects.create(product=product, image="path/to/image.jpg")
     return product
 
 
 @pytest.fixture
-def order(user, product):
-    order = Order.objects.create(
-        user=user,
+def product_2(company, categories):
+    product = Product.objects.create(
+        user=company,
+        category=categories[0],
+        sku="123",
+        name="product_2",
+        brand="product_2",
+        price=500,
+        wholesale_quantity=1000,
+        video="path/to/video.mp4",
+        quantity_in_stock=12000,
+        description="product_2",
+        manufacturer_country="product_2",
     )
-    OrderProduct.objects.create(order=order, product=product, quantity=3, discount=10.00)
+    Image.objects.create(product=product, image="path/to/image.jpg")
+    return product
+
+
+@pytest.fixture
+def basket(user, product_1, product_2):
+    basket = Basket.objects.create(user=user)
+    BasketProduct.objects.create(basket=basket, product=product_1, quantity=10)
+    BasketProduct.objects.create(basket=basket, product=product_2, quantity=10)
+    return basket
+
+
+@pytest.fixture
+def order(user, product_1):
+    order = Order.objects.create(user=user)
+    OrderProduct.objects.create(order=order, product=product_1, quantity=3, discount=10.00)
     return order

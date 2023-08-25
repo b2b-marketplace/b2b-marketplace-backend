@@ -21,7 +21,7 @@ class Test00OrderAPI:
                     "id": 1,
                     "supplier": {"id": 1, "name": "best_company"},
                     "sku": "123",
-                    "name": "Майка",
+                    "name": "product_1",
                     "price": "500.00",
                     "images": {"image": "/media/path/to/image.jpg"},
                 },
@@ -34,7 +34,7 @@ class Test00OrderAPI:
     }
 
     @mock.patch("django.utils.timezone.now", mock_time_now)
-    def test_00_create_order(self, guest_client, auth_client, product):
+    def test_00_create_order(self, guest_client, auth_client, product_1, basket):
         order_data = {
             "order_products": [
                 {
@@ -49,10 +49,13 @@ class Test00OrderAPI:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+        assert basket.basket_products.count() == 2
+
         response = auth_client.post(self.orders_url, data=order_data, format="json")
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == self.order
+        assert basket.basket_products.count() == 1
 
     def test_00_delete_order(self, guest_client, auth_client, order):
         response = guest_client.delete(f"{self.orders_url}{1}/")
