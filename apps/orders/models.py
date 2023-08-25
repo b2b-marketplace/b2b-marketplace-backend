@@ -87,6 +87,7 @@ class OrderProduct(models.Model):
     discount = models.DecimalField(
         max_digits=4,
         decimal_places=2,
+        default=0,
         verbose_name=_("Product discount"),
         validators=[validators.MinValueValidator(0), validators.MaxValueValidator(100)],
     )
