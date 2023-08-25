@@ -1,4 +1,4 @@
-from rest_framework import permissions, viewsets
+from rest_framework import exceptions, permissions, viewsets
 
 from apps.orders.models import Order
 from apps.orders.permissions import IsOwner
@@ -6,12 +6,12 @@ from apps.orders.serializers.orders import OrderReadSerializer, OrderWriteSerial
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    permission_classes = [
-        IsOwner,
-    ]
+    permission_classes = [IsOwner]
     http_method_names = ["get", "post", "patch", "delete"]
 
     def get_queryset(self):
+        if self.request.user.id != int(self.kwargs["user_id"]):
+            raise exceptions.PermissionDenied
         return Order.objects.get_related_queryset(self.request.user)
 
     def get_serializer_class(self):
