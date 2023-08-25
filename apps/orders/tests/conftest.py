@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from apps.baskets.models import Basket, BasketProduct
 from apps.orders.models import Order, OrderProduct
 from apps.products.models import Category, Image, Product
-from apps.users.models import CustomUser
+from apps.users.models import CustomUser, PhysicalPerson
 
 
 def mock_time_now():
@@ -38,8 +38,8 @@ def company(django_user_model):
 
 @pytest.fixture
 def user():
-    """Создает пользователя."""
-    return CustomUser.objects.create(username="username")
+    personal = PhysicalPerson.objects.create(first_name="person", last_name="person")
+    return CustomUser.objects.create(username="username", personal=personal)
 
 
 @pytest.fixture
