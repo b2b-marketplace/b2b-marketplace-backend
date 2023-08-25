@@ -7,7 +7,7 @@ from apps.orders.serializers.orders import OrderReadSerializer, OrderWriteSerial
 
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwner]
-    http_method_names = ["get", "post", "patch", "delete"]
+    http_method_names = ["get", "post", "delete"]
 
     def get_queryset(self):
         if self.request.user.id != int(self.kwargs["user_id"]):
@@ -17,8 +17,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method in permissions.SAFE_METHODS:
             return OrderReadSerializer
-        elif self.request.method == "POST":
-            return OrderWriteSerializer
+        return OrderWriteSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
