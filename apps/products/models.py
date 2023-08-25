@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel, SoftDeleteMixin
@@ -18,11 +20,17 @@ def get_product_directory_path(instance, filename):
     Пример использования:
         path = get_product_directory_path(image_instance, 'example.jpg')
     """
-
     if isinstance(instance, Image):
         return f"products/{instance.product.category.slug}/{instance.product.sku}/{filename}"
     if isinstance(instance, Product):
         return f"products/{instance.category.slug}/{instance.sku}/{filename}"
+
+
+def validate_user(value):
+    """Валидация, является ли пользователь поставщиком."""
+    user = get_object_or_404(get_user_model(), pk=value)
+    if not (user.company and user.company.role == "supplier"):
+        raise ValidationError(_("Only suppliers can create products."))
 
 
 class Category(models.Model):
@@ -89,6 +97,7 @@ class Product(SoftDeleteMixin, BaseModel):
         get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
+        validators=[validate_user],
         related_name="suppliers",
         verbose_name=_("Product supplier"),
     )
