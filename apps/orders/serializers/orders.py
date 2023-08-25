@@ -2,6 +2,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from apps.baskets.models import Basket
 from apps.orders.models import Order
 from apps.orders.serializers.orderproducts import (
     OrderProductReadSerializer,
@@ -45,6 +46,7 @@ class OrderWriteSerializer(serializers.ModelSerializer):
     def create_or_update_order(self, validated_data, instance=None):
         order_products = validated_data.pop("order_products", None)
         order = instance if instance else Order()
+        basket = Basket.objects.filter(user=validated_data["user"]).first()
 
         for key, value in validated_data.items():
             setattr(order, key, value)
@@ -53,6 +55,9 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         for order_product in order_products:
             product = order_product.pop("product")
             order.order_products.add(product, through_defaults=order_product)
+            basket.basket_products.remove(product)
+
+            # TODO: заменить на правильно считающую формулу обновления количества товара
             product.quantity_in_stock -= order_product.get("quantity", 0)
             product.save()
 
