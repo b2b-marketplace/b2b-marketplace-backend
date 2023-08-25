@@ -1,9 +1,18 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
 from apps.products.models import Product
+
+
+def validate_user(value):
+    """Валидация, является ли пользователь покупателем."""
+    user = get_object_or_404(get_user_model(), pk=value)
+    if user.company and user.company.role == "supplier":
+        raise ValidationError(_("Suppliers cannot create orders."))
 
 
 class Order(BaseModel):
@@ -23,6 +32,7 @@ class Order(BaseModel):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.DO_NOTHING,
+        validators=[validate_user],
         related_name="customer",
         verbose_name=_("Order owner"),
     )
