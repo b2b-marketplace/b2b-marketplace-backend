@@ -26,9 +26,9 @@ class Test00OrderAPI:
                     "images": {"image": "/media/path/to/image.jpg"},
                 },
                 "quantity": 3,
-                "discount": "10.00",
+                "discount": "0.00",
                 "cost": 1500.0,
-                "cost_with_discount": 1350.0,
+                "cost_with_discount": 1500.0,
             },
         ],
     }
@@ -40,7 +40,6 @@ class Test00OrderAPI:
                 {
                     "product": 1,
                     "quantity": 3,
-                    "discount": 10.00,
                 },
             ]
         }
