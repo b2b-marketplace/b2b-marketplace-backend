@@ -1,3 +1,4 @@
+from _decimal import ROUND_HALF_UP, Decimal
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
@@ -108,8 +109,10 @@ class OrderProduct(models.Model):
 
     @property
     def cost(self):
-        return self.product.price * self.quantity
+        cost = self.product.price * self.quantity
+        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
 
     @property
     def cost_with_discount(self):
-        return round(self.cost - self.cost * (self.discount / 100), 2)
+        cost = self.cost - self.cost * (self.discount / 100)
+        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
