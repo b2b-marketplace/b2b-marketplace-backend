@@ -16,6 +16,7 @@ class OrderManager(models.Manager):
             .prefetch_related(
                 "orders__product", "orders__product__images", "orders__product__user__company"
             )
+            .order_by("-created_at")
         )
 
 
