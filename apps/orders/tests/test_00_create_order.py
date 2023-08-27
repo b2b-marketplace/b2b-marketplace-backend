@@ -8,7 +8,7 @@ from apps.orders.tests.conftest import mock_time_now
 
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Test00OrderAPI:
-    orders_url = f"/api/v1/users/{1}/orders/"
+    orders_url = "/api/v1/orders/"
 
     order = {
         "id": 1,
@@ -23,7 +23,7 @@ class Test00OrderAPI:
                     "sku": "123",
                     "name": "product_1",
                     "price": "500.00",
-                    "images": {"image": "/media/path/to/image.jpg"},
+                    "image": "http://testserver/media/path/to/image.jpg",
                 },
                 "quantity": 3,
                 "discount": "0.00",
