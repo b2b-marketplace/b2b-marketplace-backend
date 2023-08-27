@@ -8,7 +8,7 @@ from apps.products.serializers.products import ProductReadMiniFieldSerializer
 class OrderProductReadSerializer(serializers.ModelSerializer):
     """Сериализатор для чтения промежуточной модели."""
 
-    product = ProductReadMiniFieldSerializer()
+    product = ProductReadMiniFieldSerializer().setup_eager_loading(Product.objects.all())
 
     class Meta:
         model = OrderProduct
