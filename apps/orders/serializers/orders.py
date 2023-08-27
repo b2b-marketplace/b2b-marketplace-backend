@@ -66,5 +66,5 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         return self.create_or_update_order(validated_data)
 
     def to_representation(self, instance):
-        serializer = OrderReadSerializer(instance)
+        serializer = OrderReadSerializer(instance, context=self.context)
         return serializer.data
