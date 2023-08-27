@@ -10,8 +10,8 @@ from apps.products.models import Product
 def validate_user(value):
     """Валидация, является ли пользователь покупателем."""
     user = get_object_or_404(get_user_model(), pk=value)
-    if user.company and user.company.role == "supplier":
-        raise ValidationError(_("Suppliers cannot create baskets."))
+    if not (user.personal or user.company.role == "customer"):
+        raise ValidationError(_("Only buyers can create baskets."))
 
 
 class Basket(models.Model):
