@@ -99,16 +99,8 @@ class ProductReadMiniFieldSerializer(serializers.ModelSerializer):
         fields = ("id", "supplier", "sku", "name", "price", "image")
 
     def get_image(self, product):
+        # TODO: оптимизировать запрос к Images.
         image = product.images.first()
         request = self.context.get("request")
         if image and request:
             return request.build_absolute_uri(image.image.url)
-
-    @staticmethod
-    def setup_eager_loading(queryset):
-        """Оптимизация запроса к БД.
-
-        product = ProductReadMiniFieldSerializer().setup_eager_loading(Product.objects.all())
-        """
-        queryset = queryset.prefetch_related("images")
-        return queryset
