@@ -1,9 +1,21 @@
+from _decimal import ROUND_HALF_UP, Decimal
 from django.contrib.auth import get_user_model
+from django.core import validators
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
 from apps.products.models import Product
+
+
+class OrderManager(models.Manager):
+    def get_related_queryset(self, user):
+        return (
+            self.filter(user=user)
+            .select_related("user__company", "user__personal")
+            .prefetch_related("orders__product__user__company")
+            .order_by("-created_at")
+        )
 
 
 class Order(BaseModel):
@@ -37,6 +49,8 @@ class Order(BaseModel):
         max_length=2, choices=Status.choices, default=Status.CREATED, verbose_name=_("Order status")
     )
 
+    objects = OrderManager()
+
     class Meta:
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
@@ -44,6 +58,14 @@ class Order(BaseModel):
 
     def __str__(self):
         return f"{self.user}"
+
+    def delete(self):
+        """Предотвращает удаление модели.
+
+        Вместо непосредственного удаления, помечает запись отмененной (status = canceled).
+        """
+        self.status = self.Status.CANCELED
+        self.save()
 
 
 class OrderProduct(models.Model):
@@ -63,7 +85,11 @@ class OrderProduct(models.Model):
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
     discount = models.DecimalField(
-        max_digits=4, decimal_places=2, verbose_name=_("Product discount")
+        max_digits=4,
+        decimal_places=2,
+        default=0,
+        verbose_name=_("Product discount"),
+        validators=[validators.MinValueValidator(0), validators.MaxValueValidator(100)],
     )
 
     class Meta:
@@ -79,3 +105,13 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f"{self.order} - {self.product}"
+
+    @property
+    def cost(self):
+        cost = self.product.price * self.quantity
+        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
+
+    @property
+    def cost_with_discount(self):
+        cost = self.cost - self.cost * (self.discount / 100)
+        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)

@@ -1,3 +1,4 @@
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import (
@@ -6,11 +7,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from config import settings
 from config.settings import DEBUG
 
 apps_url_patterns = [
     path("", include("apps.products.urls")),
     path("", include("apps.baskets.urls")),
+    path("", include("apps.orders.urls")),
     path("", include("apps.users.urls")),
     path("auth/", include("djoser.urls.authtoken")),
 ]
@@ -38,6 +41,8 @@ urlpatterns = [
     path(route="api/v1/", view=include(apps_url_patterns)),
     path("admin/", admin.site.urls),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if DEBUG:
     import debug_toolbar
