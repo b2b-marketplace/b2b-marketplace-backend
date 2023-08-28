@@ -44,14 +44,14 @@ class Command(BaseCommand):
     которая будет присвоена товару.
 
     Использование:
-    python manage.py update_product_prices --username <username> --file_path <file_path>
+    python manage.py update_prices --username <username> --file_path <file_path>
 
     Аргументы:
         --username: Имя пользователя, чьи цены на товары нужно обновить.
         --file_path: Путь к CSV-файлу с обновленными ценами.
 
     Пример:
-    python manage.py update_product_prices --username user1 --file_path /путь/к/файлу/с/ценами.csv
+    python manage.py update_prices --username user1 --file_path /путь/к/файлу/с/ценами.csv
     """
 
     help = "Update price from csv file"
