@@ -10,6 +10,8 @@ def get_sku_list(user):
     """Возвращает список уникальных артикулов товаров."""
     all_products = Product.objects.filter(user__username=user)
     all_skus = all_products.values_list("sku", flat=True)
+    if not all_skus:
+        raise ValueError(f"Пользователь {user} не имеет ни одного продукта.")
     return set(all_skus), all_products
 
 
@@ -25,6 +27,8 @@ def update_price_from_csv(file_path, username):
                 products_to_update.append(
                     Product(id=all_products.get(sku=row["sku"]).id, price=Decimal(row["price"]))
                 )
+    if not products_to_update:
+        raise ValueError("Нет товаров для обновления.")
 
     Product.objects.bulk_update(products_to_update, fields=["price"])
 
@@ -61,6 +65,8 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Price updated"))
         except FileNotFoundError:
             self.stdout.write(self.style.ERROR("File not found"))
+        except ValueError as exp:
+            self.stdout.write(self.style.ERROR(str(exp)))
 
     def add_arguments(self, parser):
         parser.add_argument(
