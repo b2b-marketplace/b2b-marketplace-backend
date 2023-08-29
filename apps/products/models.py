@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -18,7 +19,6 @@ def get_product_directory_path(instance, filename):
     Пример использования:
         path = get_product_directory_path(image_instance, 'example.jpg')
     """
-
     if isinstance(instance, Image):
         return f"products/{instance.product.category.slug}/{instance.product.sku}/{filename}"
     if isinstance(instance, Product):
@@ -102,7 +102,12 @@ class Product(SoftDeleteMixin, BaseModel):
     sku = models.CharField(max_length=255, verbose_name=_("Product sku"))
     name = models.CharField(max_length=255, verbose_name=_("Product name"))
     brand = models.CharField(max_length=255, verbose_name=_("Product brand"))
-    price = models.DecimalField(max_digits=11, decimal_places=2, verbose_name=_("Product price"))
+    price = models.DecimalField(
+        max_digits=11,
+        decimal_places=2,
+        verbose_name=_("Product price"),
+        validators=[MinValueValidator(0.01)],
+    )
     wholesale_quantity = models.PositiveIntegerField(verbose_name=_("Product wholesale quantity"))
     video = models.FileField(
         upload_to=get_product_directory_path, blank=True, null=True, verbose_name=_("Product video")
