@@ -8,7 +8,7 @@ from apps.products.models import Product
 
 def get_sku_list(user):
     """Возвращает список уникальных артикулов товаров."""
-    all_products = Product.objects.filter(user__username=user)
+    all_products = Product.objects.filter(user__username=user, is_deleted=False)
     all_skus = all_products.values_list("sku", flat=True)
     if not all_skus:
         raise ValueError(f"Пользователь {user} не имеет ни одного продукта.")
