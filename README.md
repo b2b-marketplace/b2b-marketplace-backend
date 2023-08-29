@@ -36,11 +36,26 @@ npx --package=@softwaretechnik/dbml-renderer -- dbml-renderer -i docs/db.dbml -o
    ```
 
 4. Создайте файл .env внутри директории infra с переменными окружения
-и скопируйте в него данные из файла ".env.example":
+   и скопируйте в него данные из файла ".env.example":
 
    ```bash
    touch infra/.env
    ```
+   В приведенном примере .env файла:
+
+         DJANGO_SUPERUSER_PASSWORD: Пароль для суперпользователя Django, который будет создан при инициализации приложения.
+
+         DJANGO_SECRET_KEY: Секретный ключ Django, используемый для хэширования паролей, создания токенов и других целей безопасности.
+
+         DJANGO_ALLOWED_HOSTS: Список разрешенных хостов, которые могут обращаться к вашему Django-приложению.
+
+         CSRF_TRUSTED_ORIGINS: Список доверенных источников, которым разрешается отправлять запросы с токенами CSRF.
+
+         DJANGO_DEBUG: Указывает, включен ли режим отладки в Django. Должен быть выключен в рабочем окружении.
+
+         POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT: Параметры для подключения к базе данных PostgreSQL.
+
+         POSTGRES_DB_TEST, POSTGRES_USER_TEST, POSTGRES_PASSWORD_TEST, POSTGRES_HOST_TEST, POSTGRES_PORT_TEST: Параметры для подключения к тестовой базе данных PostgreSQL.
 
 5. Соберите Docker-образы и запустите контейнеры:
 
