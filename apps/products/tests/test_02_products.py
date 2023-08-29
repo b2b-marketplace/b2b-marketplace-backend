@@ -17,6 +17,7 @@ PRODUCT_RESPONSE = {
     "description": "789",
     "manufacturer_country": "789",
     "images": [{"image": "http://host.ru/media/products/kategoriya-1/789/image.bmp"}],
+    "is_favorited": "false",
 }
 
 
