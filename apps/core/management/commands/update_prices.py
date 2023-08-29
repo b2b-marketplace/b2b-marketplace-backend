@@ -25,12 +25,18 @@ def update_price_from_csv(file_path, username):
         for row in reader:
             if row["sku"] in sku_set:
                 products_to_update.append(
-                    Product(id=all_products.get(sku=row["sku"]).id, price=Decimal(row["price"]))
+                    Product(
+                        id=all_products.get(sku=row["sku"]).id,
+                        sku=row["sku"],
+                        price=Decimal(row["price"]).quantize(Decimal("0.01")),
+                    )
                 )
     if not products_to_update:
         raise ValueError("Нет товаров для обновления.")
 
     Product.objects.bulk_update(products_to_update, fields=["price"])
+
+    return products_to_update
 
 
 class Command(BaseCommand):
@@ -61,8 +67,12 @@ class Command(BaseCommand):
         file_path = options.get("file_path")
 
         try:
-            update_price_from_csv(file_path=file_path, username=username)
+            update_list = update_price_from_csv(file_path=file_path, username=username)
             self.stdout.write(self.style.SUCCESS("Price updated"))
+            for product in update_list:
+                self.stdout.write(
+                    self.style.SUCCESS(f"{product.sku}: updated price -> {product.price}")
+                )
         except FileNotFoundError:
             self.stdout.write(self.style.ERROR("File not found"))
         except ValueError as exp:
