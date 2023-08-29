@@ -1,6 +1,6 @@
 import csv
 
-from _decimal import Decimal
+from _decimal import Decimal, InvalidOperation
 from django.core.management.base import BaseCommand
 
 from apps.products.models import Product
@@ -67,6 +67,8 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("File not found"))
         except ValueError as exp:
             self.stdout.write(self.style.ERROR(str(exp)))
+        except InvalidOperation:
+            self.stdout.write(self.style.ERROR("Invalid operation, price is not a number"))
 
     def add_arguments(self, parser):
         parser.add_argument(
