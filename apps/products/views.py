@@ -51,7 +51,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             return queryset.annotate(
-                is_favorited=Exists(user.favorite_products.filter(product=OuterRef("id")))
+                is_favorited=Exists(user.favorite_products.filter(pk=OuterRef("id")))
             )
         return queryset
 
@@ -73,7 +73,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def modify_user_favorites(self, request, pk=None):
-        user = self.request.user
+        user = request.user
         product = get_object_or_404(Product, pk=pk)
         favorite_product_exists = user.favorite_products.filter(pk=pk).exists()
         if request.method == "POST":
