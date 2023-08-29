@@ -69,6 +69,10 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(str(exp)))
         except InvalidOperation:
             self.stdout.write(self.style.ERROR("Invalid operation, price is not a number"))
+        except KeyError as exp:
+            self.stdout.write(self.style.ERROR(f"Error in the csv-file header: {str(exp)}"))
+        except Exception as exp:
+            self.stdout.write(self.style.ERROR(str(exp)))
 
     def add_arguments(self, parser):
         parser.add_argument(
