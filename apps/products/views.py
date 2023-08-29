@@ -1,3 +1,4 @@
+from django.db.models import Exists, OuterRef
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, parsers, permissions, viewsets
 
@@ -22,16 +23,26 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets
 class ProductViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с продуктами."""
 
-    queryset = (
-        Product.objects.all()
-        .select_related("user__company", "user__company__address", "user__company__phone_number")
-        .order_by("-id")
-    )
     serializer_class = serializers.ProductReadSerializer
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     permission_classes = (IsSellerCompanyOrReadOnly, IsOwnerOfProductOrReadOnly)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ProductFilter
+
+    def get_queryset(self):
+        queryset = (
+            Product.objects.all()
+            .select_related(
+                "user__company", "user__company__address", "user__company__phone_number"
+            )
+            .order_by("-id")
+        )
+        user = self.request.user
+        if user.is_authenticated:
+            return queryset.annotate(
+                is_favorited=Exists(user.favorite_products.filter(product=OuterRef("id")))
+            )
+        return queryset
 
     def get_serializer_class(self):
         """Возвращает класс сериализатора."""
