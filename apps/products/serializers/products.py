@@ -96,7 +96,7 @@ class ProductReadMiniFieldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("id", "supplier", "sku", "name", "price", "image")
+        fields = ("id", "supplier", "sku", "name", "image")
 
     def get_image(self, product):
         # TODO: оптимизировать запрос к Images.
