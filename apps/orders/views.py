@@ -1,4 +1,6 @@
-from rest_framework import permissions, viewsets
+from drf_spectacular.utils import extend_schema
+from rest_framework import permissions, status, viewsets
+from rest_framework.response import Response
 
 from apps.orders.models import Order
 from apps.orders.permissions import IsOwner
@@ -16,6 +18,14 @@ class OrderViewSet(viewsets.ModelViewSet):
         if self.request.method in permissions.SAFE_METHODS:
             return OrderReadSerializer
         return OrderWriteSerializer
+
+    @extend_schema(request=OrderWriteSerializer, responses={201: OrderReadSerializer})
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=[request.data], many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(*serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
