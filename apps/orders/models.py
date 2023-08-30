@@ -20,7 +20,7 @@ class OrderManager(models.Manager):
         )
 
 
-def validate_user(value):
+def validate_user_is_buyer(value):
     """Валидация, является ли пользователь покупателем."""
     user = get_object_or_404(get_user_model(), pk=value)
     if not (user.personal or user.company.role == "customer"):
@@ -44,7 +44,7 @@ class Order(BaseModel):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.DO_NOTHING,
-        validators=[validate_user],
+        validators=[validate_user_is_buyer],
         related_name="customer",
         verbose_name=_("Order owner"),
     )
