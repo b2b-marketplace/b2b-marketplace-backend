@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="suppliers",
                 to=settings.AUTH_USER_MODEL,
-                validators=[apps.products.models.validate_user],
+                validators=[apps.products.models.validate_user_is_supplier],
                 verbose_name="Product supplier",
             ),
         ),

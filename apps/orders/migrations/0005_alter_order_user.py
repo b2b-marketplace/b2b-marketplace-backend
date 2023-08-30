@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.DO_NOTHING,
                 related_name="customer",
                 to=settings.AUTH_USER_MODEL,
-                validators=[apps.orders.models.validate_user],
+                validators=[apps.orders.models.validate_user_is_buyer],
                 verbose_name="Order owner",
             ),
         ),

@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="user",
                 to=settings.AUTH_USER_MODEL,
-                validators=[apps.baskets.models.validate_user],
+                validators=[apps.baskets.models.validate_user_is_buyer],
                 verbose_name="User",
             ),
         ),
