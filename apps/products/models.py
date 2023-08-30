@@ -26,7 +26,7 @@ def get_product_directory_path(instance, filename):
         return f"products/{instance.category.slug}/{instance.sku}/{filename}"
 
 
-def validate_user(value):
+def validate_user_is_supplier(value):
     """Валидация, является ли пользователь поставщиком."""
     user = get_object_or_404(get_user_model(), pk=value)
     if not (user.is_company and user.company.role == "supplier"):
@@ -97,7 +97,7 @@ class Product(SoftDeleteMixin, BaseModel):
         get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
-        validators=[validate_user],
+        validators=[validate_user_is_supplier],
         related_name="suppliers",
         verbose_name=_("Product supplier"),
     )
