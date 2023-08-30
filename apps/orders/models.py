@@ -24,13 +24,13 @@ class Order(BaseModel):
     class Status(models.TextChoices):
         """Статусы заказа."""
 
-        CREATED = "CR", _("Created")
-        UPDATED = "UP", _("Updated")
-        PAID = "PA", _("Paid")
-        IN_TRANSIT = "TR", _("In_transit")
-        COMPLETED = "CO", _("Completed")
-        CANCELED = "CA", _("Canceled")
-        RETURNED = "RE", _("Returned")
+        CREATED = "Created", _("Created")
+        UPDATED = "Updated", _("Updated")
+        PAID = "Paid", _("Paid")
+        IN_TRANSIT = "Transit", _("In_transit")
+        RECEIVED = "Received", _("Received")
+        CANCELED = "Canceled", _("Canceled")
+        RETURNED = "Returned", _("Returned")
 
     user = models.ForeignKey(
         get_user_model(),
@@ -46,7 +46,10 @@ class Order(BaseModel):
         verbose_name=_("Products"),
     )
     status = models.CharField(
-        max_length=2, choices=Status.choices, default=Status.CREATED, verbose_name=_("Order status")
+        max_length=15,
+        choices=Status.choices,
+        default=Status.CREATED,
+        verbose_name=_("Order status"),
     )
 
     objects = OrderManager()
