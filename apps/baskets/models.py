@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.products.models import Product
 
 
-def validate_user(value):
+def validate_user_is_buyer(value):
     """Валидация, является ли пользователь покупателем."""
     user = get_object_or_404(get_user_model(), pk=value)
     if not (user.personal or user.company.role == "customer"):
@@ -20,7 +20,7 @@ class Basket(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        validators=[validate_user],
+        validators=[validate_user_is_buyer],
         related_name="user",
         verbose_name=_("User"),
     )
