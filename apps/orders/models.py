@@ -80,16 +80,15 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.DO_NOTHING,
-        related_name="orders",
+        related_name="products",
         verbose_name=_("Product in order"),
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
-    discount = models.DecimalField(
-        max_digits=4,
+    price = models.DecimalField(
+        max_digits=11,
         decimal_places=2,
-        default=0,
-        verbose_name=_("Product discount"),
-        validators=[validators.MinValueValidator(0), validators.MaxValueValidator(100)],
+        verbose_name=_("Product price"),
+        validators=[validators.MinValueValidator(0)],
     )
 
     class Meta:
@@ -109,9 +108,4 @@ class OrderProduct(models.Model):
     @property
     def cost(self):
         cost = self.product.price * self.quantity
-        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
-
-    @property
-    def cost_with_discount(self):
-        cost = self.cost - self.cost * (self.discount / 100)
         return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
