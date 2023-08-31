@@ -9,58 +9,63 @@ PRODUCT_RESPONSE = {
     "category": {"id": 1, "name": "Категория-1", "slug": "kategoriya-1", "parent_id": 3},
     "sku": "789",
     "name": "789",
-    "brand": "789",
+    "brand": "Some brand",
     "price": "789.00",
     "wholesale_quantity": 789,
     "video": "http://host.ru/media/products/kategoriya-1/789/video.mp4",
     "quantity_in_stock": 789,
-    "description": "789",
-    "manufacturer_country": "789",
+    "description": "Some description",
+    "manufacturer_country": "China",
     "images": [{"image": "http://host.ru/media/products/kategoriya-1/789/image.bmp"}],
     "is_favorited": "false",
 }
 
 
+PRODUCT_CREATE_REQUEST = {
+    "sku": "789",
+    "name": "789",
+    "brand": "Some brand",
+    "price": "789.00",
+    "wholesale_quantity": 789,
+    "quantity_in_stock": 789,
+    "description": "Some description",
+    "manufacturer_country": "China",
+    "images": [{"image": "http://host.ru/media/products/kategoriya-1/789/image.bmp"}],
+}
+
 pytestmark = pytest.mark.django_db
 
 
-def test_get_all_products(guest_client, product):
-    response = guest_client.get(PRODUCTS_ENDPOINT)
-    assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_200_OK
-
-    data = response.json()
-    assert "count" in data
-    assert data["count"] == len(product)
-    assert "next" in data
-    assert "previous" in data
-    assert "results" in data
-
-    assert isinstance(data["results"], list)
-    assert set(data["results"][0]) == set(PRODUCT_RESPONSE)
-
-    assert data["results"][0]["name"] == product[0].name
-
-
-def test_get_product_by_id(guest_client, product):
-    endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
-    response = guest_client.get(endpoint)
-
-    assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_200_OK
-
-    data = response.json()
-    assert data["name"] == product[0].name
-
-
-# TODO: создание/обновление/удаление не разрешено гостю.
-# Переписать и дополнить тесты после того, как будет реализована аутентификаиции.
-def test_create_product_smoke(guest_client):
+def test_create_product_not_allowed_for_guest_or_buyer_or_physical(
+    guest_client, authorized_buyer, authorized_physical_person
+):
     response = guest_client.post(PRODUCTS_ENDPOINT)
     assert response.status_code != status.HTTP_404_NOT_FOUND
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    response = authorized_buyer.post(PRODUCTS_ENDPOINT)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    response = authorized_physical_person.post(PRODUCTS_ENDPOINT)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_create_product_empty_data(authorized_seller):
+    response = authorized_seller.post(PRODUCTS_ENDPOINT)
+    assert response.status_code != status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    response_data = response.json()
+    for field in set(PRODUCT_CREATE_REQUEST):
+        assert field in response_data
+
+
+def test_create_product_invalid_data(authorized_seller):
+    pass
+
+
+# TODO
+# ______
+#       V
 def test_update_product_smoke(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.put(endpoint, {"some": "data"})
