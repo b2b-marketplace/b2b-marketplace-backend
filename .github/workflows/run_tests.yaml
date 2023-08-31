@@ -11,6 +11,9 @@ env:
   DJANGO_ALLOWED_HOSTS: localhost
   CSRF_TRUSTED_ORIGINS: http://localhost
   DJANGO_DEBUG: True
+  SITE_NAME: MySite
+  EMAIL_HOST: localhost
+  EMAIL_PORT: 2500
   POSTGRES_DB_TEST: b2b-marketplace-test
   POSTGRES_USER_TEST: b2b-marketplace-test
   POSTGRES_PASSWORD_TEST: somepassword-test
@@ -55,6 +58,9 @@ jobs:
           echo DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS >> infra/.env
           echo CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS >> infra/.env
           echo DJANGO_DEBUG=$DJANGO_DEBUG >> infra/.env
+          echo SITE_NAME=$SITE_NAME >> infra/.env
+          echo EMAIL_HOST=$EMAIL_HOST >> infra/.env
+          echo EMAIL_PORT=E$MAIL_PORT >> infra/.env
 
           echo POSTGRES_DB=$POSTGRES_DB >> infra/.env
           echo POSTGRES_USER=$POSTGRES_USER >> infra/.env
