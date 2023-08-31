@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path=BASE_DIR / "infra" / ".env")
 
-
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 
@@ -137,6 +136,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+SITE_NAME = os.environ["SITE_NAME"]
+EMAIL_HOST = os.environ["EMAIL_HOST"]
+EMAIL_PORT = os.environ["EMAIL_PORT"]
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -155,9 +159,6 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "0.0.1",
     "COMPONENT_SPLIT_REQUEST": True,
 }
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-SITE_NAME = "b2b"
 
 DJOSER = {
     "LOGIN_FIELD": "email",

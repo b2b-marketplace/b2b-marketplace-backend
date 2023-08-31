@@ -22,6 +22,17 @@ services:
       timeout: 5s
       retries: 5
 
+  mailbox:
+    image: inbucket/inbucket
+    container_name: b2b-marketplace-mailbox
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - "${WEB_INTERFACE_PORT}:9000"
+      - "${SMTP_PORT}:2500"
+      - "${POP3_PORT}:1100"
+
   backend:
     image: ghcr.io/b2b-marketplace/b2b_marketplace_backend:latest
     container_name: b2b_marketplace_backend
