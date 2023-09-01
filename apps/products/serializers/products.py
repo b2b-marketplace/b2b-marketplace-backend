@@ -99,8 +99,7 @@ class ProductReadMiniFieldSerializer(serializers.ModelSerializer):
         fields = ("id", "supplier", "sku", "name", "image")
 
     def get_image(self, product):
-        # TODO: оптимизировать запрос к Images.
-        image = product.images.first()
+        images = product.images.all()
         request = self.context.get("request")
-        if image and request:
-            return request.build_absolute_uri(image.image.url)
+        if images and request:
+            return request.build_absolute_uri(images[0].image.url)
