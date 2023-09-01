@@ -110,5 +110,5 @@ class OrderProduct(models.Model):
 
     @property
     def cost(self):
-        cost = self.product.price * self.quantity
+        cost = self.price * self.quantity
         return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
