@@ -93,7 +93,7 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.DO_NOTHING,
-        related_name="products",
+        related_name="orders",
         verbose_name=_("Product in order"),
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
