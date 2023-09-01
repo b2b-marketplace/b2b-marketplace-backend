@@ -5,7 +5,7 @@ PRODUCTS_ENDPOINT = "/api/v1/products/"
 
 PRODUCT_RESPONSE = {
     "id": 11,
-    "user": 2,
+    "seller": {"id": 2, "name": "OOO Название"},
     "category": {"id": 1, "name": "Категория-1", "slug": "kategoriya-1", "parent_id": 3},
     "sku": "789",
     "name": "789",
@@ -57,25 +57,25 @@ def test_get_product_by_id(guest_client, product):
 def test_create_product_smoke(guest_client):
     response = guest_client.post(PRODUCTS_ENDPOINT)
     assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_update_product_smoke(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.put(endpoint, {"some": "data"})
     assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_partial_update_product_smoke(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.patch(endpoint, {"some": "data"})
     assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_delete_product_smoke(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.delete(endpoint)
     assert response.status_code != status.HTTP_404_NOT_FOUND
-    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED

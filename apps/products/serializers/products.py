@@ -3,6 +3,10 @@ from rest_framework import serializers
 from apps.products.models import Image, Product, Video
 from apps.products.serializers import CategorySerializer, ImageSerializer
 from apps.products.serializers.videos import VideoSerializer
+from apps.users.serializers.companies import (
+    CompanyMiniFieldSerializer,
+    CompanyReadSerializer,
+)
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
@@ -15,15 +19,14 @@ class ProductReadSerializer(serializers.ModelSerializer):
     videos = VideoSerializer(many=True)
 
     category = CategorySerializer()
-    # TODO: заменить на кастомный сериализатор пользователя
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    seller = CompanyReadSerializer(read_only=True, source="user.company")
 
     class Meta:
         model = Product
         depth = 1
         fields = (
             "id",
-            "user",
+            "seller",
             "category",
             "sku",
             "name",
@@ -92,3 +95,21 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         serializer = ProductReadSerializer(instance)
         return serializer.data
+
+
+class ProductReadMiniFieldSerializer(serializers.ModelSerializer):
+    """Сериализатор для отображения ограниченного количества данных о товаре."""
+
+    supplier = CompanyMiniFieldSerializer(source="user.company")
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ("id", "supplier", "sku", "name", "price", "image")
+
+    def get_image(self, product):
+        # TODO: оптимизировать запрос к Images.
+        image = product.images.first()
+        request = self.context.get("request")
+        if image and request:
+            return request.build_absolute_uri(image.image.url)
