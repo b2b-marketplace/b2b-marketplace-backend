@@ -1,12 +1,10 @@
 import magic
-
-# TODO Необходимо на сервере установить libmagic. На Ubuntu 20.04 sudo apt-get install libmagic-dev
-
 from django.core.exceptions import ValidationError
-from django.utils.deconstruct import deconstructible
 from django.template.defaultfilters import filesizeformat
+from django.utils.deconstruct import deconstructible
 
-MAX_VIDEO_SIZE = 3 * 1024 * 1024  # 3 Мб
+from config.settings import FILE_UPLOAD_MAX_MEMORY_SIZE
+
 CONTENT_TYPES = (
     "video/mp4",
     "video/webm",
@@ -14,7 +12,7 @@ CONTENT_TYPES = (
 
 
 @deconstructible
-class VideoValidator(object):
+class VideoValidator:
     """Валидация видеофайла."""
 
     error_messages = {
@@ -26,7 +24,7 @@ class VideoValidator(object):
         f"Разрешенные типы: {', '.join(CONTENT_TYPES)}",
     }
 
-    def __init__(self, max_size=MAX_VIDEO_SIZE, content_types=CONTENT_TYPES):
+    def __init__(self, max_size=FILE_UPLOAD_MAX_MEMORY_SIZE, content_types=CONTENT_TYPES):
         self.max_size = max_size
         self.content_types = content_types
 
@@ -54,4 +52,4 @@ class VideoValidator(object):
         )
 
 
-validate_video = VideoValidator(max_size=MAX_VIDEO_SIZE, content_types=CONTENT_TYPES)
+validate_video = VideoValidator(max_size=FILE_UPLOAD_MAX_MEMORY_SIZE, content_types=CONTENT_TYPES)
