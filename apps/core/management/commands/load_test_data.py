@@ -6,7 +6,9 @@ from django.db.models import Q
 from django.utils.translation import gettext as _
 
 from apps.baskets.factories import BasketFactory, BasketProductFactory
+from apps.deliveries.factories import DeliveryFactory, DeliveryMethodFactory
 from apps.orders.factories import OrderFactory, OrderProductFactory
+from apps.orders.models import Order
 from apps.products.factories import CategoryFactory, ProductFactory
 from apps.products.models import Product
 from apps.users.factories import (
@@ -14,7 +16,7 @@ from apps.users.factories import (
     CustomUserFactory,
     PhysicalPersonFactory,
 )
-from apps.users.models import CustomUser
+from apps.users.models import Address, CustomUser
 from config.settings import LANGUAGE_CODE
 
 
@@ -47,6 +49,16 @@ class Command(BaseCommand):
             for product in user_products:
                 BasketProductFactory(basket=basket, product=product)
                 OrderProductFactory(order=order, product=product)
+
+    def create_deliveries(self, number_max):
+        orders = list(Order.objects.all())
+        addresses = list(Address.objects.all())
+        delivery_methods = DeliveryMethodFactory.create_batch(number_max)
+
+        for order, address, delivery_method in zip(orders, addresses, delivery_methods):
+            DeliveryFactory.create_batch(
+                number_max, order=order, address=address, delivery_method=delivery_method
+            )
 
     def handle(self, *args, **options):
         number_min = 1
