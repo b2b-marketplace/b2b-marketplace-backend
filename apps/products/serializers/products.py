@@ -3,6 +3,7 @@ from rest_framework import serializers
 from apps.products.models import Image, Product, Video
 from apps.products.serializers import CategorySerializer, ImageSerializer
 from apps.products.serializers.videos import VideoSerializer
+from apps.products.validators import validate_video
 from apps.users.serializers.companies import (
     CompanyMiniFieldSerializer,
     CompanyReadSerializer,
@@ -45,7 +46,9 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания нового товара или изменения существующего товара."""
 
     images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=True)
-    videos = serializers.ListField(child=serializers.FileField(), max_length=1, required=True)
+    videos = serializers.ListField(
+        child=serializers.FileField(validators=[validate_video]), max_length=1, required=True
+    )
 
     class Meta:
         model = Product
