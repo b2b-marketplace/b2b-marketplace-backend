@@ -1,0 +1,1485 @@
+openapi: 3.0.2
+info:
+  title: 'b2b-marketplace'
+  description: 'API веб-сервиса для взаимодействия между продавцами и покупателями оптовых товаров'
+  version: '0.0.1'
+
+paths:
+  /api/v1/users/suppliers/:
+    get:
+      operationId: Список поставщиков
+      description: 'Получить список поставщиков'
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Номер страницы.
+          schema:
+            type: integer
+        - name: limit
+          required: false
+          in: query
+          description: Количество объектов на странице.
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Supplier'
+          description: 'Список поставщиков'
+      tags:
+        - Поставщики
+    post:
+      operationId: Регистрация поставщика
+      description: 'Регистрация юридического лица с ролью поставщик'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierInfo'
+          description: 'Поставщик успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+      tags:
+        - Поставщики
+  /api/v1/users/customers/companies/:
+    post:
+      operationId: Регистрация покупателя-юридического лица
+      description: 'Регистрация юридического лица с ролью покупатель'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCompanyCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerCompanyInfo'
+          description: 'Покупатель успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+      tags:
+        - Покупатели
+  /api/v1/users/customers/personals/:
+    post:
+      operationId: Регистрация покупателя-физического лица
+      description: 'Регистрация физического лица с ролью покупатель'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPersonalCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPersonalInfo'
+          description: 'Покупатель успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+      tags:
+        - Покупатели
+
+  /api/v1/users/me/:
+    get:
+      operationId: Текущий пользователь
+      description: 'Информация о текущем пользователе'
+      parameters: []
+      security:
+        - Token: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SupplierConfidentionalInfo'
+                  - $ref: '#/components/schemas/CustomerCompanyConfidentionalInfo'
+                  - $ref: '#/components/schemas/CustomerPersonalInfo'
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+    patch:
+      operationId: Изменение текущего пользователя
+      description: 'Изменение информации о текущем пользователе'
+      parameters: []
+      security:
+        - Token: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/CompanyUpdate'
+                - $ref: '#/components/schemas/PersonalUpdate'
+      responses:
+        '204':
+          description: 'Пользователь успешно изменен'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+    delete:
+      operationId: Удаление пользователя
+      description: 'Удаление текущего пользователя'
+      parameters: []
+      security:
+        - Token: [ ]
+      responses:
+        '204':
+          description: 'Пользователь успешно удален'
+        '401':
+          description: 'Пользователь не авторизован'
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+  /api/v1/users/set_password/:
+    post:
+      operationId: Изменение пароля
+      description: 'Изменение пароля текущего пользователя'
+      parameters: []
+      security:
+        - Token: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+      responses:
+        '204':
+          description: 'Пароль успешно изменен'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+  /api/v1/auth/token/login/:
+    post:
+      operationId: Получить токен авторизации
+      description: Используется для авторизации по емейлу и паролю, чтобы далее использовать токен при запросах.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenGetResponse'
+          description: ''
+      tags:
+        - Пользователи
+
+  /api/v1/auth/token/logout/:
+    post:
+      operationId: Удаление токена
+      description: Удаляет токен текущего пользователя
+      parameters: []
+      security:
+        - Token: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Пользователи
+
+  /api/v1/products:
+    get:
+      tags:
+        - Товары
+      operationId: Список товаров
+      description: Страница доступна всем пользователям
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProductsList'
+    post:
+      tags:
+        - Товары
+      security:
+        - Token: []
+      operationId: Создание товара
+      description: 'Доступно только авторизованному поставщику'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductsCreateUpdate'
+      responses:
+        '201':
+          description: 'Товар успешно создан'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/products/{product_id}:
+    parameters:
+    - name: product_id
+      in: path
+      required: true
+      description: "Уникальный id товара"
+      schema:
+        type: string
+    get:
+      tags:
+        - Товары
+      operationId: Получение товара
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - Товары
+      security:
+        - Token: []
+      operationId: Обновление товара
+      description: 'Доступно только владельцу товара'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductsCreateUpdate'
+      responses:
+        '201':
+          description: 'Товар успешно обновлен'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsList'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Товары
+      security:
+        - Token: [ ]
+      operationId: Удаление товара
+      description: 'Удаление доступно только владельцу товара'
+      parameters: []
+      responses:
+        '204':
+          description: 'Товар успешно удален'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/categories:
+    get:
+      summary: 'Получить список всех категорий'
+      parameters:
+        - in: query
+          name: search
+          description: 'Поиск категории по наименованию'
+          required: false
+          schema:
+            type: string
+      tags:
+        - Категории
+      operationId: 'Cписок всех категорий'
+      description: 'Страница доступна всем пользователям.'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Category'
+
+  /api/v1/categories/{category_id}:
+    get:
+      summary: 'Получить категорию по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: category_id
+          description: "Уникальный идентификатор категории"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Категории
+      operationId: 'Получение информации о категории'
+      description: 'Страница доступна всем пользователям.'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/baskets:
+    post:
+      summary: 'Создать корзину'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Создание корзины'
+      description: 'Доступно только авторизированным пользователям'
+      responses:
+        '201':
+          description: 'Корзина успешно создана'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+
+  /api/v1/baskets/{basket_id}:
+    get:
+      summary: 'Получить корзину по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: basket_id
+          description: "Уникальный идентификатор корзины"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Получение информации о корзине'
+      description: 'Доступно только модераторам'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: 'Удалить корзину по уникальному идентификатору'
+      parameters:
+        - in: path
+          name: basket_id
+          description: "Уникальный идентификатор корзины"
+          required: true
+          schema:
+            type: string
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Удаление корзины'
+      description: 'Доступно только авторизированным пользователям'
+      responses:
+        '204':
+          description: 'Корзина успешно удалена'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/baskets/mine:
+    post:
+      summary: 'Добавить товар в корзину'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Добавление товара в корзину'
+      description: 'Доступно только авторизированным пользователям'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasketAddProduct'
+      responses:
+        '201':
+          description: 'Товар успешно добавлен'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Обновить товары в корзине'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Обновление товаров в корзине пользователя'
+      description: 'Доступно только авторизированным пользователям'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasketUpdateProducts'
+      responses:
+        '201':
+          description: 'Товар успешно добавлен'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      summary: 'Просмотреть корзину пользователя'
+      tags:
+        - Корзины
+      security:
+        - Token: []
+      operationId: 'Получение информации о корзине пользователя'
+      description: 'Доступно только авторизированному пользователю'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Basket'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/users/{user_id}/orders/:
+    get:
+      summary: 'Просмотреть заказы пользователя'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          description: 'Номер страницы'
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          description: 'Количество элементов на странице'
+          required: false
+          schema:
+            type: integer
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Просмотреть заказы пользователя'
+      description: 'Доступно только Владельцу заказа'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResult'
+                  - type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+    post:
+      summary: 'Добавить заказ'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Добавление заказа пользователя'
+      description: 'Доступно только авторизованному пользователю'
+      responses:
+        '201':
+          description: 'Заказ успешно добавлен'
+      requestBody:
+        content:
+          application/json:
+            schema:
+
+              $ref: '#/components/schemas/CreateOrder'
+
+  /api/v1/users/{user_id}/orders/{order_id}/:
+    get:
+      summary: 'Просмотреть заказ пользователя'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: order_id
+          description: 'Уникальный идентификатор заказа'
+          required: true
+          schema:
+            type: string
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Просмотреть заказ пользователя'
+      description: 'Доступно только Владельцу заказа'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: 'Изменить/удалить заказ'
+      parameters:
+        - in: path
+          name: user_id
+          description: 'Уникальный идентификатор пользователя'
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: order_id
+          description: 'Уникальный идентификатор заказа'
+          required: true
+          schema:
+            type: string
+      tags:
+        - Заказы
+      security:
+        - Token: []
+      operationId: 'Изменение заказа пользователя'
+      description: 'Доступно Владельцу заказа и Службам'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrder'
+      responses:
+        '200':
+          description: 'Заказ успешно изменен/удален'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+components:
+  schemas:
+    PaginatedResult:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+          description: 'Общее количество объектов в базе'
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://example.org/api/v1/products/?page=4
+          description: 'Ссылка на следующую страницу'
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://example.org/api/v1/products/?page=2
+          description: 'Ссылка на предыдущую страницу'
+        results:
+          type: array
+          items: {}
+
+    Supplier:
+      description: 'Поставщик'
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        company:
+          type: object
+          properties:
+            company_id:
+              type: integer
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    SupplierCreate:
+      description: 'Регистрация поставщика'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона юридического лица'
+            address:
+              type: string
+              description: 'Адрес юридического лица'
+          required:
+            - inn
+            - ogrn
+            - phone_number
+      required:
+        - email
+        - username
+        - password
+
+    CustomerCompanyCreate:
+      description: 'Регистрация покупателя-юридического лица'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: string
+              description: 'Адрес юридического лица'
+          required:
+            - inn
+            - ogrn
+            - phone_number
+      required:
+        - email
+        - username
+        - password
+
+    CustomerPersonalCreate:
+      description: 'Регистрация покупателя-физического лица'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: 'Уникальный адрес электронной почты'
+        username:
+          type: string
+          description: 'Уникальный юзернейм'
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+          description: "Пароль"
+          example: "Qwerty123"
+        personal:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: "Имя"
+              example: "Вася"
+            last_name:
+              type: string
+              maxLength: 150
+              description: "Фамилия"
+              example: "Пупкин"
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона'
+            address:
+              type: string
+              description: 'Адрес'
+          required:
+            - first_name
+            - last_name
+            - phone_number
+      required:
+        - email
+        - username
+        - password
+
+    SupplierInfo:
+      description: 'Общедоступная информация о поставщике-юридическом лице'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [supplier, customer]
+          example: supplier
+          description: 'Поставщик'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    SupplierConfidentionalInfo:
+      description: 'Информация о поставщике-юридическом лице (в личном кабинете)'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [supplier, customer]
+          example: supplier
+          description: 'Поставщик'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            company_account:
+              type: integer
+              description: 'Уникальный счет юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    CustomerCompanyInfo:
+      description: 'Общедоступная информация о покупателе-юридическом лице'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [supplier, customer]
+          example: customer
+          description: 'Покупатель'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    CustomerCompanyConfidentionalInfo:
+      description: 'Информация о покупателе-юридическом лице (в личном кабинете)'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [supplier, customer]
+          example: customer
+          description: 'Покупатель'
+        is_company:
+          type: boolean
+          example: true
+          description: 'Является компанией'
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            company_account:
+              type: integer
+              description: 'Уникальный счет юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_numbers:
+              type: array
+              items:
+                type: string
+                description: 'Уникальный номер телефона юридического лица'
+            addresses:
+              type: array
+              items:
+                type: string
+                description: 'Адрес юридического лица'
+
+    CustomerPersonalInfo:
+      description: 'Информация о покупателе-физическом лице (в личном кабинете)'
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [supplier, customer]
+          example: customer
+          description: 'Покупатель'
+        is_company:
+          type: boolean
+          example: false
+          description: 'Не является компанией'
+        personal:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: "Имя"
+              example: "Вася"
+            last_name:
+              type: string
+              maxLength: 150
+              description: "Фамилия"
+              example: "Пупкин"
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона'
+            address:
+              type: string
+              description: 'Адрес'
+
+    CompanyUpdate:
+      description: 'Изменение информации в личном кабинете юридического лица'
+      type: object
+      properties:
+        company:
+          type: object
+          properties:
+            company_name:
+              type: string
+              description: 'Наименование юридического лица'
+            company_account:
+              type: integer
+              description: 'Уникальный счет юридического лица'
+            inn:
+              type: integer
+              description: 'Уникальный ИНН юридического лица'
+            ogrn:
+              type: integer
+              description: 'Уникальный ОГРН юридического лица'
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона юридического лица'
+            address:
+              type: string
+              description: 'Адрес юридического лица'
+
+    PersonalUpdate:
+      description: 'Изменение информации в личном кабинете физического лица'
+      type: object
+      properties:
+        personal:
+          type: object
+          properties:
+            first_name:
+              type: string
+              maxLength: 150
+              description: "Имя"
+              example: "Вася"
+            last_name:
+              type: string
+              maxLength: 150
+              description: "Фамилия"
+              example: "Пупкин"
+            phone_number:
+              type: string
+              description: 'Уникальный номер телефона'
+            address:
+              type: string
+              description: 'Адрес'
+
+    Category:
+      description: 'Категория товара'
+      type: object
+      properties:
+        id:
+          type: integer          
+          example: 10
+          description: 'Уникальный идентификатор категории'
+        name:
+          type: string
+          example: Куртки
+          description: 'Наименование категории'
+        slug:
+          type: string
+          example: kurtki
+          description: 'Часть url категории (слаг)'
+        parent_id:
+          type: integer
+          example: 123
+          description: 'Уникальный идентификатор родительской категории'
+
+    ProductsList:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Уникальный id'
+        sku:
+          type: string
+          description: 'артикул товара'
+        name:
+          type: string
+          description: 'название товара'
+        brand:
+          type: string
+          description: 'производитель товара'
+        price:
+          type: number
+          description: 'цена товара'
+        wholesale_quantity:
+          type: integer
+          description: 'минимальный объем заказа'
+        video:
+          type: string
+          description: 'видео'
+        quantity_in_stock:
+          type: integer
+          description: 'количество в наличии'
+        description:
+          type: string
+          description: 'описание'
+        manufacturer_country:
+          type: string
+          description: 'страна производитель'
+        user:
+          type: object
+          items:
+            example:
+              id: 1
+              username: 'string'
+            type: object
+          properties:
+            id:
+              type: integer
+              description: 'id пользователя'
+            username:
+              type: string
+              description: 'username'
+        category:
+          $ref: '#/components/schemas/Category'
+        images:
+          type: array
+          description: 'список изображений'
+          items:
+            example:
+              image: 'http://example.org/images/image.jpeg'
+            type: object
+            properties:
+              image:
+                description: 'Ссылка на картинку на сайте'
+                example: 'http://example.org/images/image.jpeg'
+                type: string
+                format: url
+
+    Basket:
+      description: 'Корзина'
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+          description: 'Уникальный идентификатор корзины'
+        products:
+          type: array
+          description: 'Список товаров в корзине'
+          items:
+            properties:
+              product:
+                $ref: '#/components/schemas/ProductsList'
+              quantity:
+                type: integer
+                example: 1000
+                description: 'Количество товаров'
+
+    BasketAddProduct:
+      description: 'Тело запроса для добавления товара в корзину'
+      type: object
+      properties:
+        product:
+          type: object
+          properties:
+            product_id:
+              type: integer
+              example: 4
+              description: 'Уникальный идентификатор товара'
+            quantity:
+              type: integer
+              example: 234
+              description: 'Количество единиц товара'
+
+    BasketUpdateProducts:
+      description: 'Тело запроса для обновления товаров в корзине'
+      type: array
+      items:
+        $ref: '#/components/schemas/BasketAddProduct'
+
+    ProductsCreateUpdate:
+      type: object
+      properties:
+        sku:
+          type: string
+          description: 'артикул товара'
+        name:
+          type: string
+          description: 'название товара'
+        brand:
+          type: string
+          description: 'производитель товара'
+        price:
+          type: number
+          description: 'цена товара'
+        wholesale_quantity:
+          type: integer
+          description: 'минимальный объем заказа'
+        video:
+          type: string
+          description: 'видео'
+        quantity_in_stock:
+          type: integer
+          description: 'количество в наличии'
+        description:
+          type: string
+          description: 'описание'
+        manufacturer_country:
+          type: string
+          description: 'страна производитель'
+        category:
+          type: object
+          items:
+            example:
+              id: 1
+            type: object
+          properties:
+            id:
+              type: integer
+              description: 'id категории'
+        images:
+          type: array
+          description: 'список изображений'
+          items:
+            example:
+              image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg=='
+            type: object
+            properties:
+              image:
+                type: string
+                description: 'изображение'
+
+    ValidationError:
+      description: Стандартные ошибки валидации DRF
+      type: object
+      properties:
+        field_name:
+          description: 'Название поля, в котором произошли ошибки. Таких полей может быть несколько'
+          example: [ 'Обязательное поле.' ]
+          type: array
+          items:
+            type: string
+
+    AuthenticationError:
+      description: Пользователь не авторизован
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Учетные данные не были предоставлены."
+          type: string
+
+    PermissionDenied:
+      description: Недостаточно прав
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "У вас недостаточно прав для выполнения данного действия."
+          type: string
+
+    NotFound:
+      description: Объект не найден
+      type: object
+      properties:
+        detail:
+          description: 'Описание ошибки'
+          example: "Страница не найдена."
+          type: string
+
+    SetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+        current_password:
+          type: string
+      required:
+        - new_password
+        - current_password
+
+    TokenCreate:
+      type: object
+      properties:
+        password:
+          type: string
+        email:
+          type: string
+
+    TokenGetResponse:
+      type: object
+      properties:
+        auth_token:
+          type: string
+
+    ProductsInOrder:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          example: 4
+          description: 'Уникальный идентификатор товара'
+        quantity:
+          type: integer
+          example: 234
+          description: 'Количество единиц товара'
+        discount:
+          type: number
+          example: 0.90
+          description: 'Скидка'
+
+    Order:
+      description: 'Заказ'
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+          description: 'Уникальный идентификатор заказа'
+        user_id:
+          type: integer
+          example: 123
+          description: 'Уникальный идентификатор пользователя'
+        status:
+          type: string
+          example: 'new'
+          description: 'Статус заказа'
+        created_at:
+          type: string
+          example: '2022-01-01T00:00:00.000Z'
+          description: 'Дата создания заказа'
+        updated_at:
+          type: string
+          example: '2022-01-01T00:00:00.000Z'
+          description: 'Дата обновления заказа'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductsInOrder'
+
+    CreateOrder:
+      description: 'Тело запроса для создания заказа'
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            properties:
+              product_id:
+                type: integer
+                example: 4
+                description: 'Уникальный идентификатор товара'
+              quantity:
+                type: integer
+                example: 234
+                description: 'Количество единиц товара'
+
+    UpdateOrder:
+      description: 'Тело запроса для обновления/удаления заказа'
+      type: object
+      properties:
+        status:
+          type: string
+          example: 'deleted'
+        products:
+          type: object
+          properties:
+            product_id:
+              type: integer
+              example: 4
+              description: 'Уникальный идентификатор товара'
+            quantity:
+              type: integer
+              example: 234
+              description: 'Количество единиц товара'
+
+
+  responses:
+    ValidationError:
+      description: 'Ошибки валидации в стандартном формате DRF'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+
+    AuthenticationError:
+      description: Пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationError'
+
+    PermissionDenied:
+      description: Недостаточно прав
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PermissionDenied'
+
+    NotFound:
+      description: Объект не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFound'
+
+  securitySchemes:
+    Token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
