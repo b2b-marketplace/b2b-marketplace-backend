@@ -44,14 +44,14 @@ def test_get_category_by_id(guest_client, categories):
 
 
 def test_only_get_method_allowed_for_categories(guest_client, categories):
-    resposne = guest_client.post(CATEGORIES_ENDPOINT)
-    assert resposne.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    response = guest_client.post(CATEGORIES_ENDPOINT)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
-    resposne = guest_client.put(CATEGORIES_ENDPOINT)
-    assert resposne.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    response = guest_client.put(CATEGORIES_ENDPOINT)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
-    resposne = guest_client.patch(CATEGORIES_ENDPOINT)
-    assert resposne.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    response = guest_client.patch(CATEGORIES_ENDPOINT)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
-    resposne = guest_client.delete(CATEGORIES_ENDPOINT)
-    assert resposne.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    response = guest_client.delete(CATEGORIES_ENDPOINT)
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED

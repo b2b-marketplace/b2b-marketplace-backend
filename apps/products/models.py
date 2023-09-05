@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel, SoftDeleteMixin
+from apps.products.validators import validate_video
 
 
 def get_product_directory_path(instance, filename):
@@ -21,7 +22,9 @@ def get_product_directory_path(instance, filename):
         path = get_product_directory_path(image_instance, 'example.jpg')
     """
     if isinstance(instance, Image):
-        return f"products/{instance.product.category.slug}/{instance.product.sku}/{filename}"
+        return f"products/{instance.product.category.slug}/{instance.product.sku}/images/{filename}"
+    if isinstance(instance, Video):
+        return f"products/{instance.product.category.slug}/{instance.product.sku}/videos/{filename}"
     if isinstance(instance, Product):
         return f"products/{instance.category.slug}/{instance.sku}/{filename}"
 
@@ -83,11 +86,41 @@ class Image(models.Model):
         return f"{self.product}"
 
 
+class Video(models.Model):
+    """Модель видео."""
+
+    product = models.ForeignKey(
+        "Product",
+        on_delete=models.CASCADE,
+        related_name="videos",
+        verbose_name=_("Product"),
+    )
+    video = models.FileField(
+        upload_to=get_product_directory_path,
+        blank=True,
+        null=True,
+        verbose_name=_("Product video"),
+        validators=[validate_video],
+    )
+
+    class Meta:
+        verbose_name = _("Video")
+        verbose_name_plural = _("Videos")
+
+    def __str__(self):
+        return f"{self.product}"
+
+
 class ProductManager(models.Manager):
     """Менеджер для модели Product."""
 
     def get_queryset(self):
-        return super().get_queryset().select_related("user", "category").prefetch_related("images")
+        return (
+            super()
+            .get_queryset()
+            .select_related("user", "category")
+            .prefetch_related("images", "videos")
+        )
 
 
 class Product(SoftDeleteMixin, BaseModel):
@@ -113,9 +146,6 @@ class Product(SoftDeleteMixin, BaseModel):
     brand = models.CharField(max_length=255, verbose_name=_("Product brand"))
     price = models.DecimalField(max_digits=11, decimal_places=2, verbose_name=_("Product price"))
     wholesale_quantity = models.PositiveIntegerField(verbose_name=_("Product wholesale quantity"))
-    video = models.FileField(
-        upload_to=get_product_directory_path, blank=True, null=True, verbose_name=_("Product video")
-    )
     quantity_in_stock = models.PositiveIntegerField(verbose_name=_("Products quantity in stock"))
     description = models.TextField(verbose_name=_("Product description"))
     manufacturer_country = models.CharField(

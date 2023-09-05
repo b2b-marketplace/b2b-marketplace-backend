@@ -12,7 +12,7 @@ PRODUCT_RESPONSE = {
     "brand": "789",
     "price": "789.00",
     "wholesale_quantity": 789,
-    "video": "http://host.ru/media/products/kategoriya-1/789/video.mp4",
+    "videos": [{"video": "http://host.ru/media/products/kategoriya-1/789/video.mp4"}],
     "quantity_in_stock": 789,
     "description": "789",
     "manufacturer_country": "789",
