@@ -36,7 +36,7 @@ class ProductFilter(django_filters.FilterSet):
     is_favorited = django_filters.BooleanFilter(
         method="filter_favorites", help_text="Показывать избранное"
     )
-    ids = django_filters.CharFilter(method="filter_by_ids", help_text="Массив id")
+    ids = django_filters.BaseInFilter(field_name="id", lookup_expr="in", help_text="Массив id")
 
     class Meta:
         model = Product
@@ -51,11 +51,6 @@ class ProductFilter(django_filters.FilterSet):
             "ordering",
             "name",
         )
-
-    def filter_by_ids(self, queryset, name, value):
-        """Фильтрация по массиву id."""
-        id_list = [int(item) for item in value.split(",") if item.strip()]
-        return queryset.filter(id__in=id_list)
 
     def filter_by_name(self, queryset, name, value):
         """Фильтрация по названию товара.
