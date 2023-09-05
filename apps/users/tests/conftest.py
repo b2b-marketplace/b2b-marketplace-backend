@@ -21,6 +21,7 @@ def company(django_user_model):
             "company_account": "12345678901234567890",
             "address": {"address": "address"},
             "phone_number": {"phone_number": "1234567"},
+            "vat": True,
         },
     }
     user = django_user_model.objects.create_user(**data)
@@ -50,6 +51,7 @@ def customer_company(django_user_model):
             "company_account": "22222222222222222222",
             "address": {"address": "address"},
             "phone_number": {"phone_number": "123456789"},
+            "vat": False,
         },
     }
     user = django_user_model.objects.create_user(**data)
