@@ -11,11 +11,17 @@ env:
   DJANGO_ALLOWED_HOSTS: localhost
   CSRF_TRUSTED_ORIGINS: http://localhost
   DJANGO_DEBUG: True
+
   POSTGRES_DB: b2b-marketplace
   POSTGRES_USER: b2b-marketplace
   POSTGRES_PASSWORD: somepassword
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
+
+  EMAIL_HOST: fake.mail.ru
+  EMAIL_HOST_USER: fake@mail.ru
+  EMAIL_HOST_PASSWORD: fake_password
+  EMAIL_PORT: 2525
 
 jobs:
   migrations:
@@ -60,11 +66,18 @@ jobs:
           echo DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS >> infra/.env
           echo CSRF_TRUSTED_ORIGINS=$CSRF_TRUSTED_ORIGINS >> infra/.env
           echo DJANGO_DEBUG=$DJANGO_DEBUG >> infra/.env
+
           echo POSTGRES_DB=$POSTGRES_DB >> infra/.env
           echo POSTGRES_USER=$POSTGRES_USER >> infra/.env
           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> infra/.env
           echo POSTGRES_HOST=$POSTGRES_HOST >> infra/.env
           echo POSTGRES_PORT=$POSTGRES_PORT >> infra/.env
+
+          echo EMAIL_HOST=$EMAIL_HOST >> infra/.env
+          echo EMAIL_HOST_USER=$EMAIL_HOST_USER >> infra/.env
+          echo EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD >> infra/.env
+          echo EMAIL_PORT=$EMAIL_PORT >> infra/.env
+
       -
         name: Run migrations
         run: poetry run python manage.py migrate
