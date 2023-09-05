@@ -45,7 +45,7 @@ def product(user, categories):
         brand="Ультра майки инкорпорейтед",
         price="500",
         wholesale_quantity="1000",
-        video="path/to/video.mp4",
+        # video="path/to/video.mp4",
         quantity_in_stock="12000",
         description="Майка как майка",
         manufacturer_country="Китай",

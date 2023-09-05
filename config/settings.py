@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path=BASE_DIR / "infra" / ".env")
 
-
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 DEBUG = os.environ["DJANGO_DEBUG"].lower() == "true"
 
@@ -178,5 +177,8 @@ DJOSER = {
     "SET_PASSWORD_RETYPE": True,
     "HIDE_USERS": True,
 }
+
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 3 * 1024 * 1024  # 3 MB
 
 CORS_ALLOW_ALL_ORIGINS = True
