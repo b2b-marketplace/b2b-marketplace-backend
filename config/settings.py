@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "djoser",
     "django_filters",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -48,6 +49,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -176,3 +178,5 @@ DJOSER = {
     "SET_PASSWORD_RETYPE": True,
     "HIDE_USERS": True,
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
