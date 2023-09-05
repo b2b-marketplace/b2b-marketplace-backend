@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "djoser",
     "django_filters",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -48,6 +49,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -156,8 +158,16 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-SITE_NAME = "b2b"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+SITE_NAME = "b2buy"
+EMAIL_HOST = os.environ["EMAIL_HOST"]
+EMAIL_PORT = int(os.environ["EMAIL_PORT"])
+EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = f"B2Buy сервис <{EMAIL_HOST_USER}>"
+
 
 DJOSER = {
     "LOGIN_FIELD": "email",
@@ -168,3 +178,5 @@ DJOSER = {
     "SET_PASSWORD_RETYPE": True,
     "HIDE_USERS": True,
 }
+
+CORS_ALLOW_ALL_ORIGINS = True

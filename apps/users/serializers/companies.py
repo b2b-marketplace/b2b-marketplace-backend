@@ -36,6 +36,7 @@ class CompanyReadSerializer(serializers.ModelSerializer):
             "ogrn",
             "phone_number",
             "address",
+            "vat",
         )
 
 
@@ -55,6 +56,7 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
             "company_account",
             "phone_number",
             "address",
+            "vat",
         )
         extra_kwargs = {"company_account": {"write_only": True}}
 
