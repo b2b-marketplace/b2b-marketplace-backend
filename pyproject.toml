@@ -17,6 +17,7 @@ drf-spectacular = "^0.26.4"
 gunicorn = "^21.2.0"
 django-filter = "^23.2"
 python-magic = "^0.4.27"
+django-cors-headers = "^4.2.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.2.0"

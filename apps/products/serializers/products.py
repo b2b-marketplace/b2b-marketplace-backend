@@ -21,6 +21,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer()
     seller = CompanyReadSerializer(read_only=True, source="user.company")
+    is_favorited = serializers.BooleanField(default=False)
 
     class Meta:
         model = Product
@@ -39,6 +40,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
             "description",
             "manufacturer_country",
             "images",
+            "is_favorited",
         )
 
 

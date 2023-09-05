@@ -14,6 +14,7 @@ class ProductFilter(django_filters.FilterSet):
         - name: название товара (частичное совпадение)
         - min_quantity: минимальный заказ
         - ordering: сортировка по цене
+        - is_favorited: фильтрация по избранным товарам
     """
 
     category = django_filters.CharFilter(
@@ -32,12 +33,15 @@ class ProductFilter(django_filters.FilterSet):
     ordering = django_filters.OrderingFilter(
         fields=("price",), field_labels={"price": "Цена"}, help_text="Сортировка по цене"
     )
+    is_favorited = django_filters.BooleanFilter(
+        method="filter_favorites", help_text="Показывать избранное"
+    )
 
     class Meta:
         model = Product
         #  ! поле name обязательно должно быть последним элементом в fields, т.к. возвращает union
         #  https://docs.djangoproject.com/en/4.2/ref/models/querysets/#union
-        fields = ("category", "parent_category", "min_quantity", "ordering", "name")
+        fields = ("is_favorited", "category", "parent_category", "min_quantity", "ordering", "name")
 
     def filter_by_name(self, queryset, name, value):
         """Фильтрация по названию товара.
@@ -56,6 +60,22 @@ class ProductFilter(django_filters.FilterSet):
             .annotate(order=Value(1, IntegerField()))
         )
         return qs1.union(qs2).order_by("order")
+
+    def filter_favorites(self, queryset, name, value):
+        """Фильтрация по избранным товарам.
+
+        Возможные значения поля:
+            - true: отображение только избранных товаров
+            - false: отображение всех товаров, кроме избранных
+        Если пользователь не аутентифицрован - фильтарция не производится.
+        """
+        user = self.request.user
+        if not user.is_authenticated:
+            return queryset
+        if value:
+            return queryset.filter(pk__in=user.favorite_products.all())
+        if not value:
+            return queryset.exclude(pk__in=user.favorite_products.all())
 
 
 class CategoryFilter(django_filters.FilterSet):
