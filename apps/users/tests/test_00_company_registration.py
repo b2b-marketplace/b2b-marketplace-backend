@@ -40,6 +40,7 @@ class Test00CompanyRegistration:
                 "ogrn": "only_13_digit",
                 "address": {"address": "address"},
                 "phone_number": {"phone_number": "1234567"},
+                "vat": "yes",
             },
         }
 
@@ -126,6 +127,7 @@ class Test00CompanyRegistration:
                 "ogrn": "1234567890123",
                 "address": {"address": "address"},
                 "phone_number": {"phone_number": "1234567"},
+                "vat": True,
             },
         }
         response = apiclient.post(self.url_signup, data=valid_data, format="json")

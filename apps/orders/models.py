@@ -1,7 +1,9 @@
 from _decimal import ROUND_HALF_UP, Decimal
 from django.contrib.auth import get_user_model
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
@@ -16,6 +18,13 @@ class OrderManager(models.Manager):
             .prefetch_related("orders__product__user__company")
             .order_by("-created_at")
         )
+
+
+def validate_user_is_buyer(value):
+    """Валидация, является ли пользователь покупателем."""
+    user = get_object_or_404(get_user_model(), pk=value)
+    if not (user.personal or user.company.role == "customer"):
+        raise ValidationError(_("Only buyers can create orders."))
 
 
 class Order(BaseModel):
@@ -35,6 +44,7 @@ class Order(BaseModel):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.DO_NOTHING,
+        validators=[validate_user_is_buyer],
         related_name="customer",
         verbose_name=_("Order owner"),
     )

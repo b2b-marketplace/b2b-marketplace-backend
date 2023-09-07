@@ -1,6 +1,6 @@
 import pytest
 
-from apps.products.models import Category, Image, Product
+from apps.products.models import Category, Image, Product, Video
 from apps.users.models import Address, Company, CustomUser, PhoneNumber, PhysicalPerson
 
 
@@ -123,10 +123,10 @@ def product(user_seller, categories):
         brand="Ультра майки инкорпорейтед",
         price="500",
         wholesale_quantity="1000",
-        video="path/to/video.mp4",
         quantity_in_stock="12000",
         description="Майка как майка",
         manufacturer_country="Китай",
     )
     Image.objects.create(product=product, image="path/to/image.jpg")
+    Video.objects.create(product=product, video="path/to/video.mp4")
     return Product.objects.all()

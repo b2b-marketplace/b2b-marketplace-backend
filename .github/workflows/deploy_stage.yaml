@@ -99,6 +99,11 @@ jobs:
             echo POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} >> infra/.env
             echo POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} >> infra/.env
 
+            echo EMAIL_HOST=${{ secrets.EMAIL_HOST }} >> infra/.env
+            echo EMAIL_PORT=${{ secrets.EMAIL_PORT }} >> infra/.env
+            echo EMAIL_HOST_USER=$'${{ secrets.EMAIL_HOST_USER }}' >> infra/.env
+            echo EMAIL_HOST_PASSWORD=$'${{ secrets.EMAIL_HOST_PASSWORD }}' >> infra/.env
+
             echo ${{ secrets.REGISTRY_PAT }} | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
             docker image prune -f
