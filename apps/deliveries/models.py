@@ -10,6 +10,12 @@ class DeliveryMethod(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("Delivery method name"))
     description = models.CharField(max_length=255, verbose_name=_("Delivery method description"))
     slug = models.SlugField(max_length=100, unique=True, verbose_name=_("Delivery method slug"))
+    price = models.DecimalField(
+        max_digits=11,
+        decimal_places=2,
+        verbose_name=_("Delivery price"),
+        validators=[validators.MinValueValidator(0)],
+    )
 
     class Meta:
         verbose_name = _("Delivery method")
@@ -40,12 +46,6 @@ class Delivery(models.Model):
         verbose_name=_("Delivery method"),
     )
     delivery_date = models.DateTimeField()
-    price = models.DecimalField(
-        max_digits=11,
-        decimal_places=2,
-        verbose_name=_("Delivery price"),
-        validators=[validators.MinValueValidator(0)],
-    )
 
     class Meta:
         verbose_name = _("Delivery")
