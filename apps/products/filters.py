@@ -36,12 +36,21 @@ class ProductFilter(django_filters.FilterSet):
     is_favorited = django_filters.BooleanFilter(
         method="filter_favorites", help_text="Показывать избранное"
     )
+    ids = django_filters.BaseInFilter(field_name="id", lookup_expr="in", help_text="Массив id")
 
     class Meta:
         model = Product
         #  ! поле name обязательно должно быть последним элементом в fields, т.к. возвращает union
         #  https://docs.djangoproject.com/en/4.2/ref/models/querysets/#union
-        fields = ("is_favorited", "category", "parent_category", "min_quantity", "ordering", "name")
+        fields = (
+            "ids",
+            "is_favorited",
+            "category",
+            "parent_category",
+            "min_quantity",
+            "ordering",
+            "name",
+        )
 
     def filter_by_name(self, queryset, name, value):
         """Фильтрация по названию товара.
