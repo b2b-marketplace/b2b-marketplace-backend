@@ -127,6 +127,7 @@ class MeCompanyReadSerializer(serializers.ModelSerializer):
             "ogrn",
             "phone_number",
             "address",
+            "vat",
         )
 
 
