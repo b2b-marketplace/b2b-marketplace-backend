@@ -1,4 +1,8 @@
+import io
+
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image as PIL_Image
 
 from apps.products.models import Category, Image, Product, Video
 from apps.users.models import Address, Company, CustomUser, PhoneNumber, PhysicalPerson
@@ -130,3 +134,25 @@ def product(user_seller, categories):
     Image.objects.create(product=product, image="path/to/image.jpg")
     Video.objects.create(product=product, video="path/to/video.mp4")
     return Product.objects.all()
+
+
+@pytest.fixture
+def valid_images():
+    def _generate_images(images_count):
+        buffer = io.BytesIO()
+        images = []
+        for _ in range(images_count):
+            PIL_Image.new(mode="RGB", size=(200, 200)).save(buffer, format="PNG")
+            images.append(
+                SimpleUploadedFile(
+                    name="image.png", content=buffer.getvalue(), content_type="image/png"
+                )
+            )
+        return images
+
+    return _generate_images
+
+
+@pytest.fixture
+def valid_video():
+    return SimpleUploadedFile(name="video.mp4", content=b"video", content_type="video/mp4")

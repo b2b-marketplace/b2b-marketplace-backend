@@ -24,5 +24,16 @@ PRODUCT_CREATE_REQUEST = {
     "quantity_in_stock": 789,
     "description": "Some description",
     "manufacturer_country": "China",
-    # TODO
+}
+
+
+INVALID_PRODUCT_CREATE_REQUEST = {
+    "invalid_sku": "789",
+    "invalid_name": "789",
+    "invalid_brand": "Some brand",
+    "invalid_price": "789.00",
+    "invalid_wholesale_quantity": 789,
+    "invalid_quantity_in_stock": 789,
+    "invalid_description": "Some description",
+    "invalid_manufacturer_country": "China",
 }
