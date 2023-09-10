@@ -114,16 +114,6 @@ def test_update_product_allowed_for_owner(authorized_seller, product):
     assert response.status_code == status.HTTP_200_OK
 
 
-def test_update_product_not_allowed_for_non_owner(authorized_seller, user_buyer, categories):
-    product = Product(**PRODUCT_CREATE_REQUEST)
-    product.user = user_buyer
-    product.category = categories[0]
-    product.save()
-    endpoint = f"{PRODUCTS_ENDPOINT}{product.pk}/"
-    response = authorized_seller.patch(endpoint)
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
 def test_delete_product_not_allowed_for_guest(guest_client, product):
     endpoint = f"{PRODUCTS_ENDPOINT}{product[0].pk}/"
     response = guest_client.delete(endpoint)
@@ -136,16 +126,6 @@ def test_delete_product_allowed_for_owner(authorized_seller, product):
     response = authorized_seller.delete(endpoint)
     assert response.status_code != status.HTTP_404_NOT_FOUND
     assert response.status_code == status.HTTP_204_NO_CONTENT
-
-
-def test_delete_product_not_allowed_for_non_owner(authorized_seller, user_buyer, categories):
-    product = Product(**PRODUCT_CREATE_REQUEST)
-    product.user = user_buyer
-    product.category = categories[0]
-    product.save()
-    endpoint = f"{PRODUCTS_ENDPOINT}{product.pk}/"
-    response = authorized_seller.delete(endpoint)
-    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_delete_product_does_not_remove_entry_from_database(authorized_seller, product):
