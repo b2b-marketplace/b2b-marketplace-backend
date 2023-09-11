@@ -52,7 +52,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/:/config/nginx/site-confs/
+      - ./nginx/default.conf:/config/nginx/site-confs/default.conf
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
