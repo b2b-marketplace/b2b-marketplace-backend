@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - develop
-    types: [ closed ]
+    # types: [ closed ]
 
 env:
   REGISTRY: ghcr.io
@@ -53,9 +53,9 @@ jobs:
 
   deploy:
     name: Deploy and start the App
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    needs: buld_and_push_image_to_github_packages
+    # needs: buld_and_push_image_to_github_packages
     environment:
       name: Stage
 
