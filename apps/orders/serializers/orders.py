@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -40,31 +42,49 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def _sort_products_by_sellers(self, order_products):
+        sorting_products = defaultdict(list)
+        for order_product in order_products:
+            product = order_product.get("product")
+            seller = product.user
+            sorting_products[seller].append(order_product)
+        return sorting_products
+
+    def _save_obj(self, obj_model, data):
+        for key, value in data.items():
+            setattr(obj_model, key, value)
+        obj_model.save()
+
     def create_or_update_order(self, validated_data, instance=None):
         order_products = validated_data.pop("order_products", None)
-        order = instance if instance else Order()
+        sorting_products = self._sort_products_by_sellers(order_products)
         basket = Basket.objects.filter(user=validated_data["user"]).first()
+        orders = []
 
-        for key, value in validated_data.items():
-            setattr(order, key, value)
-        order.save()
+        for sorting_product in sorting_products.values():
+            order = instance if instance else Order()
+            self._save_obj(order, validated_data)
 
-        for order_product in order_products:
-            product = order_product.pop("product")
-            order.order_products.add(product, through_defaults=order_product)
-            if basket:
-                basket.basket_products.remove(product)
+            for products in sorting_product:
+                product = products.pop("product")
+                products["price"] = product.price
+                order.order_products.add(product, through_defaults=products)
 
-            # TODO: заменить на правильно считающую формулу обновления количества товара
-            product.quantity_in_stock -= order_product.get("quantity", 0)
-            product.save()
+                if basket:
+                    basket.basket_products.remove(product)
 
-        return order
+                # TODO: заменить на правильно считающую формулу обновления количества товара
+                product.quantity_in_stock -= products.get("quantity", 0)
+                product.save()
+
+            orders.append(order)
+
+        return orders
 
     @transaction.atomic
     def create(self, validated_data):
         return self.create_or_update_order(validated_data)
 
     def to_representation(self, instance):
-        serializer = OrderReadSerializer(instance, context=self.context)
+        serializer = OrderReadSerializer(instance, context=self.context, many=True)
         return serializer.data
