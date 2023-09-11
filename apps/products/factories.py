@@ -58,7 +58,7 @@ class ImageFactory(factory.django.DjangoModelFactory):
         model = Image
 
     product = factory.SubFactory(ProductFactory)
-    image = factory.django.ImageField(filename="video_example.jpg")
+    image = factory.django.ImageField(filename="example.jpg")
 
 
 class VideoFactory(factory.django.DjangoModelFactory):
