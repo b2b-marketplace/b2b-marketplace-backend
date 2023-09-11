@@ -98,7 +98,7 @@ class ProductFilter(django_filters.FilterSet):
             - true: отображать все товары, независимо от наличия
             - false: отображать только товары в наличии (quantity_in_stock > 0)
         """
-        if value is False:
+        if not value:
             return queryset.filter(quantity_in_stock__gt=0)
         return queryset
 
