@@ -17,17 +17,37 @@ def guest_client():
 
 
 @pytest.fixture
-def company(django_user_model):
+def seller_1(django_user_model):
     data = {
-        "email": "company@company.fake",
-        "username": "companyuser",
+        "email": "seller_1@seller_1.fake",
+        "username": "seller_1",
         "password": "12345678",
         "company": {
             "role": "supplier",
-            "name": "best_company",
-            "inn": "1234567890",
-            "ogrn": "1234567890123",
-            "company_account": "12345678901234567890",
+            "name": "seller_1",
+            "inn": "1" * 10,
+            "ogrn": "1" * 13,
+            "company_account": "1" * 20,
+        },
+    }
+    user = django_user_model.objects.create_user(**data)
+    user.is_active = True
+    user.save()
+    return user
+
+
+@pytest.fixture
+def seller_2(django_user_model):
+    data = {
+        "email": "seller_2@seller_2.fake",
+        "username": "seller_2",
+        "password": "12345678",
+        "company": {
+            "role": "supplier",
+            "name": "seller_2",
+            "inn": "2" * 10,
+            "ogrn": "2" * 13,
+            "company_account": "2" * 20,
         },
     }
     user = django_user_model.objects.create_user(**data)
@@ -58,9 +78,9 @@ def categories():
 
 
 @pytest.fixture
-def product_1(company, categories):
+def product_1(seller_1, categories):
     product = Product.objects.create(
-        user=company,
+        user=seller_1,
         category=categories[0],
         sku="123",
         name="product_1",
@@ -77,9 +97,9 @@ def product_1(company, categories):
 
 
 @pytest.fixture
-def product_2(company, categories):
+def product_2(seller_2, categories):
     product = Product.objects.create(
-        user=company,
+        user=seller_2,
         category=categories[0],
         sku="123",
         name="product_2",
@@ -106,5 +126,5 @@ def basket(user, product_1, product_2):
 @pytest.fixture
 def order(user, product_1):
     order = Order.objects.create(user=user)
-    OrderProduct.objects.create(order=order, product=product_1, quantity=3, discount=10.00)
+    OrderProduct.objects.create(order=order, product=product_1, quantity=3, price=100)
     return order

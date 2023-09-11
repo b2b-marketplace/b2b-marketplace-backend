@@ -15,7 +15,7 @@ class OrderManager(models.Manager):
         return (
             self.filter(user=user)
             .select_related("user__company", "user__personal")
-            .prefetch_related("orders__product__user__company")
+            .prefetch_related("orders__product__user__company", "orders__product__images")
             .order_by("-created_at")
         )
 
@@ -33,13 +33,13 @@ class Order(BaseModel):
     class Status(models.TextChoices):
         """Статусы заказа."""
 
-        CREATED = "CR", _("Created")
-        UPDATED = "UP", _("Updated")
-        PAID = "PA", _("Paid")
-        IN_TRANSIT = "TR", _("In_transit")
-        COMPLETED = "CO", _("Completed")
-        CANCELED = "CA", _("Canceled")
-        RETURNED = "RE", _("Returned")
+        CREATED = "Created", _("Created")
+        UPDATED = "Updated", _("Updated")
+        PAID = "Paid", _("Paid")
+        IN_TRANSIT = "Transit", _("In_transit")
+        RECEIVED = "Received", _("Received")
+        CANCELED = "Canceled", _("Canceled")
+        RETURNED = "Returned", _("Returned")
 
     user = models.ForeignKey(
         get_user_model(),
@@ -56,7 +56,10 @@ class Order(BaseModel):
         verbose_name=_("Products"),
     )
     status = models.CharField(
-        max_length=2, choices=Status.choices, default=Status.CREATED, verbose_name=_("Order status")
+        max_length=15,
+        choices=Status.choices,
+        default=Status.CREATED,
+        verbose_name=_("Order status"),
     )
 
     objects = OrderManager()
@@ -94,12 +97,11 @@ class OrderProduct(models.Model):
         verbose_name=_("Product in order"),
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
-    discount = models.DecimalField(
-        max_digits=4,
+    price = models.DecimalField(
+        max_digits=11,
         decimal_places=2,
-        default=0,
-        verbose_name=_("Product discount"),
-        validators=[validators.MinValueValidator(0), validators.MaxValueValidator(100)],
+        verbose_name=_("Product price"),
+        validators=[validators.MinValueValidator(0)],
     )
 
     class Meta:
@@ -118,10 +120,5 @@ class OrderProduct(models.Model):
 
     @property
     def cost(self):
-        cost = self.product.price * self.quantity
-        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
-
-    @property
-    def cost_with_discount(self):
-        cost = self.cost - self.cost * (self.discount / 100)
+        cost = self.price * self.quantity
         return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)

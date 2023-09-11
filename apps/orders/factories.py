@@ -26,4 +26,4 @@ class OrderProductFactory(factory.django.DjangoModelFactory):
     order = factory.SubFactory(OrderFactory)
     product = factory.SubFactory(ProductFactory)
     quantity = factory.Faker("pyint", min_value=1, max_value=10)
-    discount = factory.Faker("pydecimal", left_digits=2, right_digits=2)
+    price = factory.Faker("pydecimal", min_value=1, left_digits=4, right_digits=2)
