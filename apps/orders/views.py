@@ -1,7 +1,9 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
+from apps.orders.filters import BuyerOrderFilter
 from apps.orders.models import Order
 from apps.orders.permissions import IsOwner
 from apps.orders.serializers.orders import OrderReadSerializer, OrderWriteSerializer
@@ -10,6 +12,8 @@ from apps.orders.serializers.orders import OrderReadSerializer, OrderWriteSerial
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwner]
     http_method_names = ["get", "post", "delete"]
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = BuyerOrderFilter
 
     def get_queryset(self):
         return Order.objects.get_related_queryset(self.request.user)
