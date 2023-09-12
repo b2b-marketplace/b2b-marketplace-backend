@@ -70,6 +70,20 @@ def auth_client(user):
 
 
 @pytest.fixture
+def auth_seller_1(seller_1):
+    client = APIClient()
+    client.force_authenticate(user=seller_1)
+    return client
+
+
+@pytest.fixture
+def auth_seller_2(seller_2):
+    client = APIClient()
+    client.force_authenticate(user=seller_2)
+    return client
+
+
+@pytest.fixture
 def categories():
     cat1 = Category.objects.create(name="Товары для дома", slug="tovary-dlya-doma")
     Category.objects.create(name="Посуда", slug="posuda", parent=cat1)
@@ -87,7 +101,6 @@ def product_1(seller_1, categories):
         brand="product_1",
         price=500,
         wholesale_quantity=1000,
-        # video="path/to/video.mp4",
         quantity_in_stock=12000,
         description="product_1",
         manufacturer_country="product_1",
@@ -106,7 +119,6 @@ def product_2(seller_2, categories):
         brand="product_2",
         price=500,
         wholesale_quantity=1000,
-        # video="path/to/video.mp4",
         quantity_in_stock=12000,
         description="product_2",
         manufacturer_country="product_2",
@@ -124,7 +136,14 @@ def basket(user, product_1, product_2):
 
 
 @pytest.fixture
-def order(user, product_1):
+def order_1(user, product_1):
     order = Order.objects.create(user=user)
     OrderProduct.objects.create(order=order, product=product_1, quantity=3, price=100)
+    return order
+
+
+@pytest.fixture
+def order_2(user, product_2):
+    order = Order.objects.create(user=user)
+    OrderProduct.objects.create(order=order, product=product_2, quantity=3, price=100)
     return order
