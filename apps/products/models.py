@@ -13,7 +13,7 @@ def get_product_directory_path(instance, filename):
     """Функция для генерации пути сохранения файлов товаров и изображений.
 
     Args:
-        instance: Экземпляр модели (Image или Product).
+        instance: Экземпляр модели (Image, Video или Product).
         filename (str): Имя файла.
 
     Returns:

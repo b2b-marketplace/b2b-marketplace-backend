@@ -37,7 +37,9 @@ class Command(BaseCommand):
         users = CustomUser.objects.filter(is_company=True, company__role="supplier")
         for user in users:
             category = random.choice(categories)
-            ProductFactory.create_batch(number_max, user=user, category=category, create_image=True)
+            ProductFactory.create_batch(
+                number_max, user=user, category=category, create_image=True, create_video=True
+            )
 
     def create_baskets_and_orders(self, number_min):
         products = list(Product.objects.all())
