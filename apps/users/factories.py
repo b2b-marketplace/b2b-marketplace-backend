@@ -34,6 +34,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     ogrn = factory.Sequence(lambda n: f"{n:013d}")
     phone_number = factory.SubFactory(PhoneNumberFactory)
     address = factory.SubFactory(AddressFactory)
+    vat = factory.Faker("boolean")
 
 
 class PhysicalPersonFactory(factory.django.DjangoModelFactory):
@@ -64,7 +65,6 @@ class CustomUserFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def set_associated_objects(self, create, extracted, **kwargs):
         """Установка связей."""
-
         if not create:
             return
         if self.is_company:
