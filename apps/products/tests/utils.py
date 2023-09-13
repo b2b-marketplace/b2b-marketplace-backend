@@ -18,6 +18,7 @@ PRODUCT_RESPONSE = {
 PRODUCT_CREATE_REQUEST = {
     "sku": "789",
     "name": "789",
+    "category": 1,
     "brand": "Some brand",
     "price": "789.00",
     "wholesale_quantity": 789,
@@ -30,6 +31,7 @@ PRODUCT_CREATE_REQUEST = {
 INVALID_PRODUCT_CREATE_REQUEST = {
     "invalid_sku": "789",
     "invalid_name": "789",
+    "invalid_category": 1,
     "invalid_brand": "Some brand",
     "invalid_price": "789.00",
     "invalid_wholesale_quantity": 789,
