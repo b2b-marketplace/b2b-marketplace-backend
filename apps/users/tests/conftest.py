@@ -12,7 +12,7 @@ def company(django_user_model):
     data = {
         "email": "company@company.fake",
         "username": "companyuser",
-        "password": "12345678",
+        "password": "Grv&blj11765",
         "company": {
             "role": "supplier",
             "name": "best_company",
@@ -20,7 +20,7 @@ def company(django_user_model):
             "ogrn": "1234567890123",
             "company_account": "12345678901234567890",
             "address": {"address": "address"},
-            "phone_number": {"phone_number": "1234567"},
+            "phone_number": {"phone_number": "+79051234560"},
             "vat": True,
         },
     }
@@ -42,7 +42,7 @@ def customer_company(django_user_model):
     data = {
         "email": "customer@company.fake",
         "username": "customer-company",
-        "password": "12345678",
+        "password": "Grv&blj11765",
         "company": {
             "role": "customer",
             "name": "customer_company",
@@ -50,7 +50,7 @@ def customer_company(django_user_model):
             "ogrn": "3333333333333",
             "company_account": "22222222222222222222",
             "address": {"address": "address"},
-            "phone_number": {"phone_number": "123456789"},
+            "phone_number": {"phone_number": "+79051234561"},
             "vat": False,
         },
     }

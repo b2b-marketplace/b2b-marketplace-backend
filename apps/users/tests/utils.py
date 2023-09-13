@@ -49,13 +49,13 @@ invalid_data_for_company_account_inn_ogrn = [
 request_valid_data = {
     "email": "validemail@mail.fake",
     "username": "valid-username",
-    "password": "12345678",
+    "password": "Grv&blj11765",
     "company": {
         "role": "customer",
         "name": "valid-name",
         "inn": "1010101010",
         "address": {"address": "earth"},
-        "phone_number": {"phone_number": "123"},
+        "phone_number": {"phone_number": "+79051234562"},
         "vat": True,
     },
 }
@@ -71,7 +71,7 @@ response_valid_data_company_registration = {
         "inn": "1010101010",
         "ogrn": None,
         "address": {"id": 1, "address": "earth"},
-        "phone_number": {"id": 1, "phone_number": "123"},
+        "phone_number": {"id": 1, "phone_number": "+79051234562"},
         "vat": True,
     },
 }
