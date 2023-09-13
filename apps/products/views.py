@@ -64,6 +64,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         return serializers.ProductWriteSerializer
 
     def perform_create(self, serializer):
+        data = self.request.data
+        if "category" not in data or not data["category"]:
+            raise exceptions.ValidationError({"category": ["This field is required."]})
         serializer.save(user=self.request.user)
 
     @action(
