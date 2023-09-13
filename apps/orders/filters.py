@@ -12,7 +12,6 @@ class OrderFilter(django_filters.FilterSet):
     - sku: артикул товара
     - name: название товара
     - address: адрес доставки
-    - delivery_date: дата доставки
     """
 
     id = django_filters.NumberFilter(field_name="id", lookup_expr="exact", help_text="Номер заказа")

@@ -7,6 +7,7 @@ def schema_django_filter_warning(model=None):
     """
     Декоратор для исправления ошибки генерации схемы api django-filter для анонимного пользователя.
 
+    Если во вьюсете не указан queryset, надо передать модель.
     See: https://github.com/carltongibson/django-filter/issues/966
     """
 
