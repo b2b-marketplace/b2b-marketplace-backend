@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -144,7 +145,12 @@ class Product(SoftDeleteMixin, BaseModel):
     sku = models.CharField(max_length=255, verbose_name=_("Product sku"))
     name = models.CharField(max_length=255, verbose_name=_("Product name"))
     brand = models.CharField(max_length=255, verbose_name=_("Product brand"))
-    price = models.DecimalField(max_digits=11, decimal_places=2, verbose_name=_("Product price"))
+    price = models.DecimalField(
+        max_digits=11,
+        decimal_places=2,
+        verbose_name=_("Product price"),
+        validators=[MinValueValidator(0.01)],
+    )
     wholesale_quantity = models.PositiveIntegerField(verbose_name=_("Product wholesale quantity"))
     quantity_in_stock = models.PositiveIntegerField(verbose_name=_("Products quantity in stock"))
     description = models.TextField(verbose_name=_("Product description"))

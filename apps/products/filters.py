@@ -15,6 +15,8 @@ class ProductFilter(django_filters.FilterSet):
         - min_quantity: минимальный заказ
         - ordering: сортировка по цене
         - is_favorited: фильтрация по избранным товарам
+        - ids: список id товаров
+        - is_out_of_stock: фильтрация по наличию товаров (quantity_in_stock > 0)
     """
 
     category = django_filters.CharFilter(
@@ -37,6 +39,9 @@ class ProductFilter(django_filters.FilterSet):
         method="filter_favorites", help_text="Показывать избранное"
     )
     ids = django_filters.BaseInFilter(field_name="id", lookup_expr="in", help_text="Массив id")
+    is_out_of_stock = django_filters.BooleanFilter(
+        method="filter_out_of_stock", help_text="Показывать товары, отсутствующие в наличии"
+    )
 
     class Meta:
         model = Product
@@ -85,6 +90,17 @@ class ProductFilter(django_filters.FilterSet):
             return queryset.filter(pk__in=user.favorite_products.all())
         if not value:
             return queryset.exclude(pk__in=user.favorite_products.all())
+
+    def filter_out_of_stock(self, queryset, name, value):
+        """Фильтрация по наличию товара.
+
+        Возможные значения поля:
+            - true: отображать все товары, независимо от наличия
+            - false: отображать только товары в наличии (quantity_in_stock > 0)
+        """
+        if not value:
+            return queryset.filter(quantity_in_stock__gt=0)
+        return queryset
 
 
 class CategoryFilter(django_filters.FilterSet):
