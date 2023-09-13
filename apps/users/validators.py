@@ -57,6 +57,17 @@ def validate_phone_number(value):
         raise ValidationError(_("Invalid phone number format"))
 
 
+class SpecialCharactersValidator(object):
+    """Валидация пароля на наличие хотя бы одного спецсимвола."""
+
+    def validate(self, password, user=None):
+        if not re.search(r"[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]", password):
+            raise ValidationError(_("Password must contain at least one special character."))
+
+    def get_help_text(self):
+        return _("Your password must contain at least one special character.")
+
+
 def validate_user_is_supplier(value):
     """Валидатор, который проверяет, является ли пользователь поставщиком.
 
