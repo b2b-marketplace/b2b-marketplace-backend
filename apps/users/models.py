@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -157,11 +156,6 @@ class CustomUserManager(UserManager):
             extra_fields.setdefault("is_company", True)
             company = self._profile("company", Company, extra_fields)
             extra_fields.setdefault("company", company)
-
-        try:
-            validate_password(password)
-        except ValidationError as exp:
-            raise ValueError({"password": exp.messages})
 
         return super().create_user(username, email, password, **extra_fields)
 
