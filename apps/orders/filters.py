@@ -32,9 +32,6 @@ class OrderFilter(django_filters.FilterSet):
         distinct=True,
         help_text="Название товара(частичное совпадение)",
     )
-    delivery_date = django_filters.DateFilter(
-        field_name="delivery_order__delivery_date", lookup_expr="date", help_text="Дата доставки"
-    )
 
     class Meta:
         model = Order
@@ -44,7 +41,6 @@ class OrderFilter(django_filters.FilterSet):
             "created_at",
             "sku",
             "name",
-            "delivery_date",
         )
 
 
