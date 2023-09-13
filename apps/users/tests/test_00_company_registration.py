@@ -71,7 +71,6 @@ class Test00CompanyRegistration:
         outbox_after = mail.outbox
 
         assert response.status_code != status.HTTP_404_NOT_FOUND
-        # import pdb; pdb.set_trace()
         assert response.status_code == status.HTTP_201_CREATED
 
         assert response.json() == response_valid_data_company_registration
