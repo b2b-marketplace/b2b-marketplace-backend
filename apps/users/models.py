@@ -212,6 +212,9 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
     class Meta:
         swappable = "AUTH_USER_MODEL"
         ordering = ("username",)
