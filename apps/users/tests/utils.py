@@ -44,6 +44,36 @@ invalid_data_for_company_account_inn_ogrn = [
         },
         ("`ogrn` - должен состоять из 13 цифр."),
     ),
+    (
+        {
+            "email": "validemail@mail.fake",
+            "username": "valid-username",
+            "company": {
+                "role": "customer",
+                "name": "valid-name",
+                "company_account": "12345678901234567890",
+                "inn": "1234567890",
+                "ogrn": "",
+                "vat": True,
+            },
+        },
+        ("`ogrn` - не может быть пустой строкой."),
+    ),
+    (
+        {
+            "email": "validemail@mail.fake",
+            "username": "valid-username",
+            "company": {
+                "role": "customer",
+                "name": "valid-name",
+                "company_account": "",
+                "inn": "1234567890",
+                "ogrn": "1234567890123",
+                "vat": True,
+            },
+        },
+        ("`company_account` - не может быть пустой строкой."),
+    ),
 ]
 
 request_valid_data = {
