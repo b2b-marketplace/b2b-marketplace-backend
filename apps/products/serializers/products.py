@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.products.models import Image, Product, Video
+from apps.products.models import Category, Image, Product, Video
 from apps.products.serializers import CategorySerializer, ImageSerializer
 from apps.products.serializers.videos import VideoSerializer
 from apps.products.validators import validate_video
@@ -51,6 +51,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     videos = serializers.ListField(
         child=serializers.FileField(validators=[validate_video]), max_length=1, required=False
     )
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
 
     class Meta:
         model = Product
