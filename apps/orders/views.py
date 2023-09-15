@@ -3,7 +3,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
-from apps.core.schema_utils import schema_django_filter_warning
+from apps.core.decorators import django_filter_anonymoususer_warning_schema
 from apps.orders.filters import BuyerOrderFilter
 from apps.orders.models import Order
 from apps.orders.permissions import IsOwner
@@ -16,7 +16,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BuyerOrderFilter
 
-    @schema_django_filter_warning(model=Order)
+    @django_filter_anonymoususer_warning_schema(model=Order)
     def get_queryset(self):
         return Order.objects.get_related_queryset(self.request.user)
 
