@@ -120,6 +120,7 @@ class Company(models.Model):
     phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=False)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     vat = models.BooleanField(default=False)
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ("name",)

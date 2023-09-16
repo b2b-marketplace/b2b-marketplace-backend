@@ -25,6 +25,7 @@ class CompanyReadSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer(read_only=True)
     phone_number = PhoneNumberSerializer(read_only=True)
+    description = serializers.CharField(read_only=True)
 
     class Meta:
         model = Company
@@ -37,6 +38,7 @@ class CompanyReadSerializer(serializers.ModelSerializer):
             "phone_number",
             "address",
             "vat",
+            "description",
         )
 
 
@@ -45,6 +47,7 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer()
     phone_number = PhoneNumberSerializer()
+    description = serializers.CharField(required=False)
 
     class Meta:
         model = Company
@@ -57,6 +60,7 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
             "phone_number",
             "address",
             "vat",
+            "description",
         )
         extra_kwargs = {"company_account": {"write_only": True}}
 
@@ -115,6 +119,7 @@ class MeCompanyReadSerializer(serializers.ModelSerializer):
 
     address = AddressSerializer(read_only=True)
     phone_number = PhoneNumberSerializer(read_only=True)
+    description = serializers.CharField(read_only=True)
 
     class Meta:
         model = Company
@@ -128,6 +133,7 @@ class MeCompanyReadSerializer(serializers.ModelSerializer):
             "phone_number",
             "address",
             "vat",
+            "description",
         )
 
 

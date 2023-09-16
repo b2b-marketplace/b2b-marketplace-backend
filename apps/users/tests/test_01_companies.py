@@ -34,6 +34,7 @@ class Test01CompanyAPI:
                 "company_account": "22222222222222222222",
                 "address": {"address": "earth"},
                 "vat": True,
+                "description": "best_company_description",
             },
         }
 
@@ -52,6 +53,7 @@ class Test01CompanyAPI:
                 "address": {"id": 1, "address": "earth"},
                 "phone_number": {"id": 1, "phone_number": "1234567"},
                 "vat": True,
+                "description": "best_company_description",
             },
         }
 
