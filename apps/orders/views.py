@@ -1,7 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
+from apps.core.decorators import django_filter_anonymoususer_warning_schema
+from apps.orders.filters import BuyerOrderFilter
 from apps.orders.models import Order
 from apps.orders.permissions import IsOwner, IsSupplier
 from apps.orders.serializers.orders import (
@@ -12,9 +15,12 @@ from apps.orders.serializers.orders import (
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsOwner]
-    http_method_names = ["get", "post", "delete"]
+    permission_classes = (IsOwner,)
+    http_method_names = ("get", "post", "delete")
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = BuyerOrderFilter
 
+    @django_filter_anonymoususer_warning_schema(model=Order)
     def get_queryset(self):
         return Order.objects.get_related_queryset(self.request.user)
 
