@@ -45,3 +45,7 @@ class OrderFilter(django_filters.FilterSet):
 
 class BuyerOrderFilter(OrderFilter):
     """Фильтр заказов покупателя."""
+
+
+class SupplierOrderFilter(OrderFilter):
+    """Фильтр заказов продавца."""

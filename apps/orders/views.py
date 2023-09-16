@@ -4,7 +4,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
 from apps.core.decorators import django_filter_anonymoususer_warning_schema
-from apps.orders.filters import BuyerOrderFilter
+from apps.orders.filters import BuyerOrderFilter, SupplierOrderFilter
 from apps.orders.models import Order
 from apps.orders.permissions import IsOwner, IsSupplier
 from apps.orders.serializers.orders import (
@@ -45,9 +45,12 @@ class OrderViewSet(viewsets.ModelViewSet):
     request=SupplierOrderStatusUpdate, responses={200: OrderReadSerializer}, methods=("patch",)
 )
 class SupplierOrderViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsSupplier]
-    http_method_names = ["get", "patch"]
+    permission_classes = (IsSupplier,)
+    http_method_names = ("get", "patch")
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = SupplierOrderFilter
 
+    @django_filter_anonymoususer_warning_schema(model=Order)
     def get_queryset(self):
         return Order.objects.get_supplier_orders(self.request.user)
 
