@@ -34,7 +34,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - static_value:/b2b_marketplace/static/
+      - static_value:/b2b_marketplace/staticfiles/
       - media_value:/b2b_marketplace/media/
     env_file:
       - .env
@@ -61,7 +61,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/default.conf:/config/nginx/site-confs/default.conf
-      - static_value:/var/html/static/
+      - static_value:/var/html/staticfiles/
       - media_value:/var/html/media/
       - ../frontend/:/var/html/frontend/
     depends_on:
