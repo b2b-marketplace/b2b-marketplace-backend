@@ -39,6 +39,14 @@ services:
     env_file:
       - .env
 
+  frontend:
+    image: ghcr.io/b2b-marketplace/b2b_marketplace_frontend:latest
+    container_name: b2b_marketplace_frontend
+    volumes:
+      - ../frontend/:/b2b_marketplace/result_build/
+    env_file:
+      - .env
+
   swag:
     image: linuxserver/swag:2.6.0
     container_name: swag
@@ -55,6 +63,7 @@ services:
       - ./nginx/default.conf:/config/nginx/site-confs/default.conf
       - static_value:/var/html/static/
       - media_value:/var/html/media/
+      - ../frontend/:/var/html/frontend/
     depends_on:
       - backend
     env_file:
