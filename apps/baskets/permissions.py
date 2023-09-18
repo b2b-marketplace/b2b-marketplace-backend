@@ -2,7 +2,10 @@ from rest_framework import permissions
 
 
 class IsBuyer(permissions.BasePermission):
-    """Корзина доступна только компании-заказчику или физическому лицу."""
+    """Разрешение для покупателя.
+
+    Используется при создании корзины.
+    """
 
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
