@@ -73,6 +73,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           source: "infra/docker-compose.stage.yaml,infra/nginx/default.conf"
           target: ${{ env.DEPLOY_PATH }}
+          overwrite: true
       -
         name: Execute remote commands to deploy and start app
         uses: appleboy/ssh-action@v1.0.0
