@@ -1,5 +1,4 @@
 from django.db.models import Exists, OuterRef
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
@@ -12,6 +11,7 @@ from rest_framework import (
     viewsets,
 )
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 
 from apps.products import serializers
 from apps.products.filters import CategoryFilter, ProductFilter
