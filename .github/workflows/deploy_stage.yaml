@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf"
+          source: "infra/docker-compose.stage.yaml,infra/nginx/default.conf"
           target: ${{ env.DEPLOY_PATH }}
           overwrite: true
       -
