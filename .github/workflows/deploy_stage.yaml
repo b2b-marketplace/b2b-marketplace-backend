@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "infra/docker-compose.stage.yaml,infra/nginx/default.conf"
+          source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf"
           target: ${{ env.DEPLOY_PATH }}
           overwrite: true
       -
@@ -86,6 +86,8 @@ jobs:
             cd ${{ env.DEPLOY_PATH }}
             rm -f infra/.env
             touch infra/.env
+
+            sudo mv infra/nginx/nginx.stage.conf infra/nginx/default.conf
 
             echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> infra/.env
 
