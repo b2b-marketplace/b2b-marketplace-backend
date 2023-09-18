@@ -19,7 +19,7 @@ defaults:
 jobs:
   buld_and_push_image_to_github_packages:
     name: Build and push image to GitHub Packages
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,7 +55,7 @@ jobs:
     name: Deploy and start the App
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    needs: buld_and_push_image_to_github_packages
+    # needs: buld_and_push_image_to_github_packages
     environment:
       name: Stage
 
@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "infra/docker-compose.stage.yaml,infra/nginx/default.conf"
+          source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf"
           target: ${{ env.DEPLOY_PATH }}
           overwrite: true
       -
@@ -86,6 +86,8 @@ jobs:
             cd ${{ env.DEPLOY_PATH }}
             rm -f infra/.env
             touch infra/.env
+
+            sudo mv infra/nginx/nginx.stage.conf infra/nginx/default.conf
 
             echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> infra/.env
 
