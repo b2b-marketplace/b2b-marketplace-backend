@@ -43,7 +43,7 @@ services:
     image: ghcr.io/b2b-marketplace/b2b_marketplace_frontend:latest
     container_name: b2b_marketplace_frontend
     volumes:
-      - ../frontend/:/b2b_marketplace/result_build/
+      - ../frontend/:/b2b_marketplace/result_build/build/
     env_file:
       - .env
 
