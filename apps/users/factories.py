@@ -35,6 +35,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     phone_number = factory.SubFactory(PhoneNumberFactory)
     address = factory.SubFactory(AddressFactory)
     vat = factory.Faker("boolean")
+    description = factory.Faker("paragraph")
 
 
 class PhysicalPersonFactory(factory.django.DjangoModelFactory):
