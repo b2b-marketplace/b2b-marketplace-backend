@@ -40,7 +40,7 @@ class Test00OrderAPI:
 
         assert response.json() == response_order
 
-    def test_00_delete_order(self, guest_client, auth_client, order):
+    def test_00_delete_order(self, guest_client, auth_client, order_1):
         response = guest_client.delete(f"{self.orders_url}{1}/")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

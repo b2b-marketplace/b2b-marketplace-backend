@@ -242,8 +242,9 @@ class CustomUser(AbstractUser):
         Если пользователь является компанией, сбрасываем поле 'personal'.
         """
         if self.is_superuser or self.is_staff:
-            self.role = None
             self.is_company = False
+            self.company = None
+            self.personal = None
         if not self.is_company:
             self.company = None
         if self.is_company:

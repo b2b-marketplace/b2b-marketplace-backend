@@ -18,6 +18,15 @@ class OrderManager(models.Manager):
             .order_by("-created_at")
         )
 
+    def get_supplier_orders(self, supplier):
+        return (
+            self.filter(order_products__user=supplier)
+            .select_related("user__company")
+            .prefetch_related("orders__product__user__company", "orders__product__images")
+            .order_by("-created_at")
+            .distinct()
+        )
+
 
 class Order(BaseModel):
     """Модель заказа."""

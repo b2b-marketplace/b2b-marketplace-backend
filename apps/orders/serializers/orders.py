@@ -13,7 +13,7 @@ from apps.orders.serializers.orderproducts import (
 
 
 class OrderReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для отображения заказов в личном кабинете покупателя."""
+    """Сериализатор для отображения заказов в личном кабинете покупателя и продавца."""
 
     order_products = OrderProductReadSerializer(many=True, source="orders")
 
@@ -87,4 +87,25 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         serializer = OrderReadSerializer(instance, context=self.context, many=True)
+        return serializer.data
+
+
+class SupplierOrderStatusUpdate(serializers.ModelSerializer):
+    """Сериализатор для обновления статуса заказа продавцом."""
+
+    ALLOWED_STATUSES = ("Transit", "Canceled")
+
+    class Meta:
+        model = Order
+        fields = ("status",)
+
+    def validate(self, attrs):
+        status = attrs["status"]
+        if status not in self.ALLOWED_STATUSES:
+            raise serializers.ValidationError(_("Status not allowed."))
+
+        return attrs
+
+    def to_representation(self, instance):
+        serializer = OrderReadSerializer(instance, context=self.context)
         return serializer.data
