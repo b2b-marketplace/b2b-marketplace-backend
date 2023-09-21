@@ -1,12 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel, SoftDeleteMixin
 from apps.products.validators import validate_video
+from apps.users.validators import validate_user_is_supplier
 
 
 def get_product_directory_path(instance, filename):
@@ -28,13 +27,6 @@ def get_product_directory_path(instance, filename):
         return f"products/{instance.product.category.slug}/{instance.product.sku}/videos/{filename}"
     if isinstance(instance, Product):
         return f"products/{instance.category.slug}/{instance.sku}/{filename}"
-
-
-def validate_user_is_supplier(value):
-    """Валидация, является ли пользователь поставщиком."""
-    user = get_object_or_404(get_user_model(), pk=value)
-    if not (user.is_company and user.company.role == "supplier"):
-        raise ValidationError(_("Only suppliers can create products."))
 
 
 class Category(models.Model):

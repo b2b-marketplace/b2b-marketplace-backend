@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
 
@@ -100,7 +102,14 @@ class UserCompanyWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        password = validated_data.get("password")
+
+        try:
+            validate_password(password)
+            user = User.objects.create_user(**validated_data)
+            return user
+        except ValidationError as error:
+            raise serializers.ValidationError({"password": error.messages})
 
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)

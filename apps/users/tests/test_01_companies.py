@@ -50,7 +50,7 @@ class Test01CompanyAPI:
                 "ogrn": "3333333333333",
                 "company_account": "22222222222222222222",
                 "address": {"id": 1, "address": "earth"},
-                "phone_number": {"id": 1, "phone_number": "1234567"},
+                "phone_number": {"id": 1, "phone_number": "+79051234560"},
                 "vat": True,
             },
         }
