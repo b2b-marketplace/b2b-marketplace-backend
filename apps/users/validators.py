@@ -86,5 +86,5 @@ def validate_user_is_buyer(value):
     Используется при создании корзины/заказа.
     """
     user = get_object_or_404(get_user_model(), pk=value)
-    if not (user.personal or user.company.role == "customer"):
+    if not (user.personal or user.is_company and user.company.role == "customer"):
         raise ValidationError(_("The user is not a buyer."))
