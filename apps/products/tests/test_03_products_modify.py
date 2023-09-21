@@ -136,3 +136,10 @@ def test_delete_product_does_not_remove_entry_from_database(authorized_seller, p
     response = authorized_seller.delete(endpoint)
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert Product.objects.all().count() == product_count
+
+
+def test_create_product_with_valid_data_without_category(authorized_seller):
+    payload = PRODUCT_CREATE_REQUEST
+    response = authorized_seller.post(PRODUCTS_ENDPOINT, payload)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code != status.HTTP_201_CREATED

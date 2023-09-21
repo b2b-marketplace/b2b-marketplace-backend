@@ -18,7 +18,6 @@ PRODUCT_RESPONSE = {
 PRODUCT_CREATE_REQUEST = {
     "sku": "789",
     "name": "789",
-    "category": 1,
     "brand": "Some brand",
     "price": "789.00",
     "wholesale_quantity": 789,
