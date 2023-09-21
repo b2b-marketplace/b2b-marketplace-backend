@@ -34,8 +34,16 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - static_value:/b2b_marketplace/static/
+      - static_value:/b2b_marketplace/staticfiles/
       - media_value:/b2b_marketplace/media/
+    env_file:
+      - .env
+
+  frontend:
+    image: ghcr.io/b2b-marketplace/b2b_marketplace_frontend:latest
+    container_name: b2b_marketplace_frontend
+    volumes:
+      - ../frontend/:/b2b_marketplace/result_build/build/
     env_file:
       - .env
 
@@ -53,8 +61,9 @@ services:
       - "443:443"
     volumes:
       - ./nginx/default.conf:/config/nginx/site-confs/default.conf
-      - static_value:/var/html/static/
+      - static_value:/var/html/staticfiles/
       - media_value:/var/html/media/
+      - ../frontend/:/var/html/frontend/
     depends_on:
       - backend
     env_file:
