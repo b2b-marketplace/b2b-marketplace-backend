@@ -43,12 +43,14 @@ def test_create_product_invalid_content_type(authorized_seller):
     assert response.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
-def test_create_product_with_valid_data_without_media(authorized_seller):
-    response = authorized_seller.post(PRODUCTS_ENDPOINT, PRODUCT_CREATE_REQUEST)
-    assert response.status_code == status.HTTP_201_CREATED
-
+def test_create_product_with_valid_data_without_media(authorized_seller, categories):
+    payload = PRODUCT_CREATE_REQUEST
+    payload.update(category=categories[0].pk)
+    response = authorized_seller.post(PRODUCTS_ENDPOINT, payload)
     db_products = Product.objects.all()
     assert db_products.count() == 1
+
+    assert response.status_code == status.HTTP_201_CREATED
 
     json_data = response.json()
     assert db_products[0].name == json_data.get("name") == PRODUCT_CREATE_REQUEST.get("name")
@@ -134,3 +136,10 @@ def test_delete_product_does_not_remove_entry_from_database(authorized_seller, p
     response = authorized_seller.delete(endpoint)
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert Product.objects.all().count() == product_count
+
+
+def test_create_product_with_valid_data_without_category(authorized_seller):
+    payload = PRODUCT_CREATE_REQUEST
+    response = authorized_seller.post(PRODUCTS_ENDPOINT, payload)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code != status.HTTP_201_CREATED

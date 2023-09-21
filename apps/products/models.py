@@ -130,6 +130,7 @@ class Product(SoftDeleteMixin, BaseModel):
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
+        blank=False,
         null=True,
         related_name="categories",
         verbose_name=_("Product category"),
