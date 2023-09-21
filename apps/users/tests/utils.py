@@ -13,6 +13,7 @@ invalid_data_for_company_account_inn_ogrn = [
                 "address": {"address": "earth"},
                 "phone_number": {"phone_number": "+79051234562"},
                 "vat": True,
+                "description": "valid-description",
             },
         },
         ("`company_account` - должен состоять из 20 цифр."),
@@ -31,6 +32,7 @@ invalid_data_for_company_account_inn_ogrn = [
                 "address": {"address": "earth"},
                 "phone_number": {"phone_number": "+79051234562"},
                 "vat": True,
+                "description": "valid-description",
             },
         },
         ("`inn` - должен состоять из 10 цифр."),
@@ -49,6 +51,7 @@ invalid_data_for_company_account_inn_ogrn = [
                 "address": {"address": "earth"},
                 "phone_number": {"phone_number": "+79051234562"},
                 "vat": True,
+                "description": "valid-description",
             },
         },
         ("`ogrn` - должен состоять из 13 цифр."),
@@ -102,6 +105,7 @@ request_valid_data = {
         "address": {"address": "earth"},
         "phone_number": {"phone_number": "+79051234562"},
         "vat": True,
+        "description": "description",
     },
 }
 
@@ -118,5 +122,6 @@ response_valid_data_company_registration = {
         "address": {"id": 1, "address": "earth"},
         "phone_number": {"id": 1, "phone_number": "+79051234562"},
         "vat": True,
+        "description": "description",
     },
 }
