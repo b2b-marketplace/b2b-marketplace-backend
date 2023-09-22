@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf"
+          source: "infra/docker-compose.stage.yaml,infra/nginx/nginx.stage.conf,infra/fail2ban/disable_all_jails.local"
           target: ${{ env.DEPLOY_PATH }}
           overwrite: true
       -
@@ -88,6 +88,7 @@ jobs:
             touch infra/.env
 
             sudo mv infra/nginx/nginx.stage.conf infra/nginx/default.conf
+            sudo mv infra/fail2ban/disable_all_jails.local infra/fail2ban/jail.local
 
             echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> infra/.env
 

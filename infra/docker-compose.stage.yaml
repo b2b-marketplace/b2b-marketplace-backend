@@ -61,6 +61,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/default.conf:/config/nginx/site-confs/default.conf
+      - ./fail2ban/jail.local:/config/fail2ban/jail.local
       - static_value:/var/html/staticfiles/
       - media_value:/var/html/media/
       - ../frontend/:/var/html/frontend/
