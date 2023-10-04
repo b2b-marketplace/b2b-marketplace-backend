@@ -71,6 +71,7 @@ class Command(BaseCommand):
                 self.create_users(number_max)
                 self.create_products(number_max)
                 self.create_baskets_and_orders(number_min)
+                self.create_deliveries(number_max)
 
             self.stdout.write(self.style.SUCCESS(_("Test data created successfully!")))
         except Exception as exp:

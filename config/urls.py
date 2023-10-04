@@ -15,6 +15,7 @@ apps_url_patterns = [
     path("", include("apps.baskets.urls")),
     path("", include("apps.orders.urls")),
     path("", include("apps.users.urls")),
+    path("", include("apps.deliveries.urls")),
     path("auth/", include("djoser.urls.authtoken")),
 ]
 
