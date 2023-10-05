@@ -59,7 +59,7 @@ class Command(BaseCommand):
 
         for order, address, delivery_method in zip(orders, addresses, delivery_methods):
             DeliveryFactory.create_batch(
-                number_max, order=order, address=address, delivery_method=delivery_method
+                1, order=order, address=address, delivery_method=delivery_method
             )
 
     def handle(self, *args, **options):

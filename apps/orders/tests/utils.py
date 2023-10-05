@@ -18,6 +18,18 @@ response_order = [
                 "cost": 1500.0,
             },
         ],
+        "delivery": {
+            "id": 1,
+            "address": {"id": 1, "address": "address"},
+            "delivery_method": {
+                "id": 1,
+                "name": "DHL",
+                "description": "DHL delivery",
+                "slug": "dhl",
+                "price": "1000.00",
+            },
+            "delivery_date": "2023-10-04T15:38:14.540000+03:00",
+        },
     },
     {
         "id": 2,
@@ -38,5 +50,17 @@ response_order = [
                 "cost": 2500.0,
             },
         ],
+        "delivery": {
+            "id": 2,
+            "address": {"id": 1, "address": "address"},
+            "delivery_method": {
+                "id": 1,
+                "name": "DHL",
+                "description": "DHL delivery",
+                "slug": "dhl",
+                "price": "1000.00",
+            },
+            "delivery_date": "2023-10-04T15:38:14.540000+03:00",
+        },
     },
 ]

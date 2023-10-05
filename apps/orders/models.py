@@ -10,22 +10,26 @@ from apps.users.validators import validate_user_is_buyer
 
 
 class OrderManager(models.Manager):
-    def get_related_queryset(self, user):
+    def get_queryset(self):
         return (
-            self.filter(user=user)
-            .select_related("user__company", "user__personal")
+            super()
+            .get_queryset()
+            .select_related(
+                "user__company",
+                "user__personal",
+                "delivery_order",
+                "delivery_order__address",
+                "delivery_order__delivery_method",
+            )
             .prefetch_related("orders__product__user__company", "orders__product__images")
             .order_by("-created_at")
         )
 
+    def get_related_queryset(self, user):
+        return self.filter(user=user)
+
     def get_supplier_orders(self, supplier):
-        return (
-            self.filter(order_products__user=supplier)
-            .select_related("user__company")
-            .prefetch_related("orders__product__user__company", "orders__product__images")
-            .order_by("-created_at")
-            .distinct()
-        )
+        return self.filter(order_products__user=supplier).distinct()
 
 
 class Order(BaseModel):
