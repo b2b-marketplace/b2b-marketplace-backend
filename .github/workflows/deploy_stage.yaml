@@ -108,6 +108,9 @@ jobs:
             echo EMAIL_HOST_USER=$'${{ secrets.EMAIL_HOST_USER }}' >> infra/.env
             echo EMAIL_HOST_PASSWORD=$'${{ secrets.EMAIL_HOST_PASSWORD }}' >> infra/.env
 
+            echo REACT_APP_API_URL=$'${{ secrets.REACT_APP_API_URL }}' >> infra/.env
+            echo REACT_APP_GEOLOCATION_API_URL=$'${{ secrets.REACT_APP_GEOLOCATION_API_URL }}' >> infra/.env
+
             echo ${{ secrets.REGISTRY_PAT }} | docker login ${{ env.REGISTRY }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
             docker image prune -f
