@@ -40,6 +40,7 @@ class Test00CompanyRegistration:
                 "ogrn": "only_13_digit",
                 "address": {"address": "address"},
                 "phone_number": {"phone_number": "1234567"},
+                "vat": "yes",
             },
         }
 
@@ -70,7 +71,6 @@ class Test00CompanyRegistration:
         outbox_after = mail.outbox
 
         assert response.status_code != status.HTTP_404_NOT_FOUND
-
         assert response.status_code == status.HTTP_201_CREATED
 
         assert response.json() == response_valid_data_company_registration
@@ -98,7 +98,7 @@ class Test00CompanyRegistration:
 
         login_data = {
             "email": "validemail@mail.fake",
-            "password": "12345678",
+            "password": "Grv&blj11765",
         }
 
         response = apiclient.post(self.login_url, data=login_data, format="json")
@@ -125,7 +125,8 @@ class Test00CompanyRegistration:
                 "inn": "1234567890",
                 "ogrn": "1234567890123",
                 "address": {"address": "address"},
-                "phone_number": {"phone_number": "1234567"},
+                "phone_number": {"phone_number": "+79051234560"},
+                "vat": True,
             },
         }
         response = apiclient.post(self.url_signup, data=valid_data, format="json")

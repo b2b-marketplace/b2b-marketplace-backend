@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from rest_framework import serializers
 
@@ -36,6 +38,8 @@ class CompanyReadSerializer(serializers.ModelSerializer):
             "ogrn",
             "phone_number",
             "address",
+            "vat",
+            "description",
         )
 
 
@@ -55,6 +59,8 @@ class CompanyWriteSerializer(serializers.ModelSerializer):
             "company_account",
             "phone_number",
             "address",
+            "vat",
+            "description",
         )
         extra_kwargs = {"company_account": {"write_only": True}}
 
@@ -98,7 +104,14 @@ class UserCompanyWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        password = validated_data.get("password")
+
+        try:
+            validate_password(password)
+            user = User.objects.create_user(**validated_data)
+            return user
+        except ValidationError as error:
+            raise serializers.ValidationError({"password": error.messages})
 
     def to_representation(self, instance):
         serializer = UserCompanyReadSerializer(instance)
@@ -125,6 +138,8 @@ class MeCompanyReadSerializer(serializers.ModelSerializer):
             "ogrn",
             "phone_number",
             "address",
+            "vat",
+            "description",
         )
 
 

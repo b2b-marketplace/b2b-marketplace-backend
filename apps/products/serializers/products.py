@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
-from apps.products.models import Image, Product
+from apps.products.models import Category, Image, Product, Video
 from apps.products.serializers import CategorySerializer, ImageSerializer
+from apps.products.serializers.videos import VideoSerializer
+from apps.products.validators import validate_video
 from apps.users.serializers.companies import (
     CompanyMiniFieldSerializer,
     CompanyReadSerializer,
@@ -15,6 +17,8 @@ class ProductReadSerializer(serializers.ModelSerializer):
     """
 
     images = ImageSerializer(many=True)
+    videos = VideoSerializer(many=True)
+
     category = CategorySerializer()
     seller = CompanyReadSerializer(read_only=True, source="user.company")
     is_favorited = serializers.BooleanField(default=False)
@@ -31,7 +35,7 @@ class ProductReadSerializer(serializers.ModelSerializer):
             "brand",
             "price",
             "wholesale_quantity",
-            "video",
+            "videos",
             "quantity_in_stock",
             "description",
             "manufacturer_country",
@@ -43,7 +47,11 @@ class ProductReadSerializer(serializers.ModelSerializer):
 class ProductWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания нового товара или изменения существующего товара."""
 
-    images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=True)
+    images = serializers.ListField(child=serializers.ImageField(), max_length=5, required=False)
+    videos = serializers.ListField(
+        child=serializers.FileField(validators=[validate_video]), max_length=1, required=False
+    )
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=True)
 
     class Meta:
         model = Product
@@ -57,7 +65,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             "quantity_in_stock",
             "description",
             "manufacturer_country",
-            "video",
+            "videos",
             "images",
         )
 
@@ -70,6 +78,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         """
         product = instance if instance else Product()
         image_list = validated_data.pop("images", None)
+        video_list = validated_data.pop("videos", None)
         for key, val in validated_data.items():
             setattr(product, key, val)
         product.save()
@@ -77,6 +86,10 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             product.images.all().delete()
             for image in image_list:
                 Image.objects.create(product=product, image=image)
+        if video_list:
+            product.videos.all().delete()
+            for video in video_list:
+                Video.objects.create(product=product, video=video)
         return product
 
     def create(self, validated_data):
@@ -98,11 +111,10 @@ class ProductReadMiniFieldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("id", "supplier", "sku", "name", "price", "image")
+        fields = ("id", "supplier", "sku", "name", "image")
 
     def get_image(self, product):
-        # TODO: оптимизировать запрос к Images.
-        image = product.images.first()
+        images = product.images.all()
         request = self.context.get("request")
-        if image and request:
-            return request.build_absolute_uri(image.image.url)
+        if images and request:
+            return request.build_absolute_uri(images[0].image.url)

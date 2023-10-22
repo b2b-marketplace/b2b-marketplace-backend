@@ -34,19 +34,37 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - static_value:/b2b_marketplace/static/
+      - static_value:/b2b_marketplace/staticfiles/
       - media_value:/b2b_marketplace/media/
     env_file:
       - .env
 
-  nginx:
-    image: nginx:1.25.1-alpine
+  frontend:
+    image: ghcr.io/b2b-marketplace/b2b_marketplace_frontend:latest
+    container_name: b2b_marketplace_frontend
+    volumes:
+      - ../frontend/:/b2b_marketplace/result_build/build/
+    env_file:
+      - .env
+
+  swag:
+    image: linuxserver/swag:2.6.0
+    container_name: swag
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - URL=${APPLICATION_URL}
+      - VALIDATION=http
     ports:
       - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/:/etc/nginx/conf.d/
-      - static_value:/var/html/static/
+      - ./nginx/default.conf:/config/nginx/site-confs/default.conf
+      - ./fail2ban/jail.local:/config/fail2ban/jail.local
+      - static_value:/var/html/staticfiles/
       - media_value:/var/html/media/
+      - ../frontend/:/var/html/frontend/
     depends_on:
       - backend
     env_file:

@@ -1,61 +1,17 @@
-import re
-
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-
-def validate_username(value):
-    """Валидация имени пользователя."""
-    pattern = r"^[\w.@+-]+$"
-    regex_pattern = re.compile(pattern)
-    if not regex_pattern.match(value):
-        invalid_chars = []
-        for char in value:
-            if not regex_pattern.match(char):
-                invalid_chars.append(char)
-        raise ValidationError(
-            _("Invalid characters: %(invalid_chars)s") % {"invalid_chars": ", ".join(invalid_chars)}
-        )
-    if value.lower() == "me":
-        raise ValidationError(_("Cannot use 'me' as a username!"))
-    return value
-
-
-def validate_length(value, expected_length, error_message):
-    """Валидация длины строки."""
-    if len(value) != expected_length:
-        raise ValidationError(error_message)
-
-
-def validate_account(value):
-    """Валидация номера счета."""
-    validate_length(value, 20, _("The account number must contain exactly 20 characters."))
-
-
-def validate_inn(value):
-    """Валидация ИНН."""
-    validate_length(value, 10, _("The TIN must contain exactly 10 characters."))
-
-
-def validate_ogrn(value):
-    """Валидация ОГРН."""
-    validate_length(value, 13, _("The PSRN must contain exactly 13 characters."))
-
-
-def validate_digits_only(value):
-    """Валидация цифр."""
-    if not value.isdigit():
-        raise ValidationError(_("Only digits are allowed."))
-
-
-def validate_phone_number(value):
-    """Валидация номера телефона."""
-    pattern = r"^\+?[0-9]*$"
-    if not re.match(pattern, value):
-        raise ValidationError(_("Invalid phone number format"))
+from .validators import (
+    validate_account,
+    validate_digits_only,
+    validate_inn,
+    validate_ogrn,
+    validate_phone_number,
+    validate_username,
+)
 
 
 class PhoneNumber(models.Model):
@@ -101,7 +57,7 @@ class Company(models.Model):
         validators=[validate_account, validate_digits_only],
         verbose_name=_("Account"),
         null=True,
-        blank=True,
+        blank=False,
     )
     inn = models.CharField(
         max_length=10,
@@ -115,10 +71,12 @@ class Company(models.Model):
         validators=[validate_ogrn, validate_digits_only],
         verbose_name=_("PSRN"),
         null=True,
-        blank=True,
+        blank=False,
     )
     phone_number = models.ForeignKey(PhoneNumber, on_delete=models.SET_NULL, null=True, blank=False)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    vat = models.BooleanField(default=False)
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ("name",)
@@ -255,6 +213,9 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
     class Meta:
         swappable = "AUTH_USER_MODEL"
         ordering = ("username",)
@@ -281,8 +242,9 @@ class CustomUser(AbstractUser):
         Если пользователь является компанией, сбрасываем поле 'personal'.
         """
         if self.is_superuser or self.is_staff:
-            self.role = None
             self.is_company = False
+            self.company = None
+            self.personal = None
         if not self.is_company:
             self.company = None
         if self.is_company:

@@ -1,4 +1,5 @@
 import os
+from tempfile import TemporaryDirectory
 
 from .settings import *  # noqa
 
@@ -12,3 +13,5 @@ DATABASES = {
         "PORT": os.environ["POSTGRES_PORT_TEST"],
     },
 }
+
+MEDIA_ROOT = TemporaryDirectory().name

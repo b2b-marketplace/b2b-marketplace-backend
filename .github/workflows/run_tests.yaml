@@ -11,11 +11,17 @@ env:
   DJANGO_ALLOWED_HOSTS: localhost
   CSRF_TRUSTED_ORIGINS: http://localhost
   DJANGO_DEBUG: True
+
   POSTGRES_DB_TEST: b2b-marketplace-test
   POSTGRES_USER_TEST: b2b-marketplace-test
   POSTGRES_PASSWORD_TEST: somepassword-test
   POSTGRES_HOST_TEST: localhost
   POSTGRES_PORT_TEST: 5432
+
+  EMAIL_HOST: fake.mail.ru
+  EMAIL_HOST_USER: fake@mail.ru
+  EMAIL_HOST_PASSWORD: fake_password
+  EMAIL_PORT: 2525
 
 jobs:
   migrations:
@@ -67,6 +73,11 @@ jobs:
           echo POSTGRES_PASSWORD_TEST=$POSTGRES_PASSWORD_TEST >> infra/.env
           echo POSTGRES_HOST_TEST=$POSTGRES_HOST_TEST >> infra/.env
           echo POSTGRES_PORT_TEST=$POSTGRES_PORT_TEST >> infra/.env
+
+          echo EMAIL_HOST=$EMAIL_HOST >> infra/.env
+          echo EMAIL_HOST_USER=$EMAIL_HOST_USER >> infra/.env
+          echo EMAIL_HOST_PASSWORD=$EMAIL_HOST_PASSWORD >> infra/.env
+          echo EMAIL_PORT=$EMAIL_PORT >> infra/.env
       -
         name: Run test
         run: poetry run pytest

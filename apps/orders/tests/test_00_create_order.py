@@ -4,34 +4,12 @@ import pytest
 from rest_framework import status
 
 from apps.orders.tests.conftest import mock_time_now
+from apps.orders.tests.utils import response_order
 
 
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Test00OrderAPI:
     orders_url = "/api/v1/orders/"
-
-    order = {
-        "id": 1,
-        "user": 1,
-        "status": "CR",
-        "created_at": "2023-07-24",
-        "order_products": [
-            {
-                "product": {
-                    "id": 1,
-                    "supplier": {"id": 1, "name": "best_company"},
-                    "sku": "123",
-                    "name": "product_1",
-                    "price": "500.00",
-                    "image": "http://testserver/media/path/to/image.jpg",
-                },
-                "quantity": 3,
-                "discount": "0.00",
-                "cost": 1500.0,
-                "cost_with_discount": 1500.0,
-            },
-        ],
-    }
 
     @mock.patch("django.utils.timezone.now", mock_time_now)
     def test_00_create_order(self, guest_client, auth_client, product_1, basket):
@@ -40,6 +18,10 @@ class Test00OrderAPI:
                 {
                     "product": 1,
                     "quantity": 3,
+                },
+                {
+                    "product": 2,
+                    "quantity": 5,
                 },
             ]
         }
@@ -53,10 +35,12 @@ class Test00OrderAPI:
         response = auth_client.post(self.orders_url, data=order_data, format="json")
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.json() == self.order
-        assert basket.basket_products.count() == 1
+        assert len(response.json()) == 2
+        assert basket.basket_products.count() == 0
 
-    def test_00_delete_order(self, guest_client, auth_client, order):
+        assert response.json() == response_order
+
+    def test_00_delete_order(self, guest_client, auth_client, order_1):
         response = guest_client.delete(f"{self.orders_url}{1}/")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 

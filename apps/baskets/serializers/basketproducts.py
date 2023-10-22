@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.baskets.models import BasketProduct
 from apps.products.models import Product
-from apps.products.serializers import ProductReadSerializer
+from apps.products.serializers.products import ProductReadMiniFieldSerializer
 
 
 class BasketProductReadSerializer(serializers.ModelSerializer):
@@ -12,7 +12,7 @@ class BasketProductReadSerializer(serializers.ModelSerializer):
     """
 
     id = serializers.IntegerField(source="product.id", read_only=True)
-    product = ProductReadSerializer()
+    product = ProductReadMiniFieldSerializer()
 
     class Meta:
         model = BasketProduct

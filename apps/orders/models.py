@@ -1,13 +1,12 @@
 from _decimal import ROUND_HALF_UP, Decimal
 from django.contrib.auth import get_user_model
 from django.core import validators
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
 from apps.products.models import Product
+from apps.users.validators import validate_user_is_buyer
 
 
 class OrderManager(models.Manager):
@@ -15,16 +14,18 @@ class OrderManager(models.Manager):
         return (
             self.filter(user=user)
             .select_related("user__company", "user__personal")
-            .prefetch_related("orders__product__user__company")
+            .prefetch_related("orders__product__user__company", "orders__product__images")
             .order_by("-created_at")
         )
 
-
-def validate_user_is_buyer(value):
-    """Валидация, является ли пользователь покупателем."""
-    user = get_object_or_404(get_user_model(), pk=value)
-    if not (user.personal or user.company.role == "customer"):
-        raise ValidationError(_("Only buyers can create orders."))
+    def get_supplier_orders(self, supplier):
+        return (
+            self.filter(order_products__user=supplier)
+            .select_related("user__company")
+            .prefetch_related("orders__product__user__company", "orders__product__images")
+            .order_by("-created_at")
+            .distinct()
+        )
 
 
 class Order(BaseModel):
@@ -33,13 +34,13 @@ class Order(BaseModel):
     class Status(models.TextChoices):
         """Статусы заказа."""
 
-        CREATED = "CR", _("Created")
-        UPDATED = "UP", _("Updated")
-        PAID = "PA", _("Paid")
-        IN_TRANSIT = "TR", _("In_transit")
-        COMPLETED = "CO", _("Completed")
-        CANCELED = "CA", _("Canceled")
-        RETURNED = "RE", _("Returned")
+        CREATED = "Created", _("Created")
+        UPDATED = "Updated", _("Updated")
+        PAID = "Paid", _("Paid")
+        IN_TRANSIT = "Transit", _("In_transit")
+        RECEIVED = "Received", _("Received")
+        CANCELED = "Canceled", _("Canceled")
+        RETURNED = "Returned", _("Returned")
 
     user = models.ForeignKey(
         get_user_model(),
@@ -56,7 +57,10 @@ class Order(BaseModel):
         verbose_name=_("Products"),
     )
     status = models.CharField(
-        max_length=2, choices=Status.choices, default=Status.CREATED, verbose_name=_("Order status")
+        max_length=15,
+        choices=Status.choices,
+        default=Status.CREATED,
+        verbose_name=_("Order status"),
     )
 
     objects = OrderManager()
@@ -94,12 +98,11 @@ class OrderProduct(models.Model):
         verbose_name=_("Product in order"),
     )
     quantity = models.PositiveIntegerField(verbose_name=_("Product quantity in order"))
-    discount = models.DecimalField(
-        max_digits=4,
+    price = models.DecimalField(
+        max_digits=11,
         decimal_places=2,
-        default=0,
-        verbose_name=_("Product discount"),
-        validators=[validators.MinValueValidator(0), validators.MaxValueValidator(100)],
+        verbose_name=_("Product price"),
+        validators=[validators.MinValueValidator(0)],
     )
 
     class Meta:
@@ -118,10 +121,5 @@ class OrderProduct(models.Model):
 
     @property
     def cost(self):
-        cost = self.product.price * self.quantity
-        return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
-
-    @property
-    def cost_with_discount(self):
-        cost = self.cost - self.cost * (self.discount / 100)
+        cost = self.price * self.quantity
         return cost.quantize(Decimal("1.00"), rounding=ROUND_HALF_UP)
