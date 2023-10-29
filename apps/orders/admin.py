@@ -41,3 +41,9 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ("user", "status")
     empty_value_display = "-empty-"
     inlines = (OrderProductInLine,)
+
+    def delete_queryset(self, request, queryset):
+        Status = Order.Status
+        for obj in queryset:
+            obj.status = Status.CANCELED
+            obj.save()
