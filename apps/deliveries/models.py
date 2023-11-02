@@ -27,7 +27,7 @@ class DeliveryMethod(models.Model):
 
 
 class Delivery(models.Model):
-    order = models.ForeignKey(
+    order = models.OneToOneField(
         Order,
         on_delete=models.DO_NOTHING,
         related_name="delivery_order",
@@ -53,4 +53,7 @@ class Delivery(models.Model):
         indexes = [models.Index(fields=("order",))]
 
     def __str__(self):
-        return f"Delivery {self.delivery_method} of the {self.order} to the {self.address}"
+        return (
+            f"Delivery {self.delivery_method} of the {self.order} to the {self.address} "
+            f"{self.delivery_date}"
+        )

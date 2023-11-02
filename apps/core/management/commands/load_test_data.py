@@ -59,7 +59,7 @@ class Command(BaseCommand):
 
         for order, address, delivery_method in zip(orders, addresses, delivery_methods):
             DeliveryFactory.create_batch(
-                number_max, order=order, address=address, delivery_method=delivery_method
+                1, order=order, address=address, delivery_method=delivery_method
             )
 
     def handle(self, *args, **options):
@@ -71,6 +71,7 @@ class Command(BaseCommand):
                 self.create_users(number_max)
                 self.create_products(number_max)
                 self.create_baskets_and_orders(number_min)
+                self.create_deliveries(number_max)
 
             self.stdout.write(self.style.SUCCESS(_("Test data created successfully!")))
         except Exception as exp:

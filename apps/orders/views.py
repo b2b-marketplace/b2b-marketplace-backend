@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
@@ -41,8 +41,24 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-@extend_schema(
-    request=SupplierOrderStatusUpdate, responses={200: OrderReadSerializer}, methods=("patch",)
+@extend_schema_view(
+    list=extend_schema(
+        responses={200: OrderReadSerializer},
+        description="Продавец видит заказы со своими товарами.",
+        summary="Просмотр заказов продавцом.",
+    ),
+    retrieve=extend_schema(
+        responses={200: OrderReadSerializer},
+        description="Продавец видит заказ со своими товарами.",
+        summary="Просмотр заказа продавцом.",
+    ),
+    partial_update=extend_schema(
+        request=SupplierOrderStatusUpdate,
+        responses={200: OrderReadSerializer},
+        description="Продавец может сменить статусы заказов в личном кабинете. "
+        "Доступные статусы для изменения: 'Transit', 'Canceled'",
+        summary="Изменение статуса заказов продавцом.",
+    ),
 )
 class SupplierOrderViewSet(viewsets.ModelViewSet):
     permission_classes = (IsSupplier,)

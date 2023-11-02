@@ -5,6 +5,11 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.baskets.models import Basket
+from apps.deliveries.models import Delivery
+from apps.deliveries.serializers.deliveries import (
+    DeliveryReadSerializer,
+    DeliveryWriteSerializer,
+)
 from apps.orders.models import Order
 from apps.orders.serializers.orderproducts import (
     OrderProductReadSerializer,
@@ -16,20 +21,22 @@ class OrderReadSerializer(serializers.ModelSerializer):
     """Сериализатор для отображения заказов в личном кабинете покупателя и продавца."""
 
     order_products = OrderProductReadSerializer(many=True, source="orders")
+    delivery = DeliveryReadSerializer(source="delivery_order")
 
     class Meta:
         model = Order
-        fields = ("id", "user", "status", "created_at", "order_products")
+        fields = ("id", "user", "status", "created_at", "order_products", "delivery")
 
 
 class OrderWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для создания заказов покупателем."""
 
     order_products = OrderProductWriteSerializer(many=True)
+    delivery = DeliveryWriteSerializer()
 
     class Meta:
         model = Order
-        fields = ("order_products",)
+        fields = ("order_products", "delivery")
 
     def validate(self, attrs):
         for order_product in attrs["order_products"]:
@@ -57,6 +64,7 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
     def create_or_update_order(self, validated_data, instance=None):
         order_products = validated_data.pop("order_products", None)
+        delivery_data = validated_data.pop("delivery", None)
         sorting_products = self._sort_products_by_sellers(order_products)
         basket = Basket.objects.filter(user=validated_data["user"]).first()
         orders = []
@@ -77,6 +85,8 @@ class OrderWriteSerializer(serializers.ModelSerializer):
                 product.quantity_in_stock -= products.get("quantity", 0)
                 product.save()
 
+            delivery_data["order"] = order
+            Delivery.objects.update_or_create(**delivery_data)
             orders.append(order)
 
         return orders

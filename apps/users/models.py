@@ -146,7 +146,6 @@ class CustomUserManager(UserManager):
 
         obj = self._save_object(obj_model, extra_fields.pop(field_name, None))
 
-        obj.save()
         return obj
 
     def create_user(self, username, email=None, password=None, **extra_fields):

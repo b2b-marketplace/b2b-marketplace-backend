@@ -2,9 +2,10 @@ import pytest
 from rest_framework.test import APIClient
 
 from apps.baskets.models import Basket, BasketProduct
+from apps.deliveries.models import Delivery, DeliveryMethod
 from apps.orders.models import Order, OrderProduct
 from apps.products.models import Category, Image, Product
-from apps.users.models import CustomUser, PhysicalPerson
+from apps.users.models import Address, CustomUser, PhysicalPerson
 
 
 def mock_time_now():
@@ -136,10 +137,39 @@ def basket(user, product_1, product_2):
 
 
 @pytest.fixture
-def order_1(user, product_1):
+def delivery_method():
+    delivery_method = DeliveryMethod.objects.create(
+        name="DHL",
+        description="DHL delivery",
+        slug="dhl",
+        price=1000,
+    )
+    return delivery_method
+
+
+@pytest.fixture
+def address():
+    address = Address.objects.create(address="address")
+    return address
+
+
+@pytest.fixture
+def order_1(user, product_1, delivery_method, address):
     order = Order.objects.create(user=user)
+
     OrderProduct.objects.create(order=order, product=product_1, quantity=3, price=100)
     return order
+
+
+@pytest.fixture
+def delivery_1(order_1, address, delivery_method):
+    delivery = Delivery.objects.create(
+        order=order_1,
+        address=address,
+        delivery_method=delivery_method,
+        delivery_date="2023-10-04T12:38:14.540Z",
+    )
+    return delivery
 
 
 @pytest.fixture
@@ -147,3 +177,14 @@ def order_2(user, product_2):
     order = Order.objects.create(user=user)
     OrderProduct.objects.create(order=order, product=product_2, quantity=3, price=100)
     return order
+
+
+@pytest.fixture
+def delivery_2(order_2, address, delivery_method):
+    delivery = Delivery.objects.create(
+        order=order_2,
+        address=address,
+        delivery_method=delivery_method,
+        delivery_date="2023-10-04T12:38:14.540Z",
+    )
+    return delivery
