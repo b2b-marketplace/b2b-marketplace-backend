@@ -1,3 +1,5 @@
+import types
+
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -34,6 +36,14 @@ class OrderProductInLine(admin.TabularInline):
     readonly_fields = ("price",)
 
 
+def copy_func(f, name=None):
+    fn = types.FunctionType(
+        f.__code__, f.__globals__, name or f.__name__, f.__defaults__, f.__closure__
+    )
+    fn.__dict__.update(f.__dict__)
+    return fn
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "status", "created_at", "updated_at")
@@ -41,3 +51,19 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ("user", "status")
     empty_value_display = "-empty-"
     inlines = (OrderProductInLine,)
+
+    def delete_queryset(self, request, queryset):
+        Status = Order.Status
+        for obj in queryset:
+            obj.status = Status.CANCELED
+            obj.save()
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        name = "delete_selected"
+        function, name, _short_description = actions[name]
+        my_custom_delete_selected = copy_func(function, name)
+        short_description = "Отменить выбранные заказы"
+        del actions[name]
+        actions[name] = (my_custom_delete_selected, name, short_description)
+        return actions
