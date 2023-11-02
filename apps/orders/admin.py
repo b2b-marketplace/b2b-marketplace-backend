@@ -63,7 +63,7 @@ class OrderAdmin(admin.ModelAdmin):
         name = "delete_selected"
         function, name, _short_description = actions[name]
         my_custom_delete_selected = copy_func(function, name)
-        short_description = "Отмена выбранных заказов"
+        short_description = "Отменить выбранные заказы"
         del actions[name]
         actions[name] = (my_custom_delete_selected, name, short_description)
         return actions
